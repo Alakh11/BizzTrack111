@@ -1,10 +1,23 @@
-
 import MainLayout from "@/components/layout/MainLayout";
 import InvoicesList from "@/components/invoices/InvoicesList";
+import CreateInvoiceDialog from "@/components/invoices/CreateInvoiceDialog";
 import { Button } from "@/components/ui/button";
 import { FileText, Plus } from "lucide-react";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const Invoices = () => {
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const { toast } = useToast();
+
+  const handleCreateInvoice = (data: any) => {
+    toast({
+      title: "Invoice Created",
+      description: `Invoice ${data.invoiceNumber} has been created successfully.`,
+    });
+    setIsCreateDialogOpen(false);
+  };
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -15,7 +28,7 @@ const Invoices = () => {
               Manage and track all your invoices
             </p>
           </div>
-          <Button className="btn-primary">
+          <Button className="btn-primary" onClick={() => setIsCreateDialogOpen(true)}>
             <Plus className="h-4 w-4 mr-1" /> Create Invoice
           </Button>
         </div>
@@ -40,6 +53,12 @@ const Invoices = () => {
         </div>
 
         <InvoicesList />
+
+        <CreateInvoiceDialog 
+          open={isCreateDialogOpen}
+          onOpenChange={setIsCreateDialogOpen}
+          onSubmit={handleCreateInvoice}
+        />
       </div>
     </MainLayout>
   );
