@@ -526,7 +526,11 @@ const TableBody = ({ children }: { children: React.ReactNode }) => (
   <tbody>{children}</tbody>
 );
 
-const Badge = ({ children, variant = "default", className = "" }: { 
+const Badge = ({ 
+  children, 
+  variant = "default", 
+  className = "" 
+}: { 
   children: React.ReactNode; 
   variant?: "default" | "outline"; 
   className?: string; 
