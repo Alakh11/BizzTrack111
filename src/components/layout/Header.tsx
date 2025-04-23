@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Bell, Plus, Search } from 'lucide-react';
+import { Bell, Plus, Search, FileText, Users, ClipboardList } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
