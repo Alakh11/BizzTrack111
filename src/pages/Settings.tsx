@@ -391,7 +391,7 @@ const BillingSettings = () => {
             <div className="bg-muted p-4 rounded-lg">
               <div className="flex justify-between items-center mb-2">
                 <h4 className="font-medium">Pro Plan Features:</h4>
-                <Badge>Current Plan</Badge>
+                <Badge variant="outline">Current Plan</Badge>
               </div>
               <ul className="space-y-1 text-sm">
                 <li>• Unlimited invoices</li>
