@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -52,21 +53,35 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
-				}
+				success: {
+					DEFAULT: '#27AE60',
+					light: '#E3F9ED',
+				},
+				warning: {
+					DEFAULT: '#F2994A', 
+					light: '#FDEFD8',
+				},
+				error: {
+					DEFAULT: '#E53935',
+					light: '#FDEBEB',
+				},
+				info: {
+					DEFAULT: '#2F80ED',
+					light: '#EBF2FD',
+				},
+				'refrens-blue': '#2C5CC5',
+				'refrens-light-blue': '#EBF0F9',
+				'refrens-bg': '#F8F9FB',
+				'refrens-gray': '#667085',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
 				md: 'calc(var(--radius) - 2px)',
 				sm: 'calc(var(--radius) - 4px)'
+			},
+			boxShadow: {
+				'refrens': '0px 1px 3px rgba(16, 24, 40, 0.1), 0px 1px 2px rgba(16, 24, 40, 0.06)',
+				'refrens-md': '0px 4px 8px -2px rgba(16, 24, 40, 0.1), 0px 2px 4px -2px rgba(16, 24, 40, 0.06)',
 			},
 			keyframes: {
 				'accordion-down': {
