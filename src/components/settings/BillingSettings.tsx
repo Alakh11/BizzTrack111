@@ -2,7 +2,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus } from "lucide-react";
-import { SettingsTable } from "./SettingsTable";
+import SettingsTable from "./SettingsTable";
 
 interface BadgeProps {
   children: React.ReactNode;

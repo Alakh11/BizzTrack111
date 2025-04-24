@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useInvoices } from "@/hooks/useInvoices";
 import { supabase } from "@/integrations/supabase/client";
@@ -23,10 +24,10 @@ interface Invoice {
   id: string;
   invoice_number: string;
   client: { name: string };
-  amount: number;
-  date: string;
+  invoice_date: string;
   due_date: string;
-  status: InvoiceStatus;
+  status: string;
+  total_amount: number;
 }
 
 const InvoicesList = () => {
@@ -135,20 +136,18 @@ const InvoicesList = () => {
                       </Link>
                     </TableCell>
                     <TableCell>{invoice.client.name}</TableCell>
-                    <TableCell>{invoice.date}</TableCell>
+                    <TableCell>{invoice.invoice_date}</TableCell>
                     <TableCell>{invoice.due_date}</TableCell>
                     <TableCell>
                       <Badge
                         variant="outline"
-                        className={`${getStatusColor(
-                          invoice.status.status
-                        )} border`}
+                        className={`${getStatusColor(invoice.status)} border`}
                       >
-                        {invoice.status.label}
+                        {invoice.status}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      {formatCurrency(invoice.amount)}
+                      {formatCurrency(invoice.total_amount)}
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
