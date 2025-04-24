@@ -14,7 +14,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/components/ui/use-toast";
 import * as z from "zod";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name is required" }),
@@ -23,17 +27,70 @@ const formSchema = z.object({
 });
 
 const ProfileSettings = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "+1 (555) 123-4567",
+      name: "",
+      email: user?.email || "",
+      phone: "",
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  useEffect(() => {
+    const loadProfile = async () => {
+      if (!user?.id) return;
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+      
+      if (data) {
+        form.reset({
+          name: data.username || "",
+          email: user.email || "",
+          phone: data.phone || "",
+        });
+      }
+    };
+
+    loadProfile();
+  }, [user?.id, form]);
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!user?.id) return;
+    
+    setLoading(true);
+    try {
+      const { error } = await supabase
+        .from('profiles')
+        .upsert({
+          id: user.id,
+          username: values.name,
+          phone: values.phone,
+          updated_at: new Date().toISOString(),
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been successfully updated.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
