@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/hooks/useAuth";
 import Dashboard from "./pages/Dashboard";
 import Invoices from "./pages/Invoices";
 import InvoiceGeneration from "./pages/InvoiceGeneration";
@@ -11,6 +12,7 @@ import Clients from "./pages/Clients";
 import Services from "./pages/Services";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
@@ -20,15 +22,19 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/invoices" element={<Invoices />} />
-          <Route path="/invoices/new" element={<InvoiceGeneration />} />
-          <Route path="/clients" element={<Clients />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<Auth mode="login" />} />
+            <Route path="/signup" element={<Auth mode="signup" />} />
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/invoices" element={<Invoices />} />
+            <Route path="/invoices/new" element={<InvoiceGeneration />} />
+            <Route path="/clients" element={<Clients />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

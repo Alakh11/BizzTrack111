@@ -1,6 +1,8 @@
 
 import { useState } from 'react';
-import { Bell, Plus, Search, FileText, Users, ClipboardList } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Bell, Plus, Search, FileText, Users, ClipboardList, LogOut } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,6 +14,7 @@ import { Input } from "@/components/ui/input";
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const { signOut } = useAuth();
   
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center bg-white border-b border-border px-4 lg:px-6">
@@ -85,6 +88,16 @@ const Header = () => {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+
+          {/* Logout Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={signOut}
+            className="text-red-500 hover:text-red-600 hover:bg-red-50"
+          >
+            <LogOut className="h-5 w-5" />
+          </Button>
         </div>
       </div>
     </header>
