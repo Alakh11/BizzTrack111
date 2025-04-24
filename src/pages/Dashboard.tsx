@@ -1,5 +1,4 @@
-
-import { FileText, Users, DollarSign, CreditCard } from "lucide-react";
+import { IndianRupee, Users, FileText, CreditCard } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
 import StatCard from "@/components/dashboard/StatCard";
 import RevenueChart from "@/components/dashboard/RevenueChart";
@@ -17,14 +16,13 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* Stats Overview */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <StatCard
             title="Total Revenue"
-            value="$45,231.89"
+            value="₹45,231.89"
             change="12.5%"
             isPositive={true}
-            icon={<DollarSign className="h-5 w-5" />}
+            icon={<IndianRupee className="h-5 w-5" />}
           />
           <StatCard
             title="Invoices"
@@ -49,10 +47,8 @@ const Dashboard = () => {
           />
         </div>
 
-        {/* Revenue Chart */}
         <RevenueChart />
 
-        {/* Recent Invoices and Top Clients */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <RecentInvoices />
           <TopClients />

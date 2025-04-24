@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useInvoices } from "@/hooks/useInvoices";
@@ -68,7 +67,7 @@ const InvoicesList = () => {
   );
 
   const formatCurrency = (value: number) => {
-    return `$${value.toLocaleString()}`;
+    return `₹${value.toLocaleString('en-IN')}`;
   };
 
   const getStatusColor = (status: string) => {

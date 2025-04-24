@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -149,18 +148,18 @@ const Sidebar = () => {
       {/* Sidebar */}
       <div
         className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 bg-[#9b87f5] border-r border-white/10 transform transition-transform duration-300 ease-in-out lg:translate-x-0",
+          "fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-border transform transition-transform duration-300 ease-in-out lg:translate-x-0",
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-4 border-b border-white/20">
+          <div className="p-4 border-b border-border">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-md bg-white flex items-center justify-center">
-                <span className="text-[#9b87f5] font-bold">B</span>
+              <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center">
+                <span className="text-white font-bold">B</span>
               </div>
-              <span className="text-white font-bold text-xl">BizzTrack</span>
+              <span className="text-primary font-bold text-xl">BizzTrack</span>
             </Link>
           </div>
 
@@ -174,7 +173,7 @@ const Sidebar = () => {
           </nav>
 
           {/* User Profile & Logout */}
-          <div className="border-t border-white/20 p-4">
+          <div className="border-t border-border p-4">
             <div className="flex items-center space-x-3 mb-4">
               <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center">
                 <span className="font-medium text-white">
@@ -198,7 +197,7 @@ const Sidebar = () => {
         </div>
       </div>
       
-      {/* Backdrop for mobile view */}
+      {/* Backdrop */}
       {isMobileMenuOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
