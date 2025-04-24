@@ -32,7 +32,7 @@ const RevenueChart = () => {
   );
 
   const formatCurrency = (value: number) => {
-    return `$${value.toLocaleString()}`;
+    return `₹${value.toLocaleString('en-IN')}`;
   };
 
   return (

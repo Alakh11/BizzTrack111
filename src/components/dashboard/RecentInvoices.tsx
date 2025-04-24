@@ -1,4 +1,3 @@
-
 import { useMemo } from "react";
 import {
   Table,
@@ -74,7 +73,7 @@ const RecentInvoices = () => {
   );
 
   const formatCurrency = (value: number) => {
-    return `$${value.toLocaleString()}`;
+    return `₹${value.toLocaleString('en-IN')}`;
   };
 
   const getStatusColor = (status: string) => {

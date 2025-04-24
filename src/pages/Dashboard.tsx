@@ -1,3 +1,4 @@
+
 import { IndianRupee, Users, FileText, CreditCard } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
 import StatCard from "@/components/dashboard/StatCard";
@@ -40,7 +41,7 @@ const Dashboard = () => {
           />
           <StatCard
             title="Pending"
-            value="$12,450.00"
+            value="₹12,450.00"
             change="1.8%"
             isPositive={false}
             icon={<CreditCard className="h-5 w-5" />}
