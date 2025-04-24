@@ -1,7 +1,8 @@
-
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import SettingsTable from "./SettingsTable";
 
 interface BadgeProps {
@@ -97,7 +98,28 @@ const BillingSettings = () => {
           <div className="border-t pt-4">
             <h3 className="font-medium mb-3">Billing History</h3>
             <div className="border rounded-lg overflow-hidden">
-              <SettingsTable />
+              <SettingsTable>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Date</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Amount</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell>May 15, 2025</TableCell>
+                      <TableCell>Pro Plan Subscription</TableCell>
+                      <TableCell>$29.00</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">Paid</Badge>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </SettingsTable>
             </div>
           </div>
         </div>
