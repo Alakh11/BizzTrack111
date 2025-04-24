@@ -8,13 +8,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Plus } from "lucide-react";
+import type { Profile } from "@/types/profile";
 
 const BusinessSettings = () => {
   const { user } = useAuth();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const [businessData, setBusinessData] = useState({
+  const [businessData, setBusinessData] = useState<Partial<Profile>>({
     business_name: "",
     business_address: "",
     city: "",

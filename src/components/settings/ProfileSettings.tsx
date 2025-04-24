@@ -19,6 +19,7 @@ import { useToast } from "@/components/ui/use-toast";
 import * as z from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useState } from "react";
+import type { Profile } from "@/types/profile";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Name is required" }),
