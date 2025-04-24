@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import {
   Home,
@@ -11,11 +11,23 @@ import {
   LogOut,
   Menu,
   X,
+  Plus,
+  Receipt,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Sidebar = () => {
   const location = useLocation();
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
   const navItems = [
@@ -27,7 +39,22 @@ const Sidebar = () => {
     {
       name: "Invoices",
       icon: <FileText className="h-5 w-5" />,
-      href: "/invoices",
+      isDropdown: true,
+      items: [
+        {
+          name: "All Invoices",
+          href: "/invoices",
+        },
+        {
+          name: "Create Invoice",
+          href: "/invoices/new",
+        },
+      ],
+    },
+    {
+      name: "Expenses",
+      icon: <Receipt className="h-5 w-5" />,
+      href: "/expenses",
     },
     {
       name: "Clients",
@@ -48,6 +75,57 @@ const Sidebar = () => {
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login');
+  };
+
+  const renderNavItem = (item: any) => {
+    if (item.isDropdown) {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className={cn(
+              "nav-link w-full",
+              location.pathname.startsWith(item.items[0].href) && "nav-link-active"
+            )}>
+              {item.icon}
+              <span>{item.name}</span>
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start" className="w-48">
+            {item.items.map((subItem: any) => (
+              <DropdownMenuItem key={subItem.href} asChild>
+                <Link 
+                  to={subItem.href}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="w-full"
+                >
+                  {subItem.name === "Create Invoice" && <Plus className="mr-2 h-4 w-4" />}
+                  {subItem.name}
+                </Link>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    }
+
+    return (
+      <Link
+        to={item.href}
+        className={cn(
+          "nav-link",
+          location.pathname === item.href && "nav-link-active"
+        )}
+        onClick={() => setIsMobileMenuOpen(false)}
+      >
+        {item.icon}
+        <span>{item.name}</span>
+      </Link>
+    );
   };
 
   return (
@@ -89,35 +167,29 @@ const Sidebar = () => {
           {/* Navigation */}
           <nav className="flex-1 overflow-y-auto p-4 space-y-1">
             {navItems.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={cn(
-                  "nav-link",
-                  location.pathname === item.href && "nav-link-active"
-                )}
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                {item.icon}
-                <span>{item.name}</span>
-              </Link>
+              <div key={item.name} className="group/menu-item relative">
+                {renderNavItem(item)}
+              </div>
             ))}
           </nav>
 
           {/* User Profile & Logout */}
           <div className="border-t border-border p-4">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="h-10 w-10 rounded-full bg-refrens-light-blue flex items-center justify-center">
-                <span className="font-medium text-primary">JD</span>
+              <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="font-medium text-primary">
+                  {user?.email?.[0].toUpperCase() || 'U'}
+                </span>
               </div>
               <div>
-                <p className="font-medium text-sm">John Doe</p>
-                <p className="text-xs text-muted-foreground">john@example.com</p>
+                <p className="font-medium text-sm">{user?.email}</p>
+                <p className="text-xs text-muted-foreground">Logged in</p>
               </div>
             </div>
             <Button
               variant="outline"
               className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
+              onClick={handleSignOut}
             >
               <LogOut className="h-4 w-4 mr-2" />
               Logout
