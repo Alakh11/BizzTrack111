@@ -173,21 +173,21 @@ const Sidebar = () => {
           </nav>
 
           {/* User Profile & Logout */}
-          <div className="border-t border-border p-4">
+          <div className="border-t border-border p-4 bg-gray-50">
             <div className="flex items-center space-x-3 mb-4">
-              <div className="h-10 w-10 rounded-full bg-white/10 flex items-center justify-center">
-                <span className="font-medium text-white">
+              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="font-medium text-primary text-xl">
                   {user?.email?.[0].toUpperCase() || 'U'}
                 </span>
               </div>
               <div>
-                <p className="font-medium text-sm text-white">{user?.email}</p>
-                <p className="text-xs text-white/70">Logged in</p>
+                <p className="font-semibold text-primary text-sm">{user?.email}</p>
+                <p className="text-xs text-muted-foreground">Logged in</p>
               </div>
             </div>
             <Button
               variant="outline"
-              className="w-full justify-start text-white hover:text-red-500 hover:bg-white"
+              className="w-full justify-start text-primary hover:bg-primary/5"
               onClick={handleSignOut}
             >
               <LogOut className="h-4 w-4 mr-2" />
