@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Bell, Plus, Search, FileText, Users, ClipboardList, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import {
@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const { signOut } = useAuth();
+  const navigate = useNavigate();
   
   return (
     <header className="sticky top-0 z-30 flex h-16 items-center bg-white border-b border-border px-4 lg:px-6">
@@ -74,15 +75,15 @@ const Header = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/invoices/new')}>
                 <FileText className="h-4 w-4 mr-2" />
                 New Invoice
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/clients')}>
                 <Users className="h-4 w-4 mr-2" />
                 New Client
               </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate('/services')}>
                 <ClipboardList className="h-4 w-4 mr-2" />
                 New Service
               </DropdownMenuItem>

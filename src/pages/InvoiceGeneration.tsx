@@ -1,7 +1,7 @@
-
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,9 +13,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
-import MainLayout from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useClients } from "@/hooks/useClients";
+import { useServices } from "@/hooks/useServices";
+import { useInvoices } from "@/hooks/useInvoices";
+import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   // Invoice Details
@@ -47,7 +50,12 @@ const formSchema = z.object({
 });
 
 const InvoiceGeneration = () => {
-  const { toast } = useToast();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { createInvoice } = useInvoices();
+  const { clients } = useClients();
+  const { services } = useServices();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -71,16 +79,26 @@ const InvoiceGeneration = () => {
     },
   });
 
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    // Calculate total amount
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
     const total = parseFloat(data.quantity) * parseFloat(data.unitPrice);
     
-    toast({
-      title: "Invoice Created",
-      description: `Invoice ${data.invoiceNumber} has been created successfully.`,
-    });
-    
-    console.log("Invoice Data:", { ...data, total });
+    try {
+      // Create invoice
+      await createInvoice.mutateAsync({
+        user_id: user?.id,
+        invoice_number: data.invoiceNumber,
+        invoice_date: data.invoiceDate,
+        due_date: data.dueDate,
+        total_amount: total,
+        notes: data.notes,
+        terms: data.terms,
+      });
+      
+      // Navigate to invoices list
+      navigate('/invoices');
+    } catch (error) {
+      console.error('Error creating invoice:', error);
+    }
   };
 
   return (

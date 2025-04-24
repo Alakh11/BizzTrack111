@@ -1,14 +1,8 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { useInvoices } from "@/hooks/useInvoices";
+import { supabase } from "@/integrations/supabase/client";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,137 +21,44 @@ interface InvoiceStatus {
 
 interface Invoice {
   id: string;
-  invoiceNumber: string;
-  client: string;
+  invoice_number: string;
+  client: { name: string };
   amount: number;
   date: string;
-  dueDate: string;
+  due_date: string;
   status: InvoiceStatus;
 }
 
 const InvoicesList = () => {
+  const { invoices, isLoading } = useInvoices();
+  
+  useEffect(() => {
+    const channel = supabase
+      .channel('public:invoices')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'invoices' },
+        (payload) => {
+          console.log('Change received!', payload);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const invoices: Invoice[] = [
-    {
-      id: "1",
-      invoiceNumber: "INV-2024-001",
-      client: "Acme Inc",
-      amount: 3200,
-      date: "Apr 15, 2024",
-      dueDate: "Apr 30, 2024",
-      status: { status: "paid", label: "Paid" },
-    },
-    {
-      id: "2",
-      invoiceNumber: "INV-2024-002",
-      client: "TechGiant Co",
-      amount: 1800,
-      date: "Apr 12, 2024",
-      dueDate: "Apr 27, 2024",
-      status: { status: "pending", label: "Pending" },
-    },
-    {
-      id: "3",
-      invoiceNumber: "INV-2024-003",
-      client: "Globe Media",
-      amount: 2100,
-      date: "Apr 10, 2024",
-      dueDate: "Apr 25, 2024",
-      status: { status: "paid", label: "Paid" },
-    },
-    {
-      id: "4",
-      invoiceNumber: "INV-2024-004",
-      client: "Bright Solutions",
-      amount: 950,
-      date: "Apr 05, 2024",
-      dueDate: "Apr 20, 2024",
-      status: { status: "overdue", label: "Overdue" },
-    },
-    {
-      id: "5",
-      invoiceNumber: "INV-2024-005",
-      client: "Nova Systems",
-      amount: 2700,
-      date: "Apr 01, 2024",
-      dueDate: "Apr 16, 2024",
-      status: { status: "paid", label: "Paid" },
-    },
-    {
-      id: "6",
-      invoiceNumber: "INV-2024-006",
-      client: "Quantum Research",
-      amount: 4500,
-      date: "Mar 28, 2024",
-      dueDate: "Apr 12, 2024",
-      status: { status: "paid", label: "Paid" },
-    },
-    {
-      id: "7",
-      invoiceNumber: "INV-2024-007",
-      client: "Sunrise Media",
-      amount: 1350,
-      date: "Mar 25, 2024",
-      dueDate: "Apr 09, 2024",
-      status: { status: "pending", label: "Pending" },
-    },
-    {
-      id: "8",
-      invoiceNumber: "INV-2024-008",
-      client: "Blue Ocean Inc",
-      amount: 2900,
-      date: "Mar 22, 2024",
-      dueDate: "Apr 06, 2024",
-      status: { status: "overdue", label: "Overdue" },
-    },
-    {
-      id: "9",
-      invoiceNumber: "INV-2024-009",
-      client: "Green Planet Solutions",
-      amount: 1700,
-      date: "Mar 18, 2024",
-      dueDate: "Apr 02, 2024",
-      status: { status: "paid", label: "Paid" },
-    },
-    {
-      id: "10",
-      invoiceNumber: "INV-2024-010",
-      client: "Silver Technologies",
-      amount: 3800,
-      date: "Mar 15, 2024",
-      dueDate: "Mar 30, 2024",
-      status: { status: "paid", label: "Paid" },
-    },
-    {
-      id: "11",
-      invoiceNumber: "INV-2024-011",
-      client: "Golden Star Media",
-      amount: 2250,
-      date: "Mar 12, 2024",
-      dueDate: "Mar 27, 2024",
-      status: { status: "overdue", label: "Overdue" },
-    },
-    {
-      id: "12",
-      invoiceNumber: "INV-2024-012",
-      client: "Red Brick Consulting",
-      amount: 5600,
-      date: "Mar 08, 2024",
-      dueDate: "Mar 23, 2024",
-      status: { status: "paid", label: "Paid" },
-    },
-  ];
-
-  const filteredInvoices = invoices.filter(
+  const filteredInvoices = invoices?.filter(
     (invoice) =>
-      invoice.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      invoice.client.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      invoice.invoice_number.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      invoice.client?.name.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedInvoices = filteredInvoices.slice(
@@ -230,12 +131,12 @@ const InvoicesList = () => {
                         to={`/invoices/${invoice.id}`}
                         className="font-medium text-primary hover:underline"
                       >
-                        {invoice.invoiceNumber}
+                        {invoice.invoice_number}
                       </Link>
                     </TableCell>
-                    <TableCell>{invoice.client}</TableCell>
+                    <TableCell>{invoice.client.name}</TableCell>
                     <TableCell>{invoice.date}</TableCell>
-                    <TableCell>{invoice.dueDate}</TableCell>
+                    <TableCell>{invoice.due_date}</TableCell>
                     <TableCell>
                       <Badge
                         variant="outline"
