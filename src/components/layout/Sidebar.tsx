@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -12,6 +13,7 @@ import {
   X,
   Plus,
   Receipt,
+  ChartPie,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -54,6 +56,11 @@ const Sidebar = () => {
       name: "Expenses",
       icon: <Receipt className="h-5 w-5" />,
       href: "/expenses",
+    },
+    {
+      name: "Reports",
+      icon: <ChartPie className="h-5 w-5" />,
+      href: "/reports",
     },
     {
       name: "Clients",
