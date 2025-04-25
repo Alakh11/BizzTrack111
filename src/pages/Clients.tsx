@@ -81,7 +81,7 @@ const Clients = () => {
             <p className="text-sm text-muted-foreground">Total Revenue</p>
             <p className="text-2xl font-bold">
               {formatCurrency(
-                clients?.reduce((total, client) => total + (client.total_spent || 0), 0) || 0
+                clients?.reduce((total, client) => total + (0), 0) || 0
               )}
             </p>
           </div>
