@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -42,7 +41,7 @@ const BillingSettings = () => {
                 </p>
               </div>
               <div className="text-right">
-                <p className="text-lg font-bold">₹2,900/month</p>
+                <p className="text-lg font-bold">$29/month</p>
                 <p className="text-sm text-muted-foreground">
                   Next billing date: May 23, 2025
                 </p>
@@ -113,7 +112,7 @@ const BillingSettings = () => {
                     <TableRow>
                       <TableCell>May 15, 2025</TableCell>
                       <TableCell>Pro Plan Subscription</TableCell>
-                      <TableCell>₹2,900.00</TableCell>
+                      <TableCell>$29.00</TableCell>
                       <TableCell>
                         <Badge variant="outline">Paid</Badge>
                       </TableCell>

@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from "react";
+import { useMemo } from "react";
 import {
   Table,
   TableBody,
@@ -11,69 +10,70 @@ import {
 import { Badge } from "@/components/ui/badge";
 import ChartCard from "./ChartCard";
 import { Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
+
+interface InvoiceStatus {
+  status: "paid" | "pending" | "overdue";
+  label: string;
+}
 
 interface Invoice {
   id: string;
-  invoice_number: string;
-  client: { name: string };
-  total_amount: number;
-  invoice_date: string;
-  status: string;
+  invoiceNumber: string;
+  client: string;
+  amount: number;
+  date: string;
+  status: InvoiceStatus;
 }
 
 const RecentInvoices = () => {
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchRecentInvoices = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('invoices')
-        .select('*, client:client_id(name)')
-        .order('invoice_date', { ascending: false })
-        .limit(5);
-
-      if (error) throw error;
-      
-      setInvoices(data || []);
-      setIsLoading(false);
-    } catch (error) {
-      console.error('Error fetching recent invoices:', error);
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchRecentInvoices();
-
-    // Set up real-time listener
-    const channel = supabase
-      .channel('recent-invoices-changes')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'invoices' 
-      }, () => {
-        fetchRecentInvoices();
-      })
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+  const invoices = useMemo(
+    () => [
+      {
+        id: "1",
+        invoiceNumber: "INV-2024-001",
+        client: "Acme Inc",
+        amount: 3200,
+        date: "Apr 15, 2024",
+        status: { status: "paid", label: "Paid" },
+      },
+      {
+        id: "2",
+        invoiceNumber: "INV-2024-002",
+        client: "TechGiant Co",
+        amount: 1800,
+        date: "Apr 12, 2024",
+        status: { status: "pending", label: "Pending" },
+      },
+      {
+        id: "3",
+        invoiceNumber: "INV-2024-003",
+        client: "Globe Media",
+        amount: 2100,
+        date: "Apr 10, 2024",
+        status: { status: "paid", label: "Paid" },
+      },
+      {
+        id: "4",
+        invoiceNumber: "INV-2024-004",
+        client: "Bright Solutions",
+        amount: 950,
+        date: "Apr 05, 2024",
+        status: { status: "overdue", label: "Overdue" },
+      },
+      {
+        id: "5",
+        invoiceNumber: "INV-2024-005",
+        client: "Nova Systems",
+        amount: 2700,
+        date: "Apr 01, 2024",
+        status: { status: "paid", label: "Paid" },
+      },
+    ] as Invoice[],
+    []
+  );
 
   const formatCurrency = (value: number) => {
     return `₹${value.toLocaleString('en-IN')}`;
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-IN', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
   };
 
   const getStatusColor = (status: string) => {
@@ -92,54 +92,46 @@ const RecentInvoices = () => {
   return (
     <ChartCard title="Recent Invoices">
       <div className="overflow-x-auto">
-        {isLoading ? (
-          <div className="py-6 text-center">
-            <p className="text-muted-foreground">Loading invoices...</p>
-          </div>
-        ) : invoices.length === 0 ? (
-          <div className="py-6 text-center">
-            <p className="text-muted-foreground">No invoices found</p>
-          </div>
-        ) : (
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Invoice</TableHead>
-                <TableHead>Client</TableHead>
-                <TableHead>Date</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Invoice</TableHead>
+              <TableHead>Client</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Amount</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {invoices.map((invoice) => (
+              <TableRow key={invoice.id}>
+                <TableCell>
+                  <Link
+                    to={`/invoices/${invoice.id}`}
+                    className="font-medium text-primary hover:underline"
+                  >
+                    {invoice.invoiceNumber}
+                  </Link>
+                </TableCell>
+                <TableCell>{invoice.client}</TableCell>
+                <TableCell>{invoice.date}</TableCell>
+                <TableCell>
+                  <Badge
+                    variant="outline"
+                    className={`${getStatusColor(
+                      invoice.status.status
+                    )} border`}
+                  >
+                    {invoice.status.label}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-right">
+                  {formatCurrency(invoice.amount)}
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {invoices.map((invoice) => (
-                <TableRow key={invoice.id}>
-                  <TableCell>
-                    <Link
-                      to={`/invoices/${invoice.id}`}
-                      className="font-medium text-primary hover:underline"
-                    >
-                      {invoice.invoice_number}
-                    </Link>
-                  </TableCell>
-                  <TableCell>{invoice.client?.name || 'Unknown Client'}</TableCell>
-                  <TableCell>{formatDate(invoice.invoice_date)}</TableCell>
-                  <TableCell>
-                    <Badge
-                      variant="outline"
-                      className={`${getStatusColor(invoice.status)} border`}
-                    >
-                      {invoice.status}
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {formatCurrency(invoice.total_amount)}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
+            ))}
+          </TableBody>
+        </Table>
       </div>
       <div className="mt-4 text-center">
         <Link

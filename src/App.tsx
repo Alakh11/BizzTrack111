@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,16 +7,12 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Dashboard from "./pages/Dashboard";
 import Invoices from "./pages/Invoices";
 import InvoiceGeneration from "./pages/InvoiceGeneration";
-import InvoiceDetails from "./pages/InvoiceDetails";
 import Clients from "./pages/Clients";
 import Services from "./pages/Services";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Expenses from "./pages/Expenses";
-import ReportsFinancial from "./pages/ReportsFinancial";
-import ReportsTax from "./pages/ReportsTax";
-import ReportsClients from "./pages/ReportsClients";
 
 const queryClient = new QueryClient();
 
@@ -34,14 +29,10 @@ const App = () => (
             <Route path="/" element={<Dashboard />} />
             <Route path="/invoices" element={<Invoices />} />
             <Route path="/invoices/new" element={<InvoiceGeneration />} />
-            <Route path="/invoices/:id" element={<InvoiceDetails />} />
             <Route path="/expenses" element={<Expenses />} />
             <Route path="/clients" element={<Clients />} />
             <Route path="/services" element={<Services />} />
             <Route path="/settings" element={<Settings />} />
-            <Route path="/reports/financial" element={<ReportsFinancial />} />
-            <Route path="/reports/tax" element={<ReportsTax />} />
-            <Route path="/reports/clients" element={<ReportsClients />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
