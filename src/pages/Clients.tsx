@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import React, { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import {
   Table,
@@ -9,12 +9,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+import { 
+  Card, 
+  CardContent, 
+  CardDescription, 
+  CardHeader, 
+  CardTitle 
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,143 +26,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-interface Client {
-  id: string;
-  name: string;
-  company: string;
-  email: string;
-  phone: string;
-  projects: number;
-  invoices: number;
-  totalSpent: number;
-  initials: string;
-}
+import { useClients } from "@/hooks/useClients";
 
 const Clients = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  const clients: Client[] = [
-    {
-      id: "1",
-      name: "John Smith",
-      company: "Acme Inc",
-      email: "john.smith@acme.com",
-      phone: "+1 (555) 123-4567",
-      projects: 8,
-      invoices: 12,
-      totalSpent: 12500,
-      initials: "JS",
-    },
-    {
-      id: "2",
-      name: "Sarah Johnson",
-      company: "TechGiant Co",
-      email: "sarah.j@techgiant.com",
-      phone: "+1 (555) 234-5678",
-      projects: 5,
-      invoices: 7,
-      totalSpent: 10800,
-      initials: "SJ",
-    },
-    {
-      id: "3",
-      name: "Michael Brown",
-      company: "Globe Media",
-      email: "michael.b@globemedia.com",
-      phone: "+1 (555) 345-6789",
-      projects: 4,
-      invoices: 5,
-      totalSpent: 9500,
-      initials: "MB",
-    },
-    {
-      id: "4",
-      name: "Emily Davis",
-      company: "Bright Solutions",
-      email: "emily.d@brightsolutions.com",
-      phone: "+1 (555) 456-7890",
-      projects: 3,
-      invoices: 4,
-      totalSpent: 7200,
-      initials: "ED",
-    },
-    {
-      id: "5",
-      name: "Robert Wilson",
-      company: "Nova Systems",
-      email: "robert.w@novasystems.com",
-      phone: "+1 (555) 567-8901",
-      projects: 2,
-      invoices: 3,
-      totalSpent: 5400,
-      initials: "RW",
-    },
-    {
-      id: "6",
-      name: "Lisa Thompson",
-      company: "Quantum Research",
-      email: "lisa.t@quantumresearch.com",
-      phone: "+1 (555) 678-9012",
-      projects: 6,
-      invoices: 9,
-      totalSpent: 11200,
-      initials: "LT",
-    },
-    {
-      id: "7",
-      name: "David Clark",
-      company: "Sunrise Media",
-      email: "david.c@sunrisemedia.com",
-      phone: "+1 (555) 789-0123",
-      projects: 3,
-      invoices: 4,
-      totalSpent: 6800,
-      initials: "DC",
-    },
-    {
-      id: "8",
-      name: "Jennifer Lee",
-      company: "Blue Ocean Inc",
-      email: "jennifer.l@blueocean.com",
-      phone: "+1 (555) 890-1234",
-      projects: 5,
-      invoices: 6,
-      totalSpent: 8900,
-      initials: "JL",
-    },
-    {
-      id: "9",
-      name: "William Green",
-      company: "Green Planet Solutions",
-      email: "william.g@greenplanet.com",
-      phone: "+1 (555) 901-2345",
-      projects: 2,
-      invoices: 3,
-      totalSpent: 4200,
-      initials: "WG",
-    },
-    {
-      id: "10",
-      name: "Amanda White",
-      company: "Silver Technologies",
-      email: "amanda.w@silvertech.com",
-      phone: "+1 (555) 012-3456",
-      projects: 4,
-      invoices: 7,
-      totalSpent: 9800,
-      initials: "AW",
-    },
-  ];
+  const { clients, isLoading } = useClients();
 
-  const filteredClients = clients.filter(
+  const filteredClients = clients?.filter(
     (client) =>
       client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+      client.email?.toLowerCase().includes(searchQuery.toLowerCase())
+  ) || [];
 
   // Pagination logic
   const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
@@ -173,7 +50,7 @@ const Clients = () => {
   );
 
   const formatCurrency = (value: number) => {
-    return `$${value.toLocaleString()}`;
+    return `₹${value.toLocaleString('en-IN')}`;
   };
 
   return (
@@ -194,7 +71,7 @@ const Clients = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="dashboard-card">
             <p className="text-sm text-muted-foreground">Total Clients</p>
-            <p className="text-2xl font-bold">32</p>
+            <p className="text-2xl font-bold">{clients?.length || 0}</p>
           </div>
           <div className="dashboard-card">
             <p className="text-sm text-muted-foreground">Active Projects</p>
@@ -202,7 +79,11 @@ const Clients = () => {
           </div>
           <div className="dashboard-card">
             <p className="text-sm text-muted-foreground">Total Revenue</p>
-            <p className="text-2xl font-bold">$45,231.89</p>
+            <p className="text-2xl font-bold">
+              {formatCurrency(
+                clients?.reduce((total, client) => total + (client.total_spent || 0), 0) || 0
+              )}
+            </p>
           </div>
         </div>
 
@@ -242,19 +123,29 @@ const Clients = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {paginatedClients.length > 0 ? (
+                  {isLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={6} className="text-center py-8">
+                        Loading clients...
+                      </TableCell>
+                    </TableRow>
+                  ) : paginatedClients.length > 0 ? (
                     paginatedClients.map((client) => (
                       <TableRow key={client.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
                             <Avatar className="h-8 w-8 bg-refrens-light-blue text-primary">
-                              <AvatarFallback>{client.initials}</AvatarFallback>
+                              <AvatarFallback>
+                                {client.name
+                                  .split(' ')
+                                  .map(name => name[0])
+                                  .join('')
+                                  .toUpperCase()
+                                  .substring(0, 2)}
+                              </AvatarFallback>
                             </Avatar>
                             <div>
                               <p className="font-medium text-sm">{client.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {client.company}
-                              </p>
                             </div>
                           </div>
                         </TableCell>
@@ -264,10 +155,10 @@ const Clients = () => {
                             {client.phone}
                           </p>
                         </TableCell>
-                        <TableCell>{client.projects}</TableCell>
-                        <TableCell>{client.invoices}</TableCell>
+                        <TableCell>0</TableCell>
+                        <TableCell>0</TableCell>
                         <TableCell className="text-right">
-                          {formatCurrency(client.totalSpent)}
+                          {formatCurrency(0)}
                         </TableCell>
                         <TableCell>
                           <DropdownMenu>
