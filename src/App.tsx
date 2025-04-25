@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +14,9 @@ import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Expenses from "./pages/Expenses";
+import ReportsFinancial from "./pages/ReportsFinancial";
+import ReportsTax from "./pages/ReportsTax";
+import ReportsClients from "./pages/ReportsClients";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +37,9 @@ const App = () => (
             <Route path="/clients" element={<Clients />} />
             <Route path="/services" element={<Services />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/reports/financial" element={<ReportsFinancial />} />
+            <Route path="/reports/tax" element={<ReportsTax />} />
+            <Route path="/reports/clients" element={<ReportsClients />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

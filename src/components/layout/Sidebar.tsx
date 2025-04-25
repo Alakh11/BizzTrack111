@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -12,6 +13,7 @@ import {
   X,
   Plus,
   Receipt,
+  BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -64,6 +66,25 @@ const Sidebar = () => {
       name: "Services",
       icon: <ClipboardList className="h-5 w-5" />,
       href: "/services",
+    },
+    {
+      name: "Reports",
+      icon: <BarChart3 className="h-5 w-5" />,
+      isDropdown: true,
+      items: [
+        {
+          name: "Financial Reports",
+          href: "/reports/financial",
+        },
+        {
+          name: "Tax Reports",
+          href: "/reports/tax",
+        },
+        {
+          name: "Client Reports",
+          href: "/reports/clients",
+        },
+      ],
     },
     {
       name: "Settings",
