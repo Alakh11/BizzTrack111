@@ -8,6 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import Dashboard from "./pages/Dashboard";
 import Invoices from "./pages/Invoices";
 import InvoiceGeneration from "./pages/InvoiceGeneration";
+import InvoiceDetails from "./pages/InvoiceDetails";
 import Clients from "./pages/Clients";
 import Services from "./pages/Services";
 import Settings from "./pages/Settings";
@@ -33,6 +34,7 @@ const App = () => (
             <Route path="/" element={<Dashboard />} />
             <Route path="/invoices" element={<Invoices />} />
             <Route path="/invoices/new" element={<InvoiceGeneration />} />
+            <Route path="/invoices/:id" element={<InvoiceDetails />} />
             <Route path="/expenses" element={<Expenses />} />
             <Route path="/clients" element={<Clients />} />
             <Route path="/services" element={<Services />} />
