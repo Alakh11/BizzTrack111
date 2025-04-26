@@ -1,76 +1,66 @@
-
-import React from "react";
-import { Separator } from "@/components/ui/separator";
+import { Copyright, Phone, Mail, MapPin } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
+  const currentYear = new Date().getFullYear();
+  
   return (
-    <footer className="bg-background py-6 border-t mt-auto">
-      <div className="container px-4 mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+    <footer className="bg-primary/5 border-t mt-8">
+      <div className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-lg font-semibold mb-4">Alakh Corporation</h3>
-            <p className="text-muted-foreground">
-              Your trusted invoicing partner for small businesses and freelancers.
+            <h3 className="font-bold text-lg mb-4">Alakh Corporation</h3>
+            <p className="text-muted-foreground mb-4">
+              Simplify your business finances with our comprehensive invoicing and expense tracking solution.
             </p>
+            <div className="flex items-center space-x-1 text-sm">
+              <Copyright className="h-4 w-4" />
+              <span>{currentYear} Alakh Corporation. All rights reserved.</span>
+            </div>
           </div>
+          
           <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-            <ul className="space-y-2 text-muted-foreground">
-              <li className="flex items-center">
-                <span className="font-medium mr-2">Address:</span> 
-                Mirzapur, UP, India - 231312
-              </li>
-              <li className="flex items-center">
-                <span className="font-medium mr-2">Phone:</span> 
-                <a href="tel:+919580813770" className="hover:underline">+91 9580813770</a>
-              </li>
-              <li className="flex items-center">
-                <span className="font-medium mr-2">Email:</span> 
-                <a href="mailto:alakh1304@gmail.com" className="hover:underline">alakh1304@gmail.com</a>
-              </li>
-            </ul>
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="font-bold mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li>
-                <a href="/" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Dashboard
-                </a>
-              </li>
-              <li>
-                <a href="/invoices" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Invoices
-                </a>
-              </li>
-              <li>
-                <a href="/clients" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Clients
-                </a>
-              </li>
-              <li>
-                <a href="/reports" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Reports
-                </a>
-              </li>
+              <li><Link to="/" className="hover:text-primary">Dashboard</Link></li>
+              <li><Link to="/invoices" className="hover:text-primary">Invoices</Link></li>
+              <li><Link to="/expenses" className="hover:text-primary">Expenses</Link></li>
+              <li><Link to="/clients" className="hover:text-primary">Clients</Link></li>
             </ul>
           </div>
-        </div>
-        <Separator className="my-6" />
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} Alakh Corporation. All rights reserved.</p>
-          <div className="flex space-x-4 mt-4 md:mt-0">
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
-              Privacy Policy
-            </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
-              Terms of Service
-            </a>
+          
+          <div>
+            <h3 className="font-bold mb-4">Resources</h3>
+            <ul className="space-y-2">
+              <li><Link to="/reports" className="hover:text-primary">Reports</Link></li>
+              <li><Link to="#" className="hover:text-primary">Help Center</Link></li>
+              <li><Link to="#" className="hover:text-primary">FAQ</Link></li>
+              <li><Link to="#" className="hover:text-primary">Blog</Link></li>
+            </ul>
+          </div>
+          
+          <div>
+            <h3 className="font-bold mb-4">Contact Us</h3>
+            <ul className="space-y-3">
+              <li className="flex items-center">
+                <a href="tel:+919580813770" className="flex items-center hover:text-primary">
+                  <Phone className="h-4 w-4 mr-2" />
+                  <span>+91 9580813770</span>
+                </a>
+              </li>
+              <li className="flex items-center">
+                <a href="mailto:alakh1304@gmail.com" className="flex items-center hover:text-primary">
+                  <Mail className="h-4 w-4 mr-2" />
+                  <span>alakh1304@gmail.com</span>
+                </a>
+              </li>
+              <li className="flex items-center">
+                <MapPin className="h-4 w-4 mr-2" />
+                <span>Mirzapur, UP, India - 231312</span>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
