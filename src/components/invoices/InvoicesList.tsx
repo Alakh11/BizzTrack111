@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -130,7 +131,7 @@ const InvoicesList = () => {
                   <Badge 
                     variant={
                       invoice.status === "paid"
-                        ? "success"
+                        ? "secondary"
                         : invoice.status === "overdue"
                         ? "destructive"
                         : "outline"

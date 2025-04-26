@@ -86,6 +86,9 @@ const InvoiceGeneration = () => {
   const [selectedPaperSize, setSelectedPaperSize] = useState("a4");
   const [customInvoiceTitle, setCustomInvoiceTitle] = useState("INVOICE");
   const [customSubtitle, setCustomSubtitle] = useState("");
+  const [purchaseOrderNumber, setPurchaseOrderNumber] = useState("");
+  const [referenceNumber, setReferenceNumber] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState("inr");
   
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -220,13 +223,13 @@ const InvoiceGeneration = () => {
       };
       
       // Create invoice in database
-      const { data: newInvoice } = await createInvoice.mutateAsync(invoiceData);
+      const result = await createInvoice.mutateAsync(invoiceData);
       
       // If invoice was created successfully, add invoice items
-      if (newInvoice && newInvoice.id) {
+      if (result && result.id) {
         // Prepare invoice items
         const invoiceItems = items.map(item => ({
-          invoice_id: newInvoice.id,
+          invoice_id: result.id,
           description: item.description,
           quantity: item.quantity,
           unit_price: item.rate,
@@ -261,20 +264,14 @@ const InvoiceGeneration = () => {
           <div className="space-y-8">
             <div className="flex flex-col space-y-2">
               <div className="flex items-center space-x-2">
-                <FormField
-                  control={form.control}
-                  name="customInvoiceTitle"
-                  render={({ field }) => (
-                    <FormItem className="w-full">
-                      <Input 
-                        className="text-2xl font-bold border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                        value={customInvoiceTitle}
-                        onChange={(e) => setCustomInvoiceTitle(e.target.value)}
-                        placeholder="INVOICE"
-                      />
-                    </FormItem>
-                  )}
-                />
+                <FormItem className="w-full">
+                  <Input 
+                    className="text-2xl font-bold border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    value={customInvoiceTitle}
+                    onChange={(e) => setCustomInvoiceTitle(e.target.value)}
+                    placeholder="INVOICE"
+                  />
+                </FormItem>
               </div>
               
               <div>
@@ -344,31 +341,27 @@ const InvoiceGeneration = () => {
                 
                 {showAdditionalFields && (
                   <div className="space-y-4 pt-2 border-t">
-                    <FormField
-                      control={form.control}
-                      name="purchaseOrderNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Purchase Order Number</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="Enter PO number" />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
+                    <FormItem>
+                      <FormLabel>Purchase Order Number</FormLabel>
+                      <FormControl>
+                        <Input 
+                          value={purchaseOrderNumber}
+                          onChange={(e) => setPurchaseOrderNumber(e.target.value)}
+                          placeholder="Enter PO number" 
+                        />
+                      </FormControl>
+                    </FormItem>
                     
-                    <FormField
-                      control={form.control}
-                      name="referenceNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Reference Number</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="Enter reference number" />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
+                    <FormItem>
+                      <FormLabel>Reference Number</FormLabel>
+                      <FormControl>
+                        <Input 
+                          value={referenceNumber}
+                          onChange={(e) => setReferenceNumber(e.target.value)}
+                          placeholder="Enter reference number" 
+                        />
+                      </FormControl>
+                    </FormItem>
                   </div>
                 )}
               </div>
@@ -517,26 +510,23 @@ const InvoiceGeneration = () => {
             </div>
 
             <div>
-              <FormField
-                control={form.control}
-                name="currency"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Currency</FormLabel>
-                    <Select defaultValue="inr" {...field}>
-                      <SelectTrigger className="w-[280px]">
-                        <SelectValue placeholder="Select currency" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="inr">Indian Rupee (INR, ₹)</SelectItem>
-                        <SelectItem value="usd">US Dollar (USD, $)</SelectItem>
-                        <SelectItem value="eur">Euro (EUR, €)</SelectItem>
-                        <SelectItem value="gbp">British Pound (GBP, £)</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </FormItem>
-                )}
-              />
+              <FormItem>
+                <FormLabel>Currency</FormLabel>
+                <Select 
+                  value={selectedCurrency} 
+                  onValueChange={setSelectedCurrency}
+                >
+                  <SelectTrigger className="w-[280px]">
+                    <SelectValue placeholder="Select currency" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="inr">Indian Rupee (INR, ₹)</SelectItem>
+                    <SelectItem value="usd">US Dollar (USD, $)</SelectItem>
+                    <SelectItem value="eur">Euro (EUR, €)</SelectItem>
+                    <SelectItem value="gbp">British Pound (GBP, £)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </FormItem>
             </div>
 
             <Separator className="my-6" />
@@ -874,25 +864,19 @@ const InvoiceGeneration = () => {
                     <FileText className="h-5 w-5 mr-2" /> Page Setup
                   </h3>
                   
-                  <FormField
-                    control={form.control}
-                    name="paperSize"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Paper Size</FormLabel>
-                        <Select value={selectedPaperSize} onValueChange={setSelectedPaperSize}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select paper size" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {paperSizes.map((size) => (
-                              <SelectItem key={size.id} value={size.id}>{size.name}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    )}
-                  />
+                  <div>
+                    <FormLabel>Paper Size</FormLabel>
+                    <Select value={selectedPaperSize} onValueChange={setSelectedPaperSize}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select paper size" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {paperSizes.map((size) => (
+                          <SelectItem key={size.id} value={size.id}>{size.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                   
                   <FormField
                     control={form.control}
