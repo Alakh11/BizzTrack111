@@ -1,12 +1,12 @@
+
 import React, { useState } from "react";
-import { Sidebar } from "@/components/layout/Sidebar";
-import { Header } from "@/components/layout/Header";
-import { useMobile } from "@/hooks/useMobile";
+import Sidebar from "@/components/layout/Sidebar";
+import Header from "@/components/layout/Header";
+import { useIsMobile } from "@/hooks/use-mobile";
 import Footer from "./Footer";
 
-// Update the component to include the Footer at the bottom
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
-  const { isMobile } = useMobile();
+  const isMobile = useIsMobile();
   const [isSidebarOpen, setSidebarOpen] = useState(true);
 
   // Toggle sidebar
