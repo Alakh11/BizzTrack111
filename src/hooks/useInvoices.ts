@@ -10,20 +10,41 @@ export const useInvoices = () => {
   const { data: invoices, isLoading } = useQuery({
     queryKey: ['invoices'],
     queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        return [];
+      }
+      
       const { data, error } = await supabase
         .from('invoices')
-        .select('*, client:clients(name), invoice_items(*)');
+        .select('*, client:clients(name), invoice_items(*)')
+        .eq('user_id', session.user.id)
+        .order('created_at', { ascending: false });
 
       if (error) throw error;
-      return data;
+      return data || [];
     },
   });
 
   const createInvoice = useMutation({
     mutationFn: async (newInvoice: any) => {
+      // Get current user ID
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error('You must be logged in to create an invoice');
+      }
+      
+      // Add user_id to the invoice
+      const invoiceWithUserId = {
+        ...newInvoice,
+        user_id: session.user.id
+      };
+      
       const { data, error } = await supabase
         .from('invoices')
-        .insert(newInvoice)
+        .insert(invoiceWithUserId)
         .select()
         .single();
 
@@ -46,9 +67,45 @@ export const useInvoices = () => {
     },
   });
 
+  // Delete invoice
+  const deleteInvoice = useMutation({
+    mutationFn: async (invoiceId: string) => {
+      // First delete related invoice items
+      await supabase
+        .from('invoice_items')
+        .delete()
+        .eq('invoice_id', invoiceId);
+        
+      // Then delete the invoice
+      const { error } = await supabase
+        .from('invoices')
+        .delete()
+        .eq('id', invoiceId);
+
+      if (error) throw error;
+      
+      return invoiceId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      toast({
+        title: "Success",
+        description: "Invoice deleted successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     invoices,
     isLoading,
     createInvoice,
+    deleteInvoice,
   };
 };

@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,10 +10,15 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { IndianRupee, Plus, Trash } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { IndianRupee, Plus, Trash, ArrowRight, PenSquare, LayoutTemplate, PaintBucket, Type, FileImage, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
 import InvoiceSteps from "@/components/invoices/InvoiceSteps";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useClients } from "@/hooks/useClients";
+import { useInvoices } from "@/hooks/useInvoices";
+import { supabase } from "@/integrations/supabase/client";
 
 const steps = [
   {
@@ -26,28 +32,45 @@ const steps = [
     description: "Payment information",
   },
   {
-    id: "preview",
+    id: "design",
     name: "Design & Share",
-    description: "Preview and send",
+    description: "Customize and send",
   },
 ];
 
-// Mock clients data
-const mockClients = [
-  { id: "client1", name: "Tech Solutions Inc." },
-  { id: "client2", name: "Global Traders Ltd." },
-  { id: "client3", name: "Innovate Systems" },
-  { id: "client4", name: "Reliable Services" },
-  { id: "client5", name: "Premier Corp." },
+// Invoice templates
+const invoiceTemplates = [
+  { id: "standard", name: "Standard", image: "https://placehold.co/200x280/e9e9e9/999?text=Standard" },
+  { id: "professional", name: "Professional", image: "https://placehold.co/200x280/e9e9e9/999?text=Professional" },
+  { id: "modern", name: "Modern", image: "https://placehold.co/200x280/e9e9e9/999?text=Modern" },
+  { id: "classic", name: "Classic", image: "https://placehold.co/200x280/e9e9e9/999?text=Classic" },
+  { id: "simple", name: "Simple", image: "https://placehold.co/200x280/e9e9e9/999?text=Simple" },
 ];
 
-// Mock services data
-const mockServices = [
-  { id: "serv1", name: "Website Design", price: 15000 },
-  { id: "serv2", name: "Logo Design", price: 5000 },
-  { id: "serv3", name: "Web Development", price: 30000 },
-  { id: "serv4", name: "Digital Marketing", price: 8000 },
-  { id: "serv5", name: "SEO Optimization", price: 6000 },
+// Color themes
+const colorThemes = [
+  { id: "blue", name: "Blue", color: "#3b82f6" },
+  { id: "green", name: "Green", color: "#10b981" },
+  { id: "purple", name: "Purple", color: "#8b5cf6" },
+  { id: "orange", name: "Orange", color: "#f97316" },
+  { id: "red", name: "Red", color: "#ef4444" },
+  { id: "gray", name: "Gray", color: "#6b7280" },
+];
+
+// Font options
+const fontOptions = [
+  { id: "inter", name: "Inter" },
+  { id: "roboto", name: "Roboto" },
+  { id: "poppins", name: "Poppins" },
+  { id: "opensans", name: "Open Sans" },
+  { id: "lato", name: "Lato" },
+];
+
+const paperSizes = [
+  { id: "a4", name: "A4" },
+  { id: "letter", name: "Letter" },
+  { id: "legal", name: "Legal" },
+  { id: "a3", name: "A3" },
 ];
 
 const InvoiceGeneration = () => {
@@ -55,8 +78,19 @@ const InvoiceGeneration = () => {
   const [items, setItems] = useState([
     { id: 1, description: "", quantity: 1, rate: 0, amount: 0, serviceId: "" },
   ]);
+  const [showAdditionalFields, setShowAdditionalFields] = useState(false);
+  const [showShippingDetails, setShowShippingDetails] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState("standard");
+  const [selectedColor, setSelectedColor] = useState("blue");
+  const [selectedFont, setSelectedFont] = useState("inter");
+  const [selectedPaperSize, setSelectedPaperSize] = useState("a4");
+  const [customInvoiceTitle, setCustomInvoiceTitle] = useState("INVOICE");
+  const [customSubtitle, setCustomSubtitle] = useState("");
+  
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { clients = [], isLoading: clientsLoading } = useClients();
+  const { createInvoice } = useInvoices();
 
   const form = useForm({
     defaultValues: {
@@ -72,14 +106,45 @@ const InvoiceGeneration = () => {
       clientAddress: "",
       clientEmail: "",
       clientPhone: "",
+      shippedFrom: "",
+      shippedTo: "",
+      transportDetails: "",
+      gstDetails: "",
       notes: "",
       terms: "Payment is due within 14 days of issue.",
       bankName: "",
       accountNumber: "",
       ifscCode: "",
       upiId: "",
+      watermarkText: "",
+      margins: "normal",
+      textScale: "100",
     },
   });
+
+  useEffect(() => {
+    // Fetch business profile data
+    const fetchBusinessProfile = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+            
+          if (profileData) {
+            // You could set business details here if needed
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching profile:", error);
+      }
+    };
+
+    fetchBusinessProfile();
+  }, []);
 
   const calculateTotal = () => {
     return items.reduce((total, item) => total + item.amount, 0);
@@ -94,16 +159,6 @@ const InvoiceGeneration = () => {
           // Recalculate amount if quantity or rate changes
           if (field === "quantity" || field === "rate") {
             updatedItem.amount = updatedItem.quantity * updatedItem.rate;
-          }
-
-          // If service is selected, update rate
-          if (field === "serviceId") {
-            const service = mockServices.find((s) => s.id === value);
-            if (service) {
-              updatedItem.description = service.name;
-              updatedItem.rate = service.price;
-              updatedItem.amount = updatedItem.quantity * service.price;
-            }
           }
 
           return updatedItem;
@@ -128,10 +183,13 @@ const InvoiceGeneration = () => {
   };
 
   const handleClientChange = (clientId: string) => {
-    const selectedClient = mockClients.find((c) => c.id === clientId);
+    const selectedClient = clients.find((c) => c.id === clientId);
     if (selectedClient) {
       form.setValue("clientId", clientId);
       form.setValue("clientName", selectedClient.name);
+      form.setValue("clientAddress", selectedClient.address || "");
+      form.setValue("clientEmail", selectedClient.email || "");
+      form.setValue("clientPhone", selectedClient.phone || "");
     }
   };
 
@@ -147,25 +205,93 @@ const InvoiceGeneration = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 0));
   };
 
-  const handleSubmit = form.handleSubmit((data) => {
-    // In a real application, this would send data to an API
-    toast({
-      title: "Invoice created",
-      description: "Your invoice has been created successfully.",
-    });
-    
-    navigate("/invoices");
+  const handleSubmit = form.handleSubmit(async (data) => {
+    try {
+      // Prepare invoice data
+      const invoiceData = {
+        invoice_number: data.invoiceNumber,
+        invoice_date: data.invoiceDate,
+        due_date: data.dueDate,
+        total_amount: calculateTotal(),
+        client_id: data.clientId || null,
+        notes: data.notes,
+        terms: data.terms,
+        status: "pending"
+      };
+      
+      // Create invoice in database
+      const { data: newInvoice } = await createInvoice.mutateAsync(invoiceData);
+      
+      // If invoice was created successfully, add invoice items
+      if (newInvoice && newInvoice.id) {
+        // Prepare invoice items
+        const invoiceItems = items.map(item => ({
+          invoice_id: newInvoice.id,
+          description: item.description,
+          quantity: item.quantity,
+          unit_price: item.rate,
+          amount: item.amount,
+          service_id: item.serviceId || null
+        }));
+        
+        // Insert invoice items
+        await supabase.from('invoice_items').insert(invoiceItems);
+        
+        toast({
+          title: "Invoice created",
+          description: "Your invoice has been created successfully.",
+        });
+        
+        navigate("/invoices");
+      }
+    } catch (error: any) {
+      console.error("Error creating invoice:", error);
+      toast({
+        title: "Error creating invoice",
+        description: error.message || "An error occurred while creating the invoice",
+        variant: "destructive"
+      });
+    }
   });
 
   const renderStepContent = () => {
     switch (currentStep) {
       case 0: // Invoice Details
         return (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-8">
+            <div className="flex flex-col space-y-2">
+              <div className="flex items-center space-x-2">
+                <FormField
+                  control={form.control}
+                  name="customInvoiceTitle"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <Input 
+                        className="text-2xl font-bold border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                        value={customInvoiceTitle}
+                        onChange={(e) => setCustomInvoiceTitle(e.target.value)}
+                        placeholder="INVOICE"
+                      />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              
+              <div>
+                <Input 
+                  className="text-sm text-muted-foreground border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                  value={customSubtitle}
+                  onChange={(e) => setCustomSubtitle(e.target.value)}
+                  placeholder="Add Subtitle (Optional)"
+                />
+              </div>
+            </div>
+          
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Invoice Info */}
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">Invoice Information</h3>
-
+                
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -206,84 +332,211 @@ const InvoiceGeneration = () => {
                     </FormItem>
                   )}
                 />
+                
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  className="flex items-center text-sm"
+                  onClick={() => setShowAdditionalFields(!showAdditionalFields)}
+                >
+                  <Plus className="h-4 w-4 mr-1" /> Add More Fields
+                </Button>
+                
+                {showAdditionalFields && (
+                  <div className="space-y-4 pt-2 border-t">
+                    <FormField
+                      control={form.control}
+                      name="purchaseOrderNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Purchase Order Number</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Enter PO number" />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="referenceNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Reference Number</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Enter reference number" />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
               </div>
 
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Client Information</h3>
-
-                <FormItem>
-                  <FormLabel>Select Client</FormLabel>
-                  <Select
-                    onValueChange={handleClientChange}
-                    value={form.getValues("clientId")}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a client" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {mockClients.map((client) => (
-                        <SelectItem key={client.id} value={client.id}>
-                          {client.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </FormItem>
-
-                <FormField
-                  control={form.control}
-                  name="clientName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Client Name</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="clientEmail"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input type="email" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="clientPhone"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
+              {/* Billing Info */}
+              <div className="space-y-8">
+                {/* Billed By Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Billed By (Your Details)</h3>
+                  
+                  <Card className="shadow-sm">
+                    <CardContent className="p-4">
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <p className="font-medium">Alakh Corporation</p>
+                          <Button variant="ghost" size="sm">Edit</Button>
+                        </div>
+                        <p className="text-sm text-muted-foreground">Mirzapur, UP, India - 231312</p>
+                        <p className="text-sm text-muted-foreground">+91 9580813770</p>
+                        <p className="text-sm text-muted-foreground">alakh1304@gmail.com</p>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
-
-                <FormField
-                  control={form.control}
-                  name="clientAddress"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Address</FormLabel>
-                      <FormControl>
-                        <Textarea rows={3} {...field} />
-                      </FormControl>
-                    </FormItem>
+                
+                {/* Billed To Section */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Billed To (Client's Details)</h3>
+                  
+                  <FormItem>
+                    <FormLabel>Select Client</FormLabel>
+                    <Select
+                      onValueChange={handleClientChange}
+                      value={form.getValues("clientId")}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a client" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {clients && clients.map((client) => (
+                          <SelectItem key={client.id} value={client.id}>
+                            {client.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                  
+                  <div className="flex items-center">
+                    <Button type="button" variant="outline" size="sm">
+                      <Plus className="h-4 w-4 mr-2" /> Add New Client
+                    </Button>
+                  </div>
+                  
+                  {form.getValues("clientId") && (
+                    <Card className="shadow-sm">
+                      <CardContent className="p-4">
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <p className="font-medium">{form.getValues("clientName")}</p>
+                            <Button variant="ghost" size="sm">Edit</Button>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{form.getValues("clientAddress")}</p>
+                          <p className="text-sm text-muted-foreground">{form.getValues("clientEmail")}</p>
+                          <p className="text-sm text-muted-foreground">{form.getValues("clientPhone")}</p>
+                        </div>
+                      </CardContent>
+                    </Card>
                   )}
-                />
+                </div>
+                
+                {/* Shipping Details Toggle */}
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="shipping" 
+                    checked={showShippingDetails} 
+                    onCheckedChange={(checked) => setShowShippingDetails(!!checked)} 
+                  />
+                  <label 
+                    htmlFor="shipping" 
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Add Shipping Details
+                  </label>
+                </div>
+                
+                {/* Shipping Details Section */}
+                {showShippingDetails && (
+                  <div className="space-y-4 pt-2">
+                    <div className="grid grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="shippedFrom"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Shipped From</FormLabel>
+                            <FormControl>
+                              <Textarea rows={3} {...field} placeholder="Enter shipping address" />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                      
+                      <FormField
+                        control={form.control}
+                        name="shippedTo"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Shipped To</FormLabel>
+                            <FormControl>
+                              <Textarea rows={3} {...field} placeholder="Enter delivery address" />
+                            </FormControl>
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                    
+                    <FormField
+                      control={form.control}
+                      name="transportDetails"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Transport Details</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Enter transport details" />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="gstDetails"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>GST Details</FormLabel>
+                          <FormControl>
+                            <Input {...field} placeholder="Enter GST details" />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                )}
               </div>
+            </div>
+
+            <div>
+              <FormField
+                control={form.control}
+                name="currency"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Currency</FormLabel>
+                    <Select defaultValue="inr" {...field}>
+                      <SelectTrigger className="w-[280px]">
+                        <SelectValue placeholder="Select currency" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="inr">Indian Rupee (INR, ₹)</SelectItem>
+                        <SelectItem value="usd">US Dollar (USD, $)</SelectItem>
+                        <SelectItem value="eur">Euro (EUR, €)</SelectItem>
+                        <SelectItem value="gbp">British Pound (GBP, £)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
             </div>
 
             <Separator className="my-6" />
@@ -306,7 +559,6 @@ const InvoiceGeneration = () => {
                   <thead>
                     <tr className="border-b">
                       <th className="text-left py-2 px-2 font-medium">Item</th>
-                      <th className="text-left py-2 px-2 font-medium">Description</th>
                       <th className="text-right py-2 px-2 font-medium">Qty</th>
                       <th className="text-right py-2 px-2 font-medium">Rate (₹)</th>
                       <th className="text-right py-2 px-2 font-medium">Amount (₹)</th>
@@ -317,32 +569,13 @@ const InvoiceGeneration = () => {
                     {items.map((item, index) => (
                       <tr key={item.id} className="border-b">
                         <td className="py-2 px-2">
-                          <Select
-                            value={item.serviceId}
-                            onValueChange={(value) =>
-                              handleItemChange(item.id, "serviceId", value)
-                            }
-                          >
-                            <SelectTrigger className="w-[180px]">
-                              <SelectValue placeholder="Select a service" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {mockServices.map((service) => (
-                                <SelectItem key={service.id} value={service.id}>
-                                  {service.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </td>
-                        <td className="py-2 px-2">
                           <Input
                             value={item.description}
                             onChange={(e) =>
                               handleItemChange(item.id, "description", e.target.value)
                             }
                             className="w-full"
-                            placeholder="Description"
+                            placeholder="Enter item description"
                           />
                         </td>
                         <td className="py-2 px-2">
@@ -404,7 +637,7 @@ const InvoiceGeneration = () => {
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colSpan={4} className="text-right py-4 font-medium">
+                      <td colSpan={3} className="text-right py-4 font-medium">
                         Total:
                       </td>
                       <td className="text-right py-4 font-medium flex justify-end items-center">
@@ -420,212 +653,349 @@ const InvoiceGeneration = () => {
                 </table>
               </div>
             </div>
-          </>
+          </div>
         );
       case 1: // Banking Details
         return (
           <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Banking Information</h3>
-                
-                <FormField
-                  control={form.control}
-                  name="bankName"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Bank Name</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Enter bank name" />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="accountNumber"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Account Number</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Enter account number" />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="ifscCode"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>IFSC Code</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Enter IFSC code" />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="upiId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>UPI ID (Optional)</FormLabel>
-                      <FormControl>
-                        <Input {...field} placeholder="Enter UPI ID" />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">Bank Account Details</h3>
+                  
+                  <FormField
+                    control={form.control}
+                    name="bankName"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bank Name</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter bank name" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="accountNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Account Number</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter account number" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="ifscCode"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>IFSC Code</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter IFSC code" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
               
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium">Additional Information</h3>
-                
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Notes (visible to client)</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          rows={5} 
-                          {...field} 
-                          placeholder="Enter any notes for the client"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                
-                <FormField
-                  control={form.control}
-                  name="terms"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Terms and Conditions</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          rows={5} 
-                          {...field} 
-                          placeholder="Enter terms and conditions"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium">UPI Payment Details</h3>
+                  
+                  <FormField
+                    control={form.control}
+                    name="upiId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>UPI ID</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter UPI ID" />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <div className="flex items-center space-x-2 pt-4">
+                    <Switch id="qrcode" />
+                    <label htmlFor="qrcode" className="text-sm">Show QR code on invoice</label>
+                  </div>
+                </div>
               </div>
+            </div>
+            
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Additional Information</h3>
+              
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes (visible to client)</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        rows={5} 
+                        {...field} 
+                        placeholder="Enter any notes for the client"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="terms"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Terms and Conditions</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        rows={5} 
+                        {...field} 
+                        placeholder="Enter terms and conditions"
+                      />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             </div>
           </div>
         );
-      case 2: // Preview and Send
+      case 2: // Design and Share
         return (
-          <div className="space-y-6">
-            <div className="bg-white border rounded-lg p-6">
-              <div className="flex justify-between items-start mb-8">
-                <div>
-                  <h2 className="text-2xl font-bold">INVOICE</h2>
-                  <p className="text-gray-500">{form.getValues("invoiceNumber")}</p>
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Design Options */}
+              <div className="space-y-6">
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium flex items-center">
+                    <LayoutTemplate className="h-5 w-5 mr-2" /> Template Design
+                  </h3>
+                  
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    {invoiceTemplates.map((template) => (
+                      <div 
+                        key={template.id}
+                        className={`border rounded-md cursor-pointer overflow-hidden ${selectedTemplate === template.id ? 'ring-2 ring-primary' : ''}`}
+                        onClick={() => setSelectedTemplate(template.id)}
+                      >
+                        <div className="aspect-[3/4]">
+                          <img src={template.image} alt={template.name} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="p-2 text-center text-sm font-medium">{template.name}</div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="font-bold">Alakh Corporation</p>
-                  <p>Mirzapur, UP, India - 231312</p>
-                  <p>+91 9580813770</p>
-                  <p>alakh1304@gmail.com</p>
+                
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium flex items-center">
+                    <PaintBucket className="h-5 w-5 mr-2" /> Color Theme
+                  </h3>
+                  
+                  <div className="flex flex-wrap gap-3">
+                    {colorThemes.map((theme) => (
+                      <div 
+                        key={theme.id}
+                        className={`w-8 h-8 rounded-full cursor-pointer ${selectedColor === theme.id ? 'ring-2 ring-offset-2 ring-black' : ''}`}
+                        style={{ backgroundColor: theme.color }}
+                        onClick={() => setSelectedColor(theme.id)}
+                        title={theme.name}
+                      />
+                    ))}
+                  </div>
                 </div>
-              </div>
-              
-              <div className="grid grid-cols-2 gap-8 mb-8">
-                <div>
-                  <p className="text-gray-500 mb-1">Billed To:</p>
-                  <p className="font-bold">{form.getValues("clientName")}</p>
-                  <p>{form.getValues("clientAddress")}</p>
-                  <p>{form.getValues("clientEmail")}</p>
-                  <p>{form.getValues("clientPhone")}</p>
+                
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium flex items-center">
+                    <Type className="h-5 w-5 mr-2" /> Font Style
+                  </h3>
+                  
+                  <div className="flex flex-wrap gap-2">
+                    {fontOptions.map((font) => (
+                      <div 
+                        key={font.id}
+                        className={`px-3 py-2 border rounded-md cursor-pointer ${selectedFont === font.id ? 'bg-primary/10 border-primary' : ''}`}
+                        onClick={() => setSelectedFont(font.id)}
+                      >
+                        <span className="text-sm">{font.name}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="text-right">
-                  <div className="space-y-1">
-                    <div className="flex justify-between">
-                      <p className="text-gray-500">Invoice Date:</p>
-                      <p>{form.getValues("invoiceDate")}</p>
+                
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium flex items-center">
+                    <FileImage className="h-5 w-5 mr-2" /> Letterhead & Branding
+                  </h3>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-2">
+                      <Switch id="letterhead" />
+                      <label htmlFor="letterhead" className="text-sm">Add letterhead</label>
                     </div>
-                    <div className="flex justify-between">
-                      <p className="text-gray-500">Due Date:</p>
-                      <p>{form.getValues("dueDate")}</p>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Switch id="footer" />
+                      <label htmlFor="footer" className="text-sm">Add custom footer</label>
                     </div>
-                    <div className="flex justify-between font-bold">
-                      <p>Total Due:</p>
-                      <p className="flex items-center">
-                        <IndianRupee className="h-3 w-3 mr-1" />
-                        {calculateTotal().toLocaleString("en-IN", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
-                      </p>
+                    
+                    <div className="flex items-center space-x-2">
+                      <Switch id="watermark" />
+                      <label htmlFor="watermark" className="text-sm">Add watermark</label>
                     </div>
+
+                    <FormField
+                      control={form.control}
+                      name="watermarkText"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input {...field} placeholder="Watermark text" className="mt-2" />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
                   </div>
                 </div>
               </div>
               
-              <table className="w-full mb-8">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left py-2">Item</th>
-                    <th className="text-right py-2">Qty</th>
-                    <th className="text-right py-2">Rate</th>
-                    <th className="text-right py-2">Amount</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((item) => (
-                    <tr key={item.id} className="border-b">
-                      <td className="py-2">
-                        <p className="font-medium">{item.description || "Item"}</p>
-                      </td>
-                      <td className="text-right py-2">{item.quantity}</td>
-                      <td className="text-right py-2 flex justify-end items-center">
-                        <IndianRupee className="h-3 w-3 mr-1" />
-                        {item.rate.toLocaleString("en-IN")}
-                      </td>
-                      <td className="text-right py-2 flex justify-end items-center">
-                        <IndianRupee className="h-3 w-3 mr-1" />
-                        {item.amount.toLocaleString("en-IN")}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot>
-                  <tr>
-                    <td colSpan={3} className="text-right py-4 font-bold">Total:</td>
-                    <td className="text-right py-4 font-bold flex justify-end items-center">
-                      <IndianRupee className="h-3 w-3 mr-1" />
-                      {calculateTotal().toLocaleString("en-IN")}
-                    </td>
-                  </tr>
-                </tfoot>
-              </table>
-              
-              <div className="grid grid-cols-2 gap-8">
-                <div>
-                  <h4 className="font-medium mb-2">Payment Information</h4>
-                  <p>Bank: {form.getValues("bankName")}</p>
-                  <p>Account: {form.getValues("accountNumber")}</p>
-                  <p>IFSC: {form.getValues("ifscCode")}</p>
-                  {form.getValues("upiId") && <p>UPI: {form.getValues("upiId")}</p>}
+              {/* Page Setup */}
+              <div>
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium flex items-center">
+                    <FileText className="h-5 w-5 mr-2" /> Page Setup
+                  </h3>
+                  
+                  <FormField
+                    control={form.control}
+                    name="paperSize"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Paper Size</FormLabel>
+                        <Select value={selectedPaperSize} onValueChange={setSelectedPaperSize}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select paper size" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {paperSizes.map((size) => (
+                              <SelectItem key={size.id} value={size.id}>{size.name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="margins"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Margins</FormLabel>
+                        <Select defaultValue="normal" {...field}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select margins" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="narrow">Narrow</SelectItem>
+                            <SelectItem value="normal">Normal</SelectItem>
+                            <SelectItem value="wide">Wide</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="textScale"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Text Scale (%)</FormLabel>
+                        <Select defaultValue="100" {...field}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select text scale" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="90">90%</SelectItem>
+                            <SelectItem value="95">95%</SelectItem>
+                            <SelectItem value="100">100%</SelectItem>
+                            <SelectItem value="105">105%</SelectItem>
+                            <SelectItem value="110">110%</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <div className="flex items-center space-x-2 pt-2">
+                    <Checkbox id="pageless" />
+                    <label htmlFor="pageless" className="text-sm">Generate pageless PDF</label>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-medium mb-2">Notes</h4>
-                  <p>{form.getValues("notes")}</p>
+                
+                {/* Preview */}
+                <div className="mt-8">
+                  <h3 className="text-lg font-medium mb-4">Preview</h3>
+                  
+                  <div className="border rounded-md bg-gray-50 p-4 flex items-center justify-center">
+                    <div className="bg-white border shadow-sm w-full max-w-sm aspect-[3/4] p-4">
+                      <div className="text-center mb-8">
+                        <h2 className="text-xl font-bold">{customInvoiceTitle}</h2>
+                        {customSubtitle && <p className="text-sm text-muted-foreground">{customSubtitle}</p>}
+                      </div>
+                      
+                      <div className="text-xs text-muted-foreground">
+                        <p>Invoice #: {form.getValues("invoiceNumber")}</p>
+                        <p>Date: {form.getValues("invoiceDate")}</p>
+                        <p>Due: {form.getValues("dueDate")}</p>
+                      </div>
+                      
+                      <div className="my-4 text-xs">
+                        <div className="font-medium">From: Alakh Corporation</div>
+                        <div>Mirzapur, UP, India - 231312</div>
+                      </div>
+                      
+                      <div className="my-4 text-xs">
+                        <div className="font-medium">To: {form.getValues("clientName") || "Client Name"}</div>
+                        <div>{form.getValues("clientAddress") || "Client Address"}</div>
+                      </div>
+                      
+                      <table className="w-full text-xs border-t border-b my-4">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left py-1">Item</th>
+                            <th className="text-right py-1">Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="py-1">Sample Item</td>
+                            <td className="text-right py-1">₹ 1,000.00</td>
+                          </tr>
+                        </tbody>
+                        <tfoot>
+                          <tr className="border-t">
+                            <th className="text-left py-1">Total</th>
+                            <th className="text-right py-1">₹ 1,000.00</th>
+                          </tr>
+                        </tfoot>
+                      </table>
+                      
+                      <div className="text-xs mt-8 text-center text-muted-foreground">
+                        <p>Thank you for your business!</p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="mt-8 pt-4 border-t">
-                <h4 className="font-medium mb-2">Terms & Conditions</h4>
-                <p>{form.getValues("terms")}</p>
               </div>
             </div>
           </div>
@@ -680,7 +1050,7 @@ const InvoiceGeneration = () => {
                     
                     {currentStep < steps.length - 1 ? (
                       <Button type="button" onClick={handleNext}>
-                        Next
+                        Next <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
                     ) : (
                       <Button type="submit">
