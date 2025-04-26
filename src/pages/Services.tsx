@@ -3,17 +3,15 @@ import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Grid, Plus, Search } from "lucide-react";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Grid, Plus, Search, IndianRupee } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useServices } from "@/hooks/useServices";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useForm } from "react-hook-form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/hooks/use-toast";
 
 interface Service {
   id: string;
@@ -27,13 +25,25 @@ interface Service {
 const Services = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentTab, setCurrentTab] = useState("all");
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const { services: serviceData, createService, isLoading } = useServices();
+  const { toast } = useToast();
+  
+  const form = useForm({
+    defaultValues: {
+      name: "",
+      description: "",
+      price: 0,
+      category: "design",
+    },
+  });
 
   const services: Service[] = [
     {
       id: "1",
       name: "Website Design",
       description: "Custom website design with responsive layouts",
-      price: 1500,
+      price: 15000,
       category: "design",
       image: "https://images.unsplash.com/photo-1561070791-2526d30994b5",
     },
@@ -41,7 +51,7 @@ const Services = () => {
       id: "2",
       name: "Logo Design",
       description: "Professional logo design with multiple concepts",
-      price: 500,
+      price: 5000,
       category: "design",
       image: "https://images.unsplash.com/photo-1572044162444-ad60f128bdea",
     },
@@ -49,7 +59,7 @@ const Services = () => {
       id: "3",
       name: "Web Development",
       description: "Custom web application development",
-      price: 3000,
+      price: 30000,
       category: "development",
       image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c",
     },
@@ -57,7 +67,7 @@ const Services = () => {
       id: "4",
       name: "Digital Marketing",
       description: "Comprehensive digital marketing services",
-      price: 800,
+      price: 8000,
       category: "marketing",
       image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f",
     },
@@ -65,7 +75,7 @@ const Services = () => {
       id: "5",
       name: "SEO Optimization",
       description: "Search engine optimization for better rankings",
-      price: 600,
+      price: 6000,
       category: "marketing",
       image: "https://images.unsplash.com/photo-1571171637578-41bc2dd41cd2",
     },
@@ -73,7 +83,7 @@ const Services = () => {
       id: "6",
       name: "Mobile App Development",
       description: "Native mobile application development",
-      price: 4000,
+      price: 40000,
       category: "development",
       image: "https://images.unsplash.com/photo-1558655146-9f40138edfeb",
     },
@@ -81,7 +91,7 @@ const Services = () => {
       id: "7",
       name: "Content Writing",
       description: "Professional content creation services",
-      price: 300,
+      price: 3000,
       category: "content",
       image: "https://images.unsplash.com/photo-1455390582262-044cdead277a",
     },
@@ -89,7 +99,7 @@ const Services = () => {
       id: "8",
       name: "UI/UX Design",
       description: "User interface and experience design",
-      price: 1200,
+      price: 12000,
       category: "design",
       image: "https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e",
     },
@@ -106,7 +116,7 @@ const Services = () => {
   });
 
   const formatCurrency = (value: number) => {
-    return `$${value.toLocaleString()}`;
+    return `₹${value.toLocaleString('en-IN')}`;
   };
 
   const categories = [
@@ -116,6 +126,27 @@ const Services = () => {
     { value: "marketing", label: "Marketing" },
     { value: "content", label: "Content" },
   ];
+
+  const handleSubmit = form.handleSubmit(async (data) => {
+    try {
+      await createService.mutateAsync({
+        ...data,
+        category: data.category || "other",
+      });
+      setIsAddDialogOpen(false);
+      form.reset();
+      toast({
+        title: "Service created",
+        description: "Your service has been created successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create service. Please try again.",
+        variant: "destructive",
+      });
+    }
+  });
 
   return (
     <MainLayout>
@@ -127,9 +158,112 @@ const Services = () => {
               Manage your service offerings
             </p>
           </div>
-          <Button className="btn-primary">
-            <Plus className="h-4 w-4 mr-1" /> Add Service
-          </Button>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="btn-primary">
+                <Plus className="h-4 w-4 mr-1" /> Add Service
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New Service</DialogTitle>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Service Name</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Website Design" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Describe the service..."
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="price"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Price (₹)</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(Number(e.target.value))
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Category</FormLabel>
+                        <FormControl>
+                          <select
+                            className="w-full p-2 border rounded-md"
+                            {...field}
+                          >
+                            {categories
+                              .filter((cat) => cat.value !== "all")
+                              .map((category) => (
+                                <option
+                                  key={category.value}
+                                  value={category.value}
+                                >
+                                  {category.label}
+                                </option>
+                              ))}
+                          </select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className="flex justify-end gap-2 pt-4">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsAddDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="submit"
+                      disabled={isLoading || createService.isPending}
+                    >
+                      {createService.isPending ? "Adding..." : "Add Service"}
+                    </Button>
+                  </div>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <Card>
@@ -186,9 +320,10 @@ const Services = () => {
                             {service.description}
                           </p>
                           <div className="flex justify-between items-center mt-3">
-                            <p className="font-bold text-primary">
-                              {formatCurrency(service.price)}
-                            </p>
+                            <div className="font-bold text-primary flex items-center">
+                              <IndianRupee className="h-4 w-4 mr-1" />
+                              {service.price.toLocaleString('en-IN')}
+                            </div>
                             <Button variant="outline" size="sm">
                               Edit
                             </Button>

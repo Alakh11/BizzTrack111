@@ -3,198 +3,271 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { useAuth } from "@/hooks/useAuth";
-import { useToast } from "@/components/ui/use-toast";
-import * as z from "zod";
-import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
-import type { Profile } from "@/types/profile";
-
-const formSchema = z.object({
-  name: z.string().min(2, { message: "Name is required" }),
-  email: z.string().email({ message: "Invalid email address" }),
-  phone: z.string().min(6, { message: "Phone number is required" }),
-});
+import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { Lock } from "lucide-react";
 
 const ProfileSettings = () => {
-  const { user } = useAuth();
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm({
     defaultValues: {
-      name: "",
-      email: user?.email || "",
-      phone: "",
+      name: "John Doe",
+      email: "john.doe@example.com",
+      phone: "+91 98765 43210",
+      address: "123 Main St., Mumbai, Maharashtra",
+      bio: "Freelance designer and developer with 5+ years of experience.",
     },
   });
 
-  useEffect(() => {
-    const loadProfile = async () => {
-      if (!user?.id) return;
-      
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', user.id)
-        .single();
-      
-      if (data) {
-        form.reset({
-          name: data.username || "",
-          email: user.email || "",
-          phone: data.phone || "",
-        });
-      }
-    };
+  const passwordForm = useForm({
+    defaultValues: {
+      currentPassword: "",
+      newPassword: "",
+      confirmPassword: "",
+    },
+  });
 
-    loadProfile();
-  }, [user?.id, form]);
+  const onSubmit = (data: any) => {
+    toast({
+      title: "Profile updated",
+      description: "Your profile has been updated successfully",
+    });
+  };
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    if (!user?.id) return;
-    
-    setLoading(true);
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .upsert({
-          id: user.id,
-          username: values.name,
-          phone: values.phone,
-          updated_at: new Date().toISOString(),
-        });
-
-      if (error) throw error;
-
+  const onPasswordSubmit = passwordForm.handleSubmit((data) => {
+    if (data.newPassword !== data.confirmPassword) {
       toast({
-        title: "Profile updated",
-        description: "Your profile has been successfully updated.",
-      });
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: error.message,
+        title: "Password mismatch",
+        description: "New password and confirm password do not match",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
+      return;
     }
-  }
+
+    // In a real application, this would call an API to update the password
+    toast({
+      title: "Password updated",
+      description: "Your password has been updated successfully",
+    });
+    
+    setIsPasswordModalOpen(false);
+    passwordForm.reset();
+  });
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Profile Settings</CardTitle>
-        <CardDescription>
-          Manage your personal information and how it appears on Refrens
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex flex-col sm:flex-row gap-6 items-start">
-          <div className="space-y-2 w-full sm:w-auto">
-            <Label htmlFor="avatar">Profile Picture</Label>
-            <div className="flex flex-col items-center gap-2">
-              <Avatar className="h-24 w-24">
-                <AvatarImage src="https://github.com/shadcn.png" alt="User" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm">
-                  Change
-                </Button>
-                <Button variant="outline" size="sm" className="text-destructive">
-                  Remove
-                </Button>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Personal Information</CardTitle>
+          <CardDescription>
+            Update your personal information and how we can reach you
+          </CardDescription>
+        </CardHeader>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <CardContent className="space-y-6">
+              <div className="flex flex-col md:flex-row gap-6 items-start">
+                <div className="flex flex-col items-center space-y-2">
+                  <Avatar className="h-24 w-24">
+                    <AvatarImage src="https://github.com/shadcn.png" />
+                    <AvatarFallback>JD</AvatarFallback>
+                  </Avatar>
+                  <Button variant="outline" size="sm">
+                    Change Photo
+                  </Button>
+                </div>
+                <div className="flex-1 space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="name"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Full Name</FormLabel>
+                          <FormControl>
+                            <Input placeholder="John Doe" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="email"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Email</FormLabel>
+                          <FormControl>
+                            <Input placeholder="john@example.com" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="phone"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="+91 98765 43210" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Address</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Enter your address"
+                            className="resize-none"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="bio"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Bio</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Tell us about yourself"
+                            className="resize-none"
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormDescription>
+                          A brief description about yourself
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
               </div>
-            </div>
-          </div>
+            </CardContent>
+            <CardFooter className="border-t px-6 py-4">
+              <Button type="submit">Save Changes</Button>
+            </CardFooter>
+          </form>
+        </Form>
+      </Card>
 
-          <div className="flex-1 space-y-4">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Password</CardTitle>
+          <CardDescription>
+            Update your password to keep your account secure
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {isPasswordModalOpen ? (
+            <Form {...passwordForm}>
+              <form onSubmit={onPasswordSubmit} className="space-y-4">
                 <FormField
-                  control={form.control}
-                  name="name"
+                  control={passwordForm.control}
+                  name="currentPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel>Current Password</FormLabel>
                       <FormControl>
-                        <Input placeholder="Your name" {...field} />
+                        <Input type="password" placeholder="••••••••" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 <FormField
-                  control={form.control}
-                  name="email"
+                  control={passwordForm.control}
+                  name="newPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Email Address</FormLabel>
+                      <FormLabel>New Password</FormLabel>
                       <FormControl>
-                        <Input placeholder="Your email" {...field} />
+                        <Input type="password" placeholder="••••••••" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 <FormField
-                  control={form.control}
-                  name="phone"
+                  control={passwordForm.control}
+                  name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Phone Number</FormLabel>
+                      <FormLabel>Confirm Password</FormLabel>
                       <FormControl>
-                        <Input placeholder="Your phone number" {...field} />
+                        <Input type="password" placeholder="••••••••" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-
-                <div className="flex justify-end">
-                  <Button type="submit">Save Changes</Button>
+                <div className="flex space-x-2">
+                  <Button type="submit">Update Password</Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsPasswordModalOpen(false)}
+                  >
+                    Cancel
+                  </Button>
                 </div>
               </form>
             </Form>
-          </div>
-        </div>
-
-        <div className="border-t pt-4">
-          <h3 className="font-medium mb-4">Password</h3>
-          <div className="grid gap-4">
-            <div className="grid gap-2">
-              <Label htmlFor="current-password">Current Password</Label>
-              <Input id="current-password" type="password" />
+          ) : (
+            <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center space-x-2">
+                <div className="p-2 bg-primary/10 rounded-full">
+                  <Lock className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium">Password</p>
+                  <p className="text-sm text-muted-foreground">
+                    Last updated on April 15, 2023
+                  </p>
+                </div>
+              </div>
+              <Button onClick={() => setIsPasswordModalOpen(true)}>
+                Change Password
+              </Button>
             </div>
-            <div className="grid gap-2">
-              <Label htmlFor="new-password">New Password</Label>
-              <Input id="new-password" type="password" />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="confirm-password">Confirm New Password</Label>
-              <Input id="confirm-password" type="password" />
-            </div>
-            <div className="flex justify-end">
-              <Button>Update Password</Button>
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+          )}
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

@@ -19,7 +19,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { Plus, Search, FileText, Download, MoreHorizontal, Receipt, ChevronLeft, ChevronRight } from "lucide-react";
+import { Plus, Search, FileText, Download, MoreHorizontal, Receipt, ChevronLeft, ChevronRight, IndianRupee } from "lucide-react";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter 
+} from "@/components/ui/dialog";
+import { useForm } from "react-hook-form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 // Sample expense data
 const sampleExpenses = [
@@ -70,13 +83,49 @@ const sampleExpenses = [
   }
 ];
 
+const expenseCategories = [
+  "Office Supplies",
+  "Travel",
+  "Software",
+  "Utilities",
+  "Meals",
+  "Rent",
+  "Marketing",
+  "Salaries",
+  "Others"
+];
+
+const paymentMethods = [
+  "Credit Card",
+  "Debit Card",
+  "Cash",
+  "Bank Transfer",
+  "UPI",
+  "Auto Debit",
+  "Others"
+];
+
 export default function Expenses() {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [expenses, setExpenses] = useState(sampleExpenses);
   const itemsPerPage = 10;
+  const { toast } = useToast();
+
+  const form = useForm({
+    defaultValues: {
+      vendor: "",
+      category: "Office Supplies",
+      amount: "",
+      date: new Date().toISOString().split("T")[0],
+      paymentMethod: "Credit Card",
+      notes: ""
+    }
+  });
 
   // Filter expenses based on search query
-  const filteredExpenses = sampleExpenses.filter(
+  const filteredExpenses = expenses.filter(
     (expense) =>
       expense.vendor.toLowerCase().includes(searchQuery.toLowerCase()) ||
       expense.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -109,6 +158,36 @@ export default function Expenses() {
     }
   };
 
+  const handleSubmit = form.handleSubmit((data) => {
+    // Generate a unique ID for the new expense
+    const newId = `exp-${String(expenses.length + 1).padStart(3, '0')}`;
+    
+    // Create new expense object
+    const newExpense = {
+      id: newId,
+      date: data.date,
+      category: data.category,
+      vendor: data.vendor,
+      amount: parseFloat(data.amount as string),
+      status: "pending",
+      paymentMethod: data.paymentMethod,
+      notes: data.notes
+    };
+    
+    // Add to expenses
+    setExpenses([newExpense, ...expenses]);
+    
+    // Close dialog and reset form
+    setIsAddDialogOpen(false);
+    form.reset();
+    
+    // Show success toast
+    toast({
+      title: "Expense added",
+      description: "Your expense has been added successfully",
+    });
+  });
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -119,9 +198,157 @@ export default function Expenses() {
               Manage and track your business expenses
             </p>
           </div>
-          <Button className="btn-primary">
-            <Plus className="h-4 w-4 mr-1" /> Add Expense
-          </Button>
+          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="btn-primary">
+                <Plus className="h-4 w-4 mr-1" /> Add Expense
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Add New Expense</DialogTitle>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="vendor"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Vendor/Merchant</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Enter vendor name" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Category</FormLabel>
+                          <Select 
+                            onValueChange={field.onChange} 
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select category" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {expenseCategories.map(category => (
+                                <SelectItem key={category} value={category}>
+                                  {category}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="amount"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Amount (₹)</FormLabel>
+                          <FormControl>
+                            <Input 
+                              type="number" 
+                              placeholder="0.00" 
+                              {...field} 
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={form.control}
+                      name="date"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Date</FormLabel>
+                          <FormControl>
+                            <Input type="date" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    
+                    <FormField
+                      control={form.control}
+                      name="paymentMethod"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Payment Method</FormLabel>
+                          <Select 
+                            onValueChange={field.onChange} 
+                            defaultValue={field.value}
+                          >
+                            <FormControl>
+                              <SelectTrigger>
+                                <SelectValue placeholder="Select method" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {paymentMethods.map(method => (
+                                <SelectItem key={method} value={method}>
+                                  {method}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  
+                  <FormField
+                    control={form.control}
+                    name="notes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Notes (Optional)</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Add notes about this expense..."
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <DialogFooter>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setIsAddDialogOpen(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button type="submit">
+                      Add Expense
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -130,7 +357,10 @@ export default function Expenses() {
               <CardTitle className="text-sm text-muted-foreground">Total Expenses</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">₹9,800.24</p>
+              <p className="text-2xl font-bold flex items-center">
+                <IndianRupee className="h-4 w-4 mr-1" />
+                9,800.24
+              </p>
             </CardContent>
           </Card>
           <Card>
@@ -138,7 +368,10 @@ export default function Expenses() {
               <CardTitle className="text-sm text-muted-foreground">This Month</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">₹2,450.50</p>
+              <p className="text-2xl font-bold flex items-center">
+                <IndianRupee className="h-4 w-4 mr-1" />
+                2,450.50
+              </p>
             </CardContent>
           </Card>
           <Card>
@@ -146,7 +379,10 @@ export default function Expenses() {
               <CardTitle className="text-sm text-muted-foreground">Average Monthly</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-2xl font-bold">₹3,266.75</p>
+              <p className="text-2xl font-bold flex items-center">
+                <IndianRupee className="h-4 w-4 mr-1" />
+                3,266.75
+              </p>
             </CardContent>
           </Card>
           <Card>
@@ -214,8 +450,9 @@ export default function Expenses() {
                           {expense.status}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">
-                        {formatCurrency(expense.amount)}
+                      <TableCell className="text-right flex justify-end items-center">
+                        <IndianRupee className="h-3 w-3 mr-1" />
+                        {expense.amount.toLocaleString('en-IN')}
                       </TableCell>
                       <TableCell>
                         <DropdownMenu>
@@ -265,15 +502,15 @@ export default function Expenses() {
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
                 <div className="text-sm">
-                  Page {currentPage} of {totalPages}
+                  Page {currentPage} of {totalPages || 1}
                 </div>
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={() =>
-                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages || 1))
                   }
-                  disabled={currentPage === totalPages}
+                  disabled={currentPage === (totalPages || 1)}
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>

@@ -10,13 +10,13 @@ const Footer = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
-            <h3 className="font-bold text-lg mb-4">BizzTrack</h3>
+            <h3 className="font-bold text-lg mb-4">Alakh Corporation</h3>
             <p className="text-muted-foreground mb-4">
               Simplify your business finances with our comprehensive invoicing and expense tracking solution.
             </p>
             <div className="flex items-center space-x-1 text-sm">
               <Copyright className="h-4 w-4" />
-              <span>{currentYear} BizzTrack. All rights reserved.</span>
+              <span>{currentYear} Alakh Corporation. All rights reserved.</span>
             </div>
           </div>
           
@@ -44,16 +44,20 @@ const Footer = () => {
             <h3 className="font-bold mb-4">Contact Us</h3>
             <ul className="space-y-3">
               <li className="flex items-center">
-                <Phone className="h-4 w-4 mr-2" />
-                <span>+91 98765 43210</span>
+                <a href="tel:+919580813770" className="flex items-center hover:text-primary">
+                  <Phone className="h-4 w-4 mr-2" />
+                  <span>+91 9580813770</span>
+                </a>
               </li>
               <li className="flex items-center">
-                <Mail className="h-4 w-4 mr-2" />
-                <span>support@bizztrack.com</span>
+                <a href="mailto:alakh1304@gmail.com" className="flex items-center hover:text-primary">
+                  <Mail className="h-4 w-4 mr-2" />
+                  <span>alakh1304@gmail.com</span>
+                </a>
               </li>
               <li className="flex items-center">
                 <MapPin className="h-4 w-4 mr-2" />
-                <span>123 Business Park, Bangalore, India</span>
+                <span>Mirzapur, UP, India - 231312</span>
               </li>
             </ul>
           </div>
