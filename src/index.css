@@ -65,22 +65,20 @@
     --input: 217 33% 18%;
     --ring: 213 27% 84%;
   }
-}
-
-@layer base {
-  * {
-    @apply border-border;
-  }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-poppins;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium tracking-tight;
   }
 }
 
 @layer components {
   .logo-text {
-    @apply text-lg font-bold text-primary;
+    @apply text-lg font-bold text-primary font-playfair;
   }
   
   .btn-primary {
@@ -96,7 +94,7 @@
   }
   
   .dashboard-card {
-    @apply bg-card rounded-lg p-5 shadow-sm;
+    @apply bg-card rounded-lg p-5 shadow-sm hover:shadow-md transition-all duration-300;
   }
   
   .nav-link {
@@ -104,6 +102,31 @@
   }
   
   .nav-link-active {
-    @apply bg-muted text-foreground;
+    @apply bg-primary/10 text-primary border-l-2 border-primary;
   }
+  
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-md hover:border-primary/30;
+  }
+  
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent;
+  }
+
+  .playfair-heading {
+    @apply font-playfair;
+  }
+}
+
+/* Additional utility classes for font variants */
+.font-playfair {
+  font-family: 'Playfair Display', serif;
+}
+
+.font-poppins {
+  font-family: 'Poppins', sans-serif;
+}
+
+.font-montserrat {
+  font-family: 'Montserrat', sans-serif;
 }

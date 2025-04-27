@@ -1,130 +1,228 @@
-import React from "react";
+
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus } from "lucide-react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import SettingsTable from "./SettingsTable";
-
-interface BadgeProps {
-  children: React.ReactNode;
-  variant?: "default" | "outline";
-  className?: string;
-}
-
-const Badge = ({ children, variant = "default", className = "" }: BadgeProps) => (
-  <span
-    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-      ${variant === "default" ? "bg-primary text-primary-foreground" : "border"}
-      ${className}`}
-  >
-    {children}
-  </span>
-);
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2, IndianRupee } from "lucide-react";
 
 const BillingSettings = () => {
+  const plans = [
+    {
+      name: "Free",
+      price: 0,
+      description: "Basic features for small businesses",
+      features: [
+        "5 invoices per month",
+        "Basic invoice templates",
+        "Customer management",
+        "Email support",
+      ],
+      current: false,
+    },
+    {
+      name: "Standard",
+      price: 499,
+      description: "Everything you need for growing businesses",
+      features: [
+        "Unlimited invoices",
+        "10 invoice templates",
+        "Customer & vendor management",
+        "Expense tracking",
+        "Basic reporting",
+        "Priority email support",
+      ],
+      current: true,
+    },
+    {
+      name: "Professional",
+      price: 999,
+      description: "Advanced features for established businesses",
+      features: [
+        "Everything in Standard",
+        "All premium templates",
+        "Advanced reporting",
+        "Team access (up to 3 users)",
+        "Automated reminders",
+        "Dedicated support",
+        "API access",
+      ],
+      current: false,
+    },
+  ];
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Billing & Subscription</CardTitle>
-        <CardDescription>
-          Manage your subscription plan and payment methods
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          <div>
-            <div className="flex justify-between items-start mb-4">
-              <div>
-                <h3 className="font-medium">Current Plan</h3>
-                <p className="text-sm text-muted-foreground">
-                  You're currently on the Pro plan
-                </p>
-              </div>
-              <div className="text-right">
-                <p className="text-lg font-bold">$29/month</p>
-                <p className="text-sm text-muted-foreground">
-                  Next billing date: May 23, 2025
-                </p>
-              </div>
-            </div>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Subscription Plans</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {plans.map((plan) => (
+              <div
+                key={plan.name}
+                className={`border rounded-lg p-6 transition-all ${
+                  plan.current
+                    ? "border-primary shadow-md bg-primary/5"
+                    : "hover:border-primary/50 hover:shadow-sm"
+                }`}
+              >
+                <div className="flex justify-between items-start">
+                  <h3 className="font-semibold text-lg font-playfair">{plan.name}</h3>
+                  {plan.current && (
+                    <Badge className="bg-primary/10 text-primary border-primary">
+                      Current Plan
+                    </Badge>
+                  )}
+                </div>
 
-            <div className="bg-muted p-4 rounded-lg">
-              <div className="flex justify-between items-center mb-2">
-                <h4 className="font-medium">Pro Plan Features:</h4>
-                <Badge variant="outline">Current Plan</Badge>
-              </div>
-              <ul className="space-y-1 text-sm">
-                <li>• Unlimited invoices</li>
-                <li>• Up to 100 clients</li>
-                <li>• Custom branding</li>
-                <li>• Export financial reports</li>
-                <li>• Email support</li>
-              </ul>
-              <div className="mt-4 flex gap-2">
-                <Button variant="outline">Change Plan</Button>
-                <Button variant="outline" className="text-destructive">
-                  Cancel Subscription
+                <div className="mt-4 flex items-baseline">
+                  <span className="flex items-center text-3xl font-bold">
+                    <IndianRupee className="h-5 w-5 mr-1" />
+                    {plan.price}
+                  </span>
+                  <span className="ml-1 text-muted-foreground">/month</span>
+                </div>
+
+                <p className="mt-2 text-muted-foreground text-sm">
+                  {plan.description}
+                </p>
+
+                <ul className="mt-4 space-y-2">
+                  {plan.features.map((feature) => (
+                    <li key={feature} className="flex items-start">
+                      <CheckCircle2 className="h-4 w-4 text-primary mr-2 mt-0.5" />
+                      <span className="text-sm">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <Button
+                  className={`w-full mt-6 ${
+                    plan.current
+                      ? "bg-primary/20 text-primary hover:bg-primary/30 border border-primary"
+                      : "bg-primary"
+                  }`}
+                  variant={plan.current ? "outline" : "default"}
+                  disabled={plan.current}
+                >
+                  {plan.current ? "Current Plan" : "Upgrade"}
                 </Button>
               </div>
-            </div>
+            ))}
           </div>
+        </CardContent>
+      </Card>
 
-          <div className="border-t pt-4">
-            <h3 className="font-medium mb-3">Payment Methods</h3>
-            <div className="bg-card border rounded-lg p-3 mb-3 flex justify-between">
-              <div className="flex gap-3">
-                <div className="w-10 h-7 bg-[#1434CB] rounded flex items-center justify-center text-white text-xs">
-                  VISA
-                </div>
-                <div>
-                  <p className="text-sm font-medium">Visa ending in 4242</p>
-                  <p className="text-xs text-muted-foreground">
-                    Expires 12/2025
-                  </p>
-                </div>
-              </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Payment Method</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center border p-4 rounded-md">
               <div className="flex items-center">
-                <Badge variant="outline" className="mr-2">Default</Badge>
-                <Button variant="ghost" size="sm">
-                  Edit
-                </Button>
+                <div className="h-10 w-14 bg-slate-200 rounded mr-4"></div>
+                <div>
+                  <div className="font-medium">•••• •••• •••• 4242</div>
+                  <div className="text-sm text-muted-foreground">
+                    Expires 12/24
+                  </div>
+                </div>
               </div>
+              <Button variant="outline" size="sm">
+                Change
+              </Button>
             </div>
-            <Button variant="outline" className="w-full">
-              <Plus className="h-4 w-4 mr-2" /> Add Payment Method
+            <Button variant="outline" className="w-full sm:w-auto">
+              Add Payment Method
             </Button>
           </div>
+        </CardContent>
+      </Card>
 
-          <div className="border-t pt-4">
-            <h3 className="font-medium mb-3">Billing History</h3>
-            <div className="border rounded-lg overflow-hidden">
-              <SettingsTable>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>May 15, 2025</TableCell>
-                      <TableCell>Pro Plan Subscription</TableCell>
-                      <TableCell>$29.00</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">Paid</Badge>
-                      </TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </SettingsTable>
+      <Card>
+        <CardHeader>
+          <CardTitle>Billing History</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="border rounded-md">
+              <table className="min-w-full divide-y divide-border">
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Description
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Amount
+                    </th>
+                    <th className="px-4 py-2 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                      Status
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-border">
+                  <tr>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm">
+                      04/15/2023
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm">
+                      Standard Plan - Monthly
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm flex items-center">
+                      <IndianRupee className="h-3 w-3 mr-1" />
+                      499.00
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm">
+                      <Badge variant="outline" className="bg-success/10 text-success border-success">
+                        Paid
+                      </Badge>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm">
+                      03/15/2023
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm">
+                      Standard Plan - Monthly
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm flex items-center">
+                      <IndianRupee className="h-3 w-3 mr-1" />
+                      499.00
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm">
+                      <Badge variant="outline" className="bg-success/10 text-success border-success">
+                        Paid
+                      </Badge>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm">
+                      02/15/2023
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm">
+                      Standard Plan - Monthly
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm flex items-center">
+                      <IndianRupee className="h-3 w-3 mr-1" />
+                      499.00
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap text-sm">
+                      <Badge variant="outline" className="bg-success/10 text-success border-success">
+                        Paid
+                      </Badge>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 

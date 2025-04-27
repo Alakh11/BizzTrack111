@@ -1,10 +1,10 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,6 +19,8 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useClients } from "@/hooks/useClients";
 import { useInvoices } from "@/hooks/useInvoices";
 import { supabase } from "@/integrations/supabase/client";
+import InvoiceTemplates from "@/components/invoices/InvoiceTemplates";
+import LogoUpload from "@/components/invoices/LogoUpload";
 
 const steps = [
   {
@@ -38,25 +40,6 @@ const steps = [
   },
 ];
 
-// Invoice templates
-const invoiceTemplates = [
-  { id: "standard", name: "Standard", image: "https://placehold.co/200x280/e9e9e9/999?text=Standard" },
-  { id: "professional", name: "Professional", image: "https://placehold.co/200x280/e9e9e9/999?text=Professional" },
-  { id: "modern", name: "Modern", image: "https://placehold.co/200x280/e9e9e9/999?text=Modern" },
-  { id: "classic", name: "Classic", image: "https://placehold.co/200x280/e9e9e9/999?text=Classic" },
-  { id: "simple", name: "Simple", image: "https://placehold.co/200x280/e9e9e9/999?text=Simple" },
-];
-
-// Color themes
-const colorThemes = [
-  { id: "blue", name: "Blue", color: "#3b82f6" },
-  { id: "green", name: "Green", color: "#10b981" },
-  { id: "purple", name: "Purple", color: "#8b5cf6" },
-  { id: "orange", name: "Orange", color: "#f97316" },
-  { id: "red", name: "Red", color: "#ef4444" },
-  { id: "gray", name: "Gray", color: "#6b7280" },
-];
-
 // Font options
 const fontOptions = [
   { id: "inter", name: "Inter" },
@@ -71,6 +54,16 @@ const paperSizes = [
   { id: "letter", name: "Letter" },
   { id: "legal", name: "Legal" },
   { id: "a3", name: "A3" },
+];
+
+// Color themes
+const colorThemes = [
+  { id: "blue", name: "Blue", color: "#3b82f6" },
+  { id: "green", name: "Green", color: "#10b981" },
+  { id: "purple", name: "Purple", color: "#8b5cf6" },
+  { id: "orange", name: "Orange", color: "#f97316" },
+  { id: "red", name: "Red", color: "#ef4444" },
+  { id: "gray", name: "Gray", color: "#6b7280" },
 ];
 
 const InvoiceGeneration = () => {
@@ -89,11 +82,16 @@ const InvoiceGeneration = () => {
   const [purchaseOrderNumber, setPurchaseOrderNumber] = useState("");
   const [referenceNumber, setReferenceNumber] = useState("");
   const [selectedCurrency, setSelectedCurrency] = useState("inr");
+  const [businessLogo, setBusinessLogo] = useState("");
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [invoiceId, setInvoiceId] = useState<string | null>(null);
   
   const { toast } = useToast();
   const navigate = useNavigate();
+  const params = useParams();
+  const location = useLocation();
   const { clients = [], isLoading: clientsLoading } = useClients();
-  const { createInvoice } = useInvoices();
+  const { createInvoice, updateInvoice, getInvoice } = useInvoices();
 
   const form = useForm({
     defaultValues: {
@@ -125,8 +123,94 @@ const InvoiceGeneration = () => {
     },
   });
 
+  // Check if we're in edit mode
   useEffect(() => {
-    // Fetch business profile data
+    const fetchInvoice = async () => {
+      if (params.id) {
+        try {
+          setIsEditMode(true);
+          setInvoiceId(params.id);
+          
+          // Try to get invoice from location state first (for better UX)
+          let invoiceData;
+          if (location.state?.invoice) {
+            invoiceData = location.state.invoice;
+          } else {
+            // Fetch from API if not in state
+            invoiceData = await getInvoice(params.id);
+          }
+          
+          if (invoiceData) {
+            // Set form values
+            form.setValue("invoiceNumber", invoiceData.invoice_number);
+            form.setValue("invoiceDate", invoiceData.invoice_date);
+            form.setValue("dueDate", invoiceData.due_date);
+            form.setValue("clientId", invoiceData.client_id || "");
+            form.setValue("notes", invoiceData.notes || "");
+            form.setValue("terms", invoiceData.terms || "");
+            
+            // Set client details if available
+            if (invoiceData.client) {
+              form.setValue("clientName", invoiceData.client.name || "");
+              form.setValue("clientAddress", invoiceData.client.address || "");
+              form.setValue("clientEmail", invoiceData.client.email || "");
+              form.setValue("clientPhone", invoiceData.client.phone || "");
+            }
+            
+            // Set invoice items
+            if (invoiceData.invoice_items && invoiceData.invoice_items.length > 0) {
+              setItems(invoiceData.invoice_items.map((item: any, index: number) => ({
+                id: index + 1,
+                description: item.description,
+                quantity: item.quantity,
+                rate: item.unit_price,
+                amount: item.amount,
+                serviceId: item.service_id || ""
+              })));
+            }
+
+            // If there are design settings stored in metadata
+            if (invoiceData.metadata) {
+              try {
+                const metadata = JSON.parse(invoiceData.metadata);
+                if (metadata.design) {
+                  setSelectedTemplate(metadata.design.template || "standard");
+                  setSelectedColor(metadata.design.color || "blue");
+                  setSelectedFont(metadata.design.font || "inter");
+                  setCustomInvoiceTitle(metadata.design.title || "INVOICE");
+                  setBusinessLogo(metadata.design.logo || "");
+                }
+                if (metadata.additional) {
+                  setPurchaseOrderNumber(metadata.additional.poNumber || "");
+                  setReferenceNumber(metadata.additional.refNumber || "");
+                }
+              } catch (e) {
+                console.error("Error parsing invoice metadata", e);
+              }
+            }
+
+            toast({
+              title: "Invoice loaded",
+              description: "You are now editing invoice #" + invoiceData.invoice_number,
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching invoice:", error);
+          toast({
+            title: "Error",
+            description: "Could not load invoice for editing",
+            variant: "destructive"
+          });
+          navigate("/invoices");
+        }
+      }
+    };
+
+    fetchInvoice();
+  }, [params.id, form, navigate, toast, getInvoice, location.state]);
+
+  // Fetch business profile data
+  useEffect(() => {
     const fetchBusinessProfile = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -210,6 +294,24 @@ const InvoiceGeneration = () => {
 
   const handleSubmit = form.handleSubmit(async (data) => {
     try {
+      // Prepare metadata for design settings
+      const metadata = {
+        design: {
+          template: selectedTemplate,
+          color: selectedColor,
+          font: selectedFont,
+          paperSize: selectedPaperSize,
+          title: customInvoiceTitle,
+          subtitle: customSubtitle,
+          logo: businessLogo,
+        },
+        additional: {
+          poNumber: purchaseOrderNumber,
+          refNumber: referenceNumber,
+          currency: selectedCurrency,
+        }
+      };
+      
       // Prepare invoice data
       const invoiceData = {
         invoice_number: data.invoiceNumber,
@@ -219,39 +321,60 @@ const InvoiceGeneration = () => {
         client_id: data.clientId || null,
         notes: data.notes,
         terms: data.terms,
-        status: "pending"
+        status: "pending",
+        metadata: JSON.stringify(metadata)
       };
       
-      // Create invoice in database
-      const result = await createInvoice.mutateAsync(invoiceData);
-      
-      // If invoice was created successfully, add invoice items
-      if (result && result.id) {
-        // Prepare invoice items
-        const invoiceItems = items.map(item => ({
-          invoice_id: result.id,
-          description: item.description,
-          quantity: item.quantity,
-          unit_price: item.rate,
-          amount: item.amount,
-          service_id: item.serviceId || null
-        }));
-        
-        // Insert invoice items
-        await supabase.from('invoice_items').insert(invoiceItems);
-        
-        toast({
-          title: "Invoice created",
-          description: "Your invoice has been created successfully.",
+      // Prepare invoice items
+      const invoiceItems = items.map(item => ({
+        description: item.description,
+        quantity: item.quantity,
+        unit_price: item.rate,
+        amount: item.amount,
+        service_id: item.serviceId || null
+      }));
+
+      if (isEditMode && invoiceId) {
+        // Update existing invoice
+        await updateInvoice.mutateAsync({ 
+          id: invoiceId, 
+          invoiceData: {
+            ...invoiceData,
+            invoice_items: invoiceItems
+          }
         });
         
-        navigate("/invoices");
+        toast({
+          title: "Invoice updated",
+          description: "Your invoice has been updated successfully.",
+        });
+      } else {
+        // Create new invoice
+        const result = await createInvoice.mutateAsync(invoiceData);
+        
+        // If invoice was created successfully, add invoice items
+        if (result && result.id) {
+          // Insert invoice items
+          await supabase.from('invoice_items').insert(
+            invoiceItems.map(item => ({
+              ...item,
+              invoice_id: result.id
+            }))
+          );
+          
+          toast({
+            title: "Invoice created",
+            description: "Your invoice has been created successfully.",
+          });
+        }
       }
+      
+      navigate("/invoices");
     } catch (error: any) {
-      console.error("Error creating invoice:", error);
+      console.error("Error with invoice:", error);
       toast({
-        title: "Error creating invoice",
-        description: error.message || "An error occurred while creating the invoice",
+        title: isEditMode ? "Error updating invoice" : "Error creating invoice",
+        description: error.message || `An error occurred while ${isEditMode ? 'updating' : 'creating'} the invoice`,
         variant: "destructive"
       });
     }
@@ -266,7 +389,7 @@ const InvoiceGeneration = () => {
               <div className="flex items-center space-x-2">
                 <FormItem className="w-full">
                   <Input 
-                    className="text-2xl font-bold border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+                    className="text-2xl font-bold border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 font-playfair"
                     value={customInvoiceTitle}
                     onChange={(e) => setCustomInvoiceTitle(e.target.value)}
                     placeholder="INVOICE"
@@ -287,7 +410,7 @@ const InvoiceGeneration = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Invoice Info */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium">Invoice Information</h3>
+                <h3 className="text-lg font-medium font-playfair">Invoice Information</h3>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
@@ -370,7 +493,7 @@ const InvoiceGeneration = () => {
               <div className="space-y-8">
                 {/* Billed By Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Billed By (Your Details)</h3>
+                  <h3 className="text-lg font-medium font-playfair">Billed By (Your Details)</h3>
                   
                   <Card className="shadow-sm">
                     <CardContent className="p-4">
@@ -389,7 +512,7 @@ const InvoiceGeneration = () => {
                 
                 {/* Billed To Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Billed To (Client's Details)</h3>
+                  <h3 className="text-lg font-medium font-playfair">Billed To (Client's Details)</h3>
                   
                   <FormItem>
                     <FormLabel>Select Client</FormLabel>
@@ -533,7 +656,7 @@ const InvoiceGeneration = () => {
 
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium">Invoice Items</h3>
+                <h3 className="text-lg font-medium font-playfair">Invoice Items</h3>
                 <Button
                   type="button"
                   variant="outline"
@@ -651,7 +774,7 @@ const InvoiceGeneration = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">Bank Account Details</h3>
+                  <h3 className="text-lg font-medium font-playfair">Bank Account Details</h3>
                   
                   <FormField
                     control={form.control}
@@ -696,7 +819,7 @@ const InvoiceGeneration = () => {
               
               <div className="space-y-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium">UPI Payment Details</h3>
+                  <h3 className="text-lg font-medium font-playfair">UPI Payment Details</h3>
                   
                   <FormField
                     control={form.control}
@@ -720,7 +843,7 @@ const InvoiceGeneration = () => {
             </div>
             
             <div className="space-y-4">
-              <h3 className="text-lg font-medium">Additional Information</h3>
+              <h3 className="text-lg font-medium font-playfair">Additional Information</h3>
               
               <FormField
                 control={form.control}
@@ -765,28 +888,25 @@ const InvoiceGeneration = () => {
               {/* Design Options */}
               <div className="space-y-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium flex items-center">
+                  <h3 className="text-lg font-medium font-playfair flex items-center">
+                    <FileImage className="h-5 w-5 mr-2" /> Business Logo
+                  </h3>
+                  <LogoUpload onUpload={setBusinessLogo} currentLogo={businessLogo} />
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-medium flex items-center font-playfair">
                     <LayoutTemplate className="h-5 w-5 mr-2" /> Template Design
                   </h3>
                   
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                    {invoiceTemplates.map((template) => (
-                      <div 
-                        key={template.id}
-                        className={`border rounded-md cursor-pointer overflow-hidden ${selectedTemplate === template.id ? 'ring-2 ring-primary' : ''}`}
-                        onClick={() => setSelectedTemplate(template.id)}
-                      >
-                        <div className="aspect-[3/4]">
-                          <img src={template.image} alt={template.name} className="w-full h-full object-cover" />
-                        </div>
-                        <div className="p-2 text-center text-sm font-medium">{template.name}</div>
-                      </div>
-                    ))}
-                  </div>
+                  <InvoiceTemplates 
+                    selectedTemplate={selectedTemplate} 
+                    setSelectedTemplate={setSelectedTemplate} 
+                  />
                 </div>
                 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium flex items-center">
+                  <h3 className="text-lg font-medium flex items-center font-playfair">
                     <PaintBucket className="h-5 w-5 mr-2" /> Color Theme
                   </h3>
                   
@@ -804,7 +924,7 @@ const InvoiceGeneration = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium flex items-center">
+                  <h3 className="text-lg font-medium flex items-center font-playfair">
                     <Type className="h-5 w-5 mr-2" /> Font Style
                   </h3>
                   
@@ -822,7 +942,7 @@ const InvoiceGeneration = () => {
                 </div>
                 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium flex items-center">
+                  <h3 className="text-lg font-medium flex items-center font-playfair">
                     <FileImage className="h-5 w-5 mr-2" /> Letterhead & Branding
                   </h3>
                   
@@ -860,7 +980,7 @@ const InvoiceGeneration = () => {
               {/* Page Setup */}
               <div>
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium flex items-center">
+                  <h3 className="text-lg font-medium flex items-center font-playfair">
                     <FileText className="h-5 w-5 mr-2" /> Page Setup
                   </h3>
                   
@@ -884,7 +1004,7 @@ const InvoiceGeneration = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Margins</FormLabel>
-                        <Select defaultValue="normal" {...field}>
+                        <Select defaultValue={field.value}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select margins" />
                           </SelectTrigger>
@@ -904,7 +1024,7 @@ const InvoiceGeneration = () => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Text Scale (%)</FormLabel>
-                        <Select defaultValue="100" {...field}>
+                        <Select defaultValue={field.value}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select text scale" />
                           </SelectTrigger>
@@ -928,12 +1048,19 @@ const InvoiceGeneration = () => {
                 
                 {/* Preview */}
                 <div className="mt-8">
-                  <h3 className="text-lg font-medium mb-4">Preview</h3>
+                  <h3 className="text-lg font-medium mb-4 font-playfair">Preview</h3>
                   
                   <div className="border rounded-md bg-gray-50 p-4 flex items-center justify-center">
                     <div className="bg-white border shadow-sm w-full max-w-sm aspect-[3/4] p-4">
+                      {/* Show logo if uploaded */}
+                      {businessLogo && (
+                        <div className="flex justify-end mb-4">
+                          <img src={businessLogo} alt="Business Logo" className="h-12 object-contain" />
+                        </div>
+                      )}
+
                       <div className="text-center mb-8">
-                        <h2 className="text-xl font-bold">{customInvoiceTitle}</h2>
+                        <h2 className={`text-xl font-bold font-${selectedFont}`}>{customInvoiceTitle}</h2>
                         {customSubtitle && <p className="text-sm text-muted-foreground">{customSubtitle}</p>}
                       </div>
                       
@@ -994,9 +1121,13 @@ const InvoiceGeneration = () => {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold">Create New Invoice</h1>
+            <h1 className="text-2xl font-bold font-playfair">
+              {isEditMode ? "Edit Invoice" : "Create New Invoice"}
+            </h1>
             <p className="text-muted-foreground">
-              Create a new invoice for your clients
+              {isEditMode 
+                ? "Update invoice details, items, and design" 
+                : "Create a new invoice for your clients"}
             </p>
           </div>
         </div>
@@ -1038,7 +1169,7 @@ const InvoiceGeneration = () => {
                       </Button>
                     ) : (
                       <Button type="submit">
-                        Save Invoice
+                        {isEditMode ? "Update Invoice" : "Save Invoice"}
                       </Button>
                     )}
                   </div>
