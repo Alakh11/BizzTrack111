@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
 import { useIsMobile } from "@/hooks/use-mobile";
-import Footer from "./Footer";
+import { Footer }from "./Footer";
 
 const MainLayout = ({ children }: { children: React.ReactNode }) => {
   const isMobile = useIsMobile();

@@ -2,7 +2,7 @@
 import { Copyright, Phone, Mail, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 
-const Footer = () => {
+export const Footer = () => {
   const currentYear = new Date().getFullYear();
   
   return (
