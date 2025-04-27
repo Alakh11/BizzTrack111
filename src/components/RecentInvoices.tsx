@@ -56,10 +56,17 @@ const RecentInvoices: React.FC = () => {
                 <Badge
                   variant={
                     invoice.status === "paid"
-                      ? "success"
+                      ? "outline"
                       : invoice.status === "pending"
                       ? "outline"
                       : "destructive"
+                  }
+                  className={
+                    invoice.status === "paid"
+                      ? "bg-green-50 text-green-700 border-green-200"
+                      : invoice.status === "pending"
+                      ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                      : ""
                   }
                 >
                   {invoice.status}

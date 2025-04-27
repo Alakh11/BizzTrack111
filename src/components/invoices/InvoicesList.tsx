@@ -344,7 +344,11 @@ const InvoicesList = () => {
       {/* Invoice View Dialog */}
       {viewingInvoice && (
         <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
-          <InvoiceView invoice={viewingInvoice} />
+          <InvoiceView 
+            invoice={viewingInvoice} 
+            open={isViewOpen}
+            onOpenChange={setIsViewOpen}
+          />
         </Dialog>
       )}
     </div>
