@@ -15,7 +15,7 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { BanknotesIcon, CreditCard } from "lucide-react";
+import { Banknote, CreditCard } from "lucide-react";
 
 interface PaymentOptionsProps {
   form: any;
@@ -31,7 +31,7 @@ const PaymentOptions = ({ form }: PaymentOptionsProps) => {
       <Tabs defaultValue="bank" className="w-full">
         <TabsList className="grid grid-cols-2 w-full">
           <TabsTrigger value="bank" className="flex items-center gap-2">
-            <BanknotesIcon className="h-4 w-4" /> Bank Account
+            <Banknote className="h-4 w-4" /> Bank Account
           </TabsTrigger>
           <TabsTrigger value="upi" className="flex items-center gap-2">
             <CreditCard className="h-4 w-4" /> UPI Payment
