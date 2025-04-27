@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, toast } from "sonner"
 
@@ -5,6 +6,15 @@ type ToasterProps = React.ComponentProps<typeof Sonner>
 
 const Toaster = ({ ...props }: ToasterProps) => {
   const { theme = "system" } = useTheme()
+=======
+import { useTheme } from "next-themes";
+import { Toaster as Sonner, toast } from "sonner";
+
+type ToasterProps = React.ComponentProps<typeof Sonner>;
+
+const Toaster = ({ ...props }: ToasterProps) => {
+  const { theme = "system" } = useTheme();
+>>>>>>> tempRepo/main
 
   return (
     <Sonner
@@ -23,7 +33,14 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       {...props}
     />
+<<<<<<< HEAD
   )
 }
 
 export { Toaster, toast }
+=======
+  );
+};
+
+export { Toaster, toast };
+>>>>>>> tempRepo/main

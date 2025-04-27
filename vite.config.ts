@@ -9,11 +9,17 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+<<<<<<< HEAD
   plugins: [
     react(),
     mode === 'development' &&
     componentTagger(),
   ].filter(Boolean),
+=======
+  plugins: [react(), mode === "development" && componentTagger()].filter(
+    Boolean,
+  ),
+>>>>>>> tempRepo/main
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 
 import { cn } from "@/lib/utils"
+=======
+import * as React from "react";
+import { cva, type VariantProps } from "class-variance-authority";
+
+import { cn } from "@/lib/utils";
+>>>>>>> tempRepo/main
 
 const alertVariants = cva(
   "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
@@ -16,8 +23,13 @@ const alertVariants = cva(
     defaultVariants: {
       variant: "default",
     },
+<<<<<<< HEAD
   }
 )
+=======
+  },
+);
+>>>>>>> tempRepo/main
 
 const Alert = React.forwardRef<
   HTMLDivElement,
@@ -29,8 +41,13 @@ const Alert = React.forwardRef<
     className={cn(alertVariants({ variant }), className)}
     {...props}
   />
+<<<<<<< HEAD
 ))
 Alert.displayName = "Alert"
+=======
+));
+Alert.displayName = "Alert";
+>>>>>>> tempRepo/main
 
 const AlertTitle = React.forwardRef<
   HTMLParagraphElement,
@@ -41,8 +58,13 @@ const AlertTitle = React.forwardRef<
     className={cn("mb-1 font-medium leading-none tracking-tight", className)}
     {...props}
   />
+<<<<<<< HEAD
 ))
 AlertTitle.displayName = "AlertTitle"
+=======
+));
+AlertTitle.displayName = "AlertTitle";
+>>>>>>> tempRepo/main
 
 const AlertDescription = React.forwardRef<
   HTMLParagraphElement,
@@ -53,7 +75,14 @@ const AlertDescription = React.forwardRef<
     className={cn("text-sm [&_p]:leading-relaxed", className)}
     {...props}
   />
+<<<<<<< HEAD
 ))
 AlertDescription.displayName = "AlertDescription"
 
 export { Alert, AlertTitle, AlertDescription }
+=======
+));
+AlertDescription.displayName = "AlertDescription";
+
+export { Alert, AlertTitle, AlertDescription };
+>>>>>>> tempRepo/main

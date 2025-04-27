@@ -1,7 +1,14 @@
+<<<<<<< HEAD
 import { GripVertical } from "lucide-react"
 import * as ResizablePrimitive from "react-resizable-panels"
 
 import { cn } from "@/lib/utils"
+=======
+import { GripVertical } from "lucide-react";
+import * as ResizablePrimitive from "react-resizable-panels";
+
+import { cn } from "@/lib/utils";
+>>>>>>> tempRepo/main
 
 const ResizablePanelGroup = ({
   className,
@@ -10,6 +17,7 @@ const ResizablePanelGroup = ({
   <ResizablePrimitive.PanelGroup
     className={cn(
       "flex h-full w-full data-[panel-group-direction=vertical]:flex-col",
+<<<<<<< HEAD
       className
     )}
     {...props}
@@ -17,18 +25,35 @@ const ResizablePanelGroup = ({
 )
 
 const ResizablePanel = ResizablePrimitive.Panel
+=======
+      className,
+    )}
+    {...props}
+  />
+);
+
+const ResizablePanel = ResizablePrimitive.Panel;
+>>>>>>> tempRepo/main
 
 const ResizableHandle = ({
   withHandle,
   className,
   ...props
 }: React.ComponentProps<typeof ResizablePrimitive.PanelResizeHandle> & {
+<<<<<<< HEAD
   withHandle?: boolean
+=======
+  withHandle?: boolean;
+>>>>>>> tempRepo/main
 }) => (
   <ResizablePrimitive.PanelResizeHandle
     className={cn(
       "relative flex w-px items-center justify-center bg-border after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:-translate-x-1/2 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1 data-[panel-group-direction=vertical]:h-px data-[panel-group-direction=vertical]:w-full data-[panel-group-direction=vertical]:after:left-0 data-[panel-group-direction=vertical]:after:h-1 data-[panel-group-direction=vertical]:after:w-full data-[panel-group-direction=vertical]:after:-translate-y-1/2 data-[panel-group-direction=vertical]:after:translate-x-0 [&[data-panel-group-direction=vertical]>div]:rotate-90",
+<<<<<<< HEAD
       className
+=======
+      className,
+>>>>>>> tempRepo/main
     )}
     {...props}
   >
@@ -38,6 +63,12 @@ const ResizableHandle = ({
       </div>
     )}
   </ResizablePrimitive.PanelResizeHandle>
+<<<<<<< HEAD
 )
 
 export { ResizablePanelGroup, ResizablePanel, ResizableHandle }
+=======
+);
+
+export { ResizablePanelGroup, ResizablePanel, ResizableHandle };
+>>>>>>> tempRepo/main
