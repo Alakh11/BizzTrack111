@@ -67,6 +67,55 @@ export const useInvoices = () => {
     },
   });
 
+  // Update invoice
+  const updateInvoice = useMutation({
+    mutationFn: async ({ id, invoiceData }: { id: string; invoiceData: any }) => {
+      const { error } = await supabase
+        .from('invoices')
+        .update(invoiceData)
+        .eq('id', id);
+
+      if (error) throw error;
+      
+      // If there are invoice items to update
+      if (invoiceData.invoice_items && invoiceData.invoice_items.length > 0) {
+        // First delete existing invoice items
+        await supabase
+          .from('invoice_items')
+          .delete()
+          .eq('invoice_id', id);
+        
+        // Then insert the new ones
+        const items = invoiceData.invoice_items.map((item: any) => ({
+          ...item,
+          invoice_id: id
+        }));
+        
+        const { error: itemsError } = await supabase
+          .from('invoice_items')
+          .insert(items);
+        
+        if (itemsError) throw itemsError;
+      }
+      
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['invoices'] });
+      toast({
+        title: "Success",
+        description: "Invoice updated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   // Delete invoice
   const deleteInvoice = useMutation({
     mutationFn: async (invoiceId: string) => {
@@ -102,10 +151,24 @@ export const useInvoices = () => {
     },
   });
 
+  // Get single invoice
+  const getInvoice = async (id: string) => {
+    const { data, error } = await supabase
+      .from('invoices')
+      .select('*, client:clients(name, address, email, phone), invoice_items(*)')
+      .eq('id', id)
+      .single();
+
+    if (error) throw error;
+    return data;
+  };
+
   return {
     invoices,
     isLoading,
     createInvoice,
+    updateInvoice,
     deleteInvoice,
+    getInvoice,
   };
 };

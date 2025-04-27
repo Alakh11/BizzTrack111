@@ -25,7 +25,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const Sidebar = () => {
+interface SidebarProps {
+  isOpen?: boolean;
+}
+
+const Sidebar = ({ isOpen = true }: SidebarProps) => {
   const location = useLocation();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -156,7 +160,8 @@ const Sidebar = () => {
       <div
         className={cn(
           "fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-border transform transition-transform duration-300 ease-in-out lg:translate-x-0",
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
+          !isOpen && "lg:-translate-x-full"
         )}
       >
         <div className="flex flex-col h-full">
@@ -166,7 +171,7 @@ const Sidebar = () => {
               <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center">
                 <span className="text-white font-bold">B</span>
               </div>
-              <span className="text-primary font-bold text-xl">BizzTrack</span>
+              <span className="text-primary font-bold text-xl font-playfair">BizzTrack</span>
             </Link>
           </div>
 
