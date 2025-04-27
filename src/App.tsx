@@ -30,13 +30,6 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-<<<<<<< HEAD
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/clients" element={<Clients />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-=======
         <AuthProvider>
           <Routes>
             <Route path="/login" element={<Auth mode="login" />} />
@@ -57,7 +50,6 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
->>>>>>> tempRepo/main
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
