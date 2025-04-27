@@ -1,12 +1,3 @@
-<<<<<<< HEAD
-import * as React from "react"
-import * as AccordionPrimitive from "@radix-ui/react-accordion"
-import { ChevronDown } from "lucide-react"
-
-import { cn } from "@/lib/utils"
-
-const Accordion = AccordionPrimitive.Root
-=======
 import * as React from "react";
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import { ChevronDown } from "lucide-react";
@@ -14,7 +5,6 @@ import { ChevronDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const Accordion = AccordionPrimitive.Root;
->>>>>>> tempRepo/main
 
 const AccordionItem = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Item>,
@@ -25,13 +15,8 @@ const AccordionItem = React.forwardRef<
     className={cn("border-b", className)}
     {...props}
   />
-<<<<<<< HEAD
-))
-AccordionItem.displayName = "AccordionItem"
-=======
 ));
 AccordionItem.displayName = "AccordionItem";
->>>>>>> tempRepo/main
 
 const AccordionTrigger = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Trigger>,
@@ -42,11 +27,7 @@ const AccordionTrigger = React.forwardRef<
       ref={ref}
       className={cn(
         "flex flex-1 items-center justify-between py-4 font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-180",
-<<<<<<< HEAD
-        className
-=======
         className,
->>>>>>> tempRepo/main
       )}
       {...props}
     >
@@ -54,13 +35,8 @@ const AccordionTrigger = React.forwardRef<
       <ChevronDown className="h-4 w-4 shrink-0 transition-transform duration-200" />
     </AccordionPrimitive.Trigger>
   </AccordionPrimitive.Header>
-<<<<<<< HEAD
-))
-AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName
-=======
 ));
 AccordionTrigger.displayName = AccordionPrimitive.Trigger.displayName;
->>>>>>> tempRepo/main
 
 const AccordionContent = React.forwardRef<
   React.ElementRef<typeof AccordionPrimitive.Content>,
@@ -73,16 +49,8 @@ const AccordionContent = React.forwardRef<
   >
     <div className={cn("pb-4 pt-0", className)}>{children}</div>
   </AccordionPrimitive.Content>
-<<<<<<< HEAD
-))
-
-AccordionContent.displayName = AccordionPrimitive.Content.displayName
-
-export { Accordion, AccordionItem, AccordionTrigger, AccordionContent }
-=======
 ));
 
 AccordionContent.displayName = AccordionPrimitive.Content.displayName;
 
 export { Accordion, AccordionItem, AccordionTrigger, AccordionContent };
->>>>>>> tempRepo/main

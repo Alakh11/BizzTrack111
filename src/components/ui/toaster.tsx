@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { useToast } from "@/hooks/use-toast"
-=======
 import { useToast } from "@/hooks/use-toast";
->>>>>>> tempRepo/main
 import {
   Toast,
   ToastClose,
@@ -10,17 +6,10 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-<<<<<<< HEAD
-} from "@/components/ui/toast"
-
-export function Toaster() {
-  const { toasts } = useToast()
-=======
 } from "@/components/ui/toast";
 
 export function Toaster() {
   const { toasts } = useToast();
->>>>>>> tempRepo/main
 
   return (
     <ToastProvider>
@@ -36,17 +25,9 @@ export function Toaster() {
             {action}
             <ToastClose />
           </Toast>
-<<<<<<< HEAD
-        )
-      })}
-      <ToastViewport />
-    </ToastProvider>
-  )
-=======
         );
       })}
       <ToastViewport />
     </ToastProvider>
   );
->>>>>>> tempRepo/main
 }

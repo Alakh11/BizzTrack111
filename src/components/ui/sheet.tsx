@@ -1,19 +1,3 @@
-<<<<<<< HEAD
-import * as SheetPrimitive from "@radix-ui/react-dialog"
-import { cva, type VariantProps } from "class-variance-authority"
-import { X } from "lucide-react"
-import * as React from "react"
-
-import { cn } from "@/lib/utils"
-
-const Sheet = SheetPrimitive.Root
-
-const SheetTrigger = SheetPrimitive.Trigger
-
-const SheetClose = SheetPrimitive.Close
-
-const SheetPortal = SheetPrimitive.Portal
-=======
 import * as SheetPrimitive from "@radix-ui/react-dialog";
 import { cva, type VariantProps } from "class-variance-authority";
 import { X } from "lucide-react";
@@ -28,7 +12,6 @@ const SheetTrigger = SheetPrimitive.Trigger;
 const SheetClose = SheetPrimitive.Close;
 
 const SheetPortal = SheetPrimitive.Portal;
->>>>>>> tempRepo/main
 
 const SheetOverlay = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Overlay>,
@@ -37,22 +20,13 @@ const SheetOverlay = React.forwardRef<
   <SheetPrimitive.Overlay
     className={cn(
       "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
-<<<<<<< HEAD
-      className
-=======
       className,
->>>>>>> tempRepo/main
     )}
     {...props}
     ref={ref}
   />
-<<<<<<< HEAD
-))
-SheetOverlay.displayName = SheetPrimitive.Overlay.displayName
-=======
 ));
 SheetOverlay.displayName = SheetPrimitive.Overlay.displayName;
->>>>>>> tempRepo/main
 
 const sheetVariants = cva(
   "fixed z-50 gap-4 bg-background p-6 shadow-lg transition ease-in-out data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:duration-500",
@@ -70,21 +44,12 @@ const sheetVariants = cva(
     defaultVariants: {
       side: "right",
     },
-<<<<<<< HEAD
-  }
-)
-
-interface SheetContentProps
-  extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
-  VariantProps<typeof sheetVariants> { }
-=======
   },
 );
 
 interface SheetContentProps
   extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
     VariantProps<typeof sheetVariants> {}
->>>>>>> tempRepo/main
 
 const SheetContent = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Content>,
@@ -104,13 +69,8 @@ const SheetContent = React.forwardRef<
       </SheetPrimitive.Close>
     </SheetPrimitive.Content>
   </SheetPortal>
-<<<<<<< HEAD
-))
-SheetContent.displayName = SheetPrimitive.Content.displayName
-=======
 ));
 SheetContent.displayName = SheetPrimitive.Content.displayName;
->>>>>>> tempRepo/main
 
 const SheetHeader = ({
   className,
@@ -119,21 +79,12 @@ const SheetHeader = ({
   <div
     className={cn(
       "flex flex-col space-y-2 text-center sm:text-left",
-<<<<<<< HEAD
-      className
-    )}
-    {...props}
-  />
-)
-SheetHeader.displayName = "SheetHeader"
-=======
       className,
     )}
     {...props}
   />
 );
 SheetHeader.displayName = "SheetHeader";
->>>>>>> tempRepo/main
 
 const SheetFooter = ({
   className,
@@ -142,21 +93,12 @@ const SheetFooter = ({
   <div
     className={cn(
       "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
-<<<<<<< HEAD
-      className
-    )}
-    {...props}
-  />
-)
-SheetFooter.displayName = "SheetFooter"
-=======
       className,
     )}
     {...props}
   />
 );
 SheetFooter.displayName = "SheetFooter";
->>>>>>> tempRepo/main
 
 const SheetTitle = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Title>,
@@ -167,13 +109,8 @@ const SheetTitle = React.forwardRef<
     className={cn("text-lg font-semibold text-foreground", className)}
     {...props}
   />
-<<<<<<< HEAD
-))
-SheetTitle.displayName = SheetPrimitive.Title.displayName
-=======
 ));
 SheetTitle.displayName = SheetPrimitive.Title.displayName;
->>>>>>> tempRepo/main
 
 const SheetDescription = React.forwardRef<
   React.ElementRef<typeof SheetPrimitive.Description>,
@@ -184,16 +121,6 @@ const SheetDescription = React.forwardRef<
     className={cn("text-sm text-muted-foreground", className)}
     {...props}
   />
-<<<<<<< HEAD
-))
-SheetDescription.displayName = SheetPrimitive.Description.displayName
-
-export {
-  Sheet, SheetClose,
-  SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetOverlay, SheetPortal, SheetTitle, SheetTrigger
-}
-
-=======
 ));
 SheetDescription.displayName = SheetPrimitive.Description.displayName;
 
@@ -209,4 +136,3 @@ export {
   SheetTitle,
   SheetTrigger,
 };
->>>>>>> tempRepo/main
