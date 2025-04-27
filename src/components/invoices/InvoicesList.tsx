@@ -1,4 +1,3 @@
-<script src="http://192.168.29.168:8097"></script>;
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
