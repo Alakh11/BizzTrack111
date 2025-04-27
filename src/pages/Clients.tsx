@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import {
@@ -19,7 +18,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Plus, Search, MoreHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  Plus,
+  Search,
+  MoreHorizontal,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -161,7 +166,7 @@ const Clients = () => {
     (client) =>
       client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       client.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.email.toLowerCase().includes(searchQuery.toLowerCase())
+      client.email.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Pagination logic
@@ -169,7 +174,7 @@ const Clients = () => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedClients = filteredClients.slice(
     startIndex,
-    startIndex + itemsPerPage
+    startIndex + itemsPerPage,
   );
 
   const formatCurrency = (value: number) => {
@@ -251,7 +256,9 @@ const Clients = () => {
                               <AvatarFallback>{client.initials}</AvatarFallback>
                             </Avatar>
                             <div>
-                              <p className="font-medium text-sm">{client.name}</p>
+                              <p className="font-medium text-sm">
+                                {client.name}
+                              </p>
                               <p className="text-xs text-muted-foreground">
                                 {client.company}
                               </p>
@@ -279,7 +286,9 @@ const Clients = () => {
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem>View Client</DropdownMenuItem>
                               <DropdownMenuItem>Edit Client</DropdownMenuItem>
-                              <DropdownMenuItem>Create Invoice</DropdownMenuItem>
+                              <DropdownMenuItem>
+                                Create Invoice
+                              </DropdownMenuItem>
                               <DropdownMenuItem className="text-destructive">
                                 Delete Client
                               </DropdownMenuItem>
@@ -304,14 +313,16 @@ const Clients = () => {
               <div className="flex items-center justify-between mt-4">
                 <div className="text-sm text-muted-foreground">
                   Showing {startIndex + 1} to{" "}
-                  {Math.min(startIndex + itemsPerPage, filteredClients.length)} of{" "}
-                  {filteredClients.length} entries
+                  {Math.min(startIndex + itemsPerPage, filteredClients.length)}{" "}
+                  of {filteredClients.length} entries
                 </div>
                 <div className="flex items-center space-x-2">
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    onClick={() =>
+                      setCurrentPage((prev) => Math.max(prev - 1, 1))
+                    }
                     disabled={currentPage === 1}
                   >
                     <ChevronLeft className="h-4 w-4" />

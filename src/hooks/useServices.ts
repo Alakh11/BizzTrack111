@@ -1,18 +1,15 @@
-
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from './use-toast';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "./use-toast";
 
 export const useServices = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
   const { data: services, isLoading } = useQuery({
-    queryKey: ['services'],
+    queryKey: ["services"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('services')
-        .select('*');
+      const { data, error } = await supabase.from("services").select("*");
 
       if (error) throw error;
       return data;
@@ -22,7 +19,7 @@ export const useServices = () => {
   const createService = useMutation({
     mutationFn: async (newService: any) => {
       const { data, error } = await supabase
-        .from('services')
+        .from("services")
         .insert(newService)
         .select()
         .single();
@@ -31,7 +28,7 @@ export const useServices = () => {
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['services'] });
+      queryClient.invalidateQueries({ queryKey: ["services"] });
       toast({
         title: "Success",
         description: "Service created successfully",

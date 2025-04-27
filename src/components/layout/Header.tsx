@@ -1,5 +1,3 @@
-
-
 import { Button } from "@/components/ui/button";
 import {
   Bell,
@@ -40,9 +38,9 @@ const Header = ({ onToggleSidebar, isSidebarOpen = true }: HeaderProps) => {
     <header className="border-b py-3 px-4 md:px-6 bg-white">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onToggleSidebar}
             className="hidden lg:flex"
           >
@@ -101,7 +99,10 @@ const Header = ({ onToggleSidebar, isSidebarOpen = true }: HeaderProps) => {
                 Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer" onClick={handleSignOut}>
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={handleSignOut}
+              >
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
               </DropdownMenuItem>

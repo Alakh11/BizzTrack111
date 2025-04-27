@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,9 +9,9 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Download, Printer, Share2, Edit, ArrowLeft } from "lucide-react";
-import { useNavigate } from 'react-router-dom';
-import { Badge } from '@/components/ui/badge';
-import { IndianRupee } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
+import { IndianRupee } from "lucide-react";
 
 interface InvoiceViewProps {
   open: boolean;
@@ -22,7 +21,7 @@ interface InvoiceViewProps {
 
 const InvoiceView = ({ open, onOpenChange, invoice }: InvoiceViewProps) => {
   const navigate = useNavigate();
-  
+
   if (!invoice) return null;
 
   const handleEdit = () => {
@@ -32,9 +31,9 @@ const InvoiceView = ({ open, onOpenChange, invoice }: InvoiceViewProps) => {
 
   const handleDownload = () => {
     // Create a printable version of the invoice
-    const printWindow = window.open('', '_blank');
+    const printWindow = window.open("", "_blank");
     if (!printWindow) return;
-    
+
     const html = `
       <html>
         <head>
@@ -74,9 +73,9 @@ const InvoiceView = ({ open, onOpenChange, invoice }: InvoiceViewProps) => {
               </div>
               <div class="info-block">
                 <h3>To:</h3>
-                <p>${invoice.client?.name || 'Client'}<br>
-                ${invoice.client?.address || ''}<br>
-                ${invoice.client?.email || ''}</p>
+                <p>${invoice.client?.name || "Client"}<br>
+                ${invoice.client?.address || ""}<br>
+                ${invoice.client?.email || ""}</p>
               </div>
             </div>
             
@@ -101,25 +100,31 @@ const InvoiceView = ({ open, onOpenChange, invoice }: InvoiceViewProps) => {
                 </tr>
               </thead>
               <tbody>
-                ${invoice.invoice_items?.map((item: any) => `
+                ${
+                  invoice.invoice_items
+                    ?.map(
+                      (item: any) => `
                 <tr>
                   <td>${item.description}</td>
                   <td>${item.quantity}</td>
                   <td>${item.unit_price}</td>
                   <td>${item.amount}</td>
                 </tr>
-                `).join('') || ''}
+                `,
+                    )
+                    .join("") || ""
+                }
               </tbody>
               <tfoot>
                 <tr>
                   <th colspan="3">Total:</th>
-                  <th>₹ ${invoice.total_amount.toLocaleString('en-IN')}</th>
+                  <th>₹ ${invoice.total_amount.toLocaleString("en-IN")}</th>
                 </tr>
               </tfoot>
             </table>
             
-            ${invoice.notes ? `<div><h3>Notes:</h3><p>${invoice.notes}</p></div>` : ''}
-            ${invoice.terms ? `<div><h3>Terms and Conditions:</h3><p>${invoice.terms}</p></div>` : ''}
+            ${invoice.notes ? `<div><h3>Notes:</h3><p>${invoice.notes}</p></div>` : ""}
+            ${invoice.terms ? `<div><h3>Terms and Conditions:</h3><p>${invoice.terms}</p></div>` : ""}
             
             <div class="footer">
               <p>Thank you for your business!</p>
@@ -128,7 +133,7 @@ const InvoiceView = ({ open, onOpenChange, invoice }: InvoiceViewProps) => {
         </body>
       </html>
     `;
-    
+
     printWindow.document.write(html);
     printWindow.document.close();
     setTimeout(() => {
@@ -137,10 +142,13 @@ const InvoiceView = ({ open, onOpenChange, invoice }: InvoiceViewProps) => {
   };
 
   const getStatusColor = (status: string) => {
-    switch(status) {
-      case 'paid': return 'bg-success/10 text-success border-success';
-      case 'overdue': return 'bg-destructive/10 text-destructive border-destructive';
-      default: return 'bg-warning/10 text-warning border-warning';
+    switch (status) {
+      case "paid":
+        return "bg-success/10 text-success border-success";
+      case "overdue":
+        return "bg-destructive/10 text-destructive border-destructive";
+      default:
+        return "bg-warning/10 text-warning border-warning";
     }
   };
 
@@ -149,8 +157,12 @@ const InvoiceView = ({ open, onOpenChange, invoice }: InvoiceViewProps) => {
       <DialogContent className="max-w-4xl h-[85vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex justify-between items-center">
-            <DialogTitle className="text-2xl font-playfair">Invoice #{invoice.invoice_number}</DialogTitle>
-            <Badge className={`${getStatusColor(invoice.status)} capitalize px-3 py-1`}>
+            <DialogTitle className="text-2xl font-playfair">
+              Invoice #{invoice.invoice_number}
+            </DialogTitle>
+            <Badge
+              className={`${getStatusColor(invoice.status)} capitalize px-3 py-1`}
+            >
               {invoice.status}
             </Badge>
           </div>
@@ -164,7 +176,9 @@ const InvoiceView = ({ open, onOpenChange, invoice }: InvoiceViewProps) => {
           <div className="flex justify-between items-start">
             <div>
               <div className="text-2xl font-bold font-playfair">INVOICE</div>
-              <div className="text-muted-foreground text-sm">{invoice.invoice_number}</div>
+              <div className="text-muted-foreground text-sm">
+                {invoice.invoice_number}
+              </div>
             </div>
             <div className="h-16 w-16 bg-gray-100 flex items-center justify-center rounded border">
               <span className="text-xl font-bold">Logo</span>
@@ -174,36 +188,58 @@ const InvoiceView = ({ open, onOpenChange, invoice }: InvoiceViewProps) => {
           {/* Business and Client Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-2">
-              <h3 className="font-medium text-sm text-muted-foreground">From</h3>
+              <h3 className="font-medium text-sm text-muted-foreground">
+                From
+              </h3>
               <div className="font-medium">Alakh Corporation</div>
-              <div className="text-sm text-muted-foreground">Mirzapur, UP, India - 231312</div>
-              <div className="text-sm text-muted-foreground">+91 9580813770</div>
-              <div className="text-sm text-muted-foreground">alakh1304@gmail.com</div>
+              <div className="text-sm text-muted-foreground">
+                Mirzapur, UP, India - 231312
+              </div>
+              <div className="text-sm text-muted-foreground">
+                +91 9580813770
+              </div>
+              <div className="text-sm text-muted-foreground">
+                alakh1304@gmail.com
+              </div>
             </div>
             <div className="space-y-2">
               <h3 className="font-medium text-sm text-muted-foreground">To</h3>
-              <div className="font-medium">{invoice.client?.name || 'Client Name'}</div>
-              <div className="text-sm text-muted-foreground">{invoice.client?.address || 'Client Address'}</div>
-              <div className="text-sm text-muted-foreground">{invoice.client?.email || 'Client Email'}</div>
-              <div className="text-sm text-muted-foreground">{invoice.client?.phone || 'Client Phone'}</div>
+              <div className="font-medium">
+                {invoice.client?.name || "Client Name"}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {invoice.client?.address || "Client Address"}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {invoice.client?.email || "Client Email"}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {invoice.client?.phone || "Client Phone"}
+              </div>
             </div>
           </div>
 
           {/* Invoice Details */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-muted/20 p-4 rounded-md">
-              <h3 className="text-sm font-medium text-muted-foreground">Invoice Date</h3>
+              <h3 className="text-sm font-medium text-muted-foreground">
+                Invoice Date
+              </h3>
               <p>{new Date(invoice.invoice_date).toLocaleDateString()}</p>
             </div>
             <div className="bg-muted/20 p-4 rounded-md">
-              <h3 className="text-sm font-medium text-muted-foreground">Due Date</h3>
+              <h3 className="text-sm font-medium text-muted-foreground">
+                Due Date
+              </h3>
               <p>{new Date(invoice.due_date).toLocaleDateString()}</p>
             </div>
             <div className="bg-muted/20 p-4 rounded-md">
-              <h3 className="text-sm font-medium text-muted-foreground">Total Amount</h3>
+              <h3 className="text-sm font-medium text-muted-foreground">
+                Total Amount
+              </h3>
               <p className="flex items-center font-medium text-lg">
                 <IndianRupee className="h-4 w-4 mr-1" />
-                {invoice.total_amount.toLocaleString('en-IN')}
+                {invoice.total_amount.toLocaleString("en-IN")}
               </p>
             </div>
           </div>
@@ -213,16 +249,28 @@ const InvoiceView = ({ open, onOpenChange, invoice }: InvoiceViewProps) => {
             <table className="min-w-full divide-y divide-border">
               <thead className="bg-muted/30">
                 <tr>
-                  <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  >
                     Item
                   </th>
-                  <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  >
                     Quantity
                   </th>
-                  <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  >
                     Rate
                   </th>
-                  <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                  <th
+                    scope="col"
+                    className="px-4 py-3 text-right text-xs font-medium text-muted-foreground uppercase tracking-wider"
+                  >
                     Amount
                   </th>
                 </tr>
@@ -230,18 +278,22 @@ const InvoiceView = ({ open, onOpenChange, invoice }: InvoiceViewProps) => {
               <tbody className="bg-white divide-y divide-border">
                 {invoice.invoice_items?.map((item: any) => (
                   <tr key={item.id}>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm">{item.description}</td>
-                    <td className="px-4 py-3 whitespace-nowrap text-sm text-right">{item.quantity}</td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm">
+                      {item.description}
+                    </td>
+                    <td className="px-4 py-3 whitespace-nowrap text-sm text-right">
+                      {item.quantity}
+                    </td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm text-right">
                       <div className="flex items-center justify-end">
                         <IndianRupee className="h-3 w-3 mr-1" />
-                        {item.unit_price.toLocaleString('en-IN')}
+                        {item.unit_price.toLocaleString("en-IN")}
                       </div>
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-right">
                       <div className="flex items-center justify-end">
                         <IndianRupee className="h-3 w-3 mr-1" />
-                        {item.amount.toLocaleString('en-IN')}
+                        {item.amount.toLocaleString("en-IN")}
                       </div>
                     </td>
                   </tr>
@@ -249,13 +301,16 @@ const InvoiceView = ({ open, onOpenChange, invoice }: InvoiceViewProps) => {
               </tbody>
               <tfoot>
                 <tr className="bg-muted/10">
-                  <th colSpan={3} className="px-4 py-3 text-right text-sm font-medium">
+                  <th
+                    colSpan={3}
+                    className="px-4 py-3 text-right text-sm font-medium"
+                  >
                     Total:
                   </th>
                   <th className="px-4 py-3 text-right text-sm font-medium">
                     <div className="flex items-center justify-end">
                       <IndianRupee className="h-3 w-3 mr-1" />
-                      {invoice.total_amount.toLocaleString('en-IN')}
+                      {invoice.total_amount.toLocaleString("en-IN")}
                     </div>
                   </th>
                 </tr>
@@ -269,13 +324,17 @@ const InvoiceView = ({ open, onOpenChange, invoice }: InvoiceViewProps) => {
               {invoice.notes && (
                 <div className="space-y-2">
                   <h3 className="font-medium">Notes</h3>
-                  <p className="text-sm text-muted-foreground">{invoice.notes}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {invoice.notes}
+                  </p>
                 </div>
               )}
               {invoice.terms && (
                 <div className="space-y-2">
                   <h3 className="font-medium">Terms and Conditions</h3>
-                  <p className="text-sm text-muted-foreground">{invoice.terms}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {invoice.terms}
+                  </p>
                 </div>
               )}
             </div>

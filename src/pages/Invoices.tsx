@@ -28,7 +28,10 @@ const Invoices = () => {
               Manage and track all your invoices
             </p>
           </div>
-          <Button className="btn-primary" onClick={() => setIsCreateDialogOpen(true)}>
+          <Button
+            className="btn-primary"
+            onClick={() => setIsCreateDialogOpen(true)}
+          >
             <Plus className="h-4 w-4 mr-1" /> Create Invoice
           </Button>
         </div>
@@ -54,7 +57,7 @@ const Invoices = () => {
 
         <InvoicesList />
 
-        <CreateInvoiceDialog 
+        <CreateInvoiceDialog
           open={isCreateDialogOpen}
           onOpenChange={setIsCreateDialogOpen}
           onSubmit={handleCreateInvoice}

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -15,7 +14,11 @@ interface InvoiceStepsProps {
   onChange: (step: number) => void;
 }
 
-export function InvoiceSteps({ currentStep, steps, onChange }: InvoiceStepsProps) {
+export function InvoiceSteps({
+  currentStep,
+  steps,
+  onChange,
+}: InvoiceStepsProps) {
   return (
     <nav aria-label="Progress" className="mb-8">
       <ol role="list" className="space-y-4 md:flex md:space-x-8 md:space-y-0">
@@ -27,8 +30,8 @@ export function InvoiceSteps({ currentStep, steps, onChange }: InvoiceStepsProps
                 index < currentStep
                   ? "border-primary"
                   : index === currentStep
-                  ? "border-primary"
-                  : "border-border"
+                    ? "border-primary"
+                    : "border-border",
               )}
             >
               <span className="flex items-center text-sm font-medium">
@@ -38,8 +41,8 @@ export function InvoiceSteps({ currentStep, steps, onChange }: InvoiceStepsProps
                     index < currentStep
                       ? "bg-primary text-white"
                       : index === currentStep
-                      ? "border-2 border-primary text-primary"
-                      : "border-2 border-border text-muted-foreground"
+                        ? "border-2 border-primary text-primary"
+                        : "border-2 border-border text-muted-foreground",
                   )}
                 >
                   {index < currentStep ? (
@@ -52,7 +55,9 @@ export function InvoiceSteps({ currentStep, steps, onChange }: InvoiceStepsProps
                   onClick={() => onChange(index)}
                   className={cn(
                     "text-sm font-medium",
-                    index <= currentStep ? "text-primary" : "text-muted-foreground"
+                    index <= currentStep
+                      ? "text-primary"
+                      : "text-muted-foreground",
                   )}
                 >
                   {step.name}

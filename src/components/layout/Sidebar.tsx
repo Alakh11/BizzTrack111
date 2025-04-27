@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -34,7 +33,7 @@ const Sidebar = ({ isOpen = true }: SidebarProps) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+
   const navItems = [
     {
       name: "Dashboard",
@@ -89,7 +88,7 @@ const Sidebar = ({ isOpen = true }: SidebarProps) => {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/login');
+    navigate("/login");
   };
 
   const renderNavItem = (item: any) => {
@@ -97,10 +96,13 @@ const Sidebar = ({ isOpen = true }: SidebarProps) => {
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className={cn(
-              "nav-link w-full",
-              location.pathname.startsWith(item.items[0].href) && "nav-link-active"
-            )}>
+            <button
+              className={cn(
+                "nav-link w-full",
+                location.pathname.startsWith(item.items[0].href) &&
+                  "nav-link-active",
+              )}
+            >
               {item.icon}
               <span>{item.name}</span>
             </button>
@@ -108,12 +110,14 @@ const Sidebar = ({ isOpen = true }: SidebarProps) => {
           <DropdownMenuContent align="start" className="w-48">
             {item.items.map((subItem: any) => (
               <DropdownMenuItem key={subItem.href} asChild>
-                <Link 
+                <Link
                   to={subItem.href}
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="w-full"
                 >
-                  {subItem.name === "Create Invoice" && <Plus className="mr-2 h-4 w-4" />}
+                  {subItem.name === "Create Invoice" && (
+                    <Plus className="mr-2 h-4 w-4" />
+                  )}
                   {subItem.name}
                 </Link>
               </DropdownMenuItem>
@@ -128,7 +132,7 @@ const Sidebar = ({ isOpen = true }: SidebarProps) => {
         to={item.href}
         className={cn(
           "nav-link",
-          location.pathname === item.href && "nav-link-active"
+          location.pathname === item.href && "nav-link-active",
         )}
         onClick={() => setIsMobileMenuOpen(false)}
       >
@@ -161,7 +165,7 @@ const Sidebar = ({ isOpen = true }: SidebarProps) => {
         className={cn(
           "fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-border transform transition-transform duration-300 ease-in-out lg:translate-x-0",
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
-          !isOpen && "lg:-translate-x-full"
+          !isOpen && "lg:-translate-x-full",
         )}
       >
         <div className="flex flex-col h-full">
@@ -171,7 +175,9 @@ const Sidebar = ({ isOpen = true }: SidebarProps) => {
               <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center">
                 <span className="text-white font-bold">B</span>
               </div>
-              <span className="text-primary font-bold text-xl font-playfair">BizzTrack</span>
+              <span className="text-primary font-bold text-xl font-playfair">
+                BizzTrack
+              </span>
             </Link>
           </div>
 
@@ -189,11 +195,13 @@ const Sidebar = ({ isOpen = true }: SidebarProps) => {
             <div className="flex items-center space-x-3 mb-4">
               <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
                 <span className="font-medium text-primary text-xl">
-                  {user?.email?.[0].toUpperCase() || 'U'}
+                  {user?.email?.[0].toUpperCase() || "U"}
                 </span>
               </div>
               <div>
-                <p className="font-semibold text-primary text-sm">{user?.email}</p>
+                <p className="font-semibold text-primary text-sm">
+                  {user?.email}
+                </p>
                 <p className="text-xs text-muted-foreground">Logged in</p>
               </div>
             </div>
@@ -208,10 +216,10 @@ const Sidebar = ({ isOpen = true }: SidebarProps) => {
           </div>
         </div>
       </div>
-      
+
       {/* Backdrop */}
       {isMobileMenuOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
           onClick={() => setIsMobileMenuOpen(false)}
         />

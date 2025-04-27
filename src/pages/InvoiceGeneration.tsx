@@ -1,17 +1,40 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { IndianRupee, Plus, Trash, ArrowRight, PenSquare, LayoutTemplate, PaintBucket, Type, FileImage, FileText } from "lucide-react";
+import {
+  IndianRupee,
+  Plus,
+  Trash,
+  ArrowRight,
+  PenSquare,
+  LayoutTemplate,
+  PaintBucket,
+  Type,
+  FileImage,
+  FileText,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import InvoiceSteps from "@/components/invoices/InvoiceSteps";
 import { Switch } from "@/components/ui/switch";
@@ -85,7 +108,7 @@ const InvoiceGeneration = () => {
   const [businessLogo, setBusinessLogo] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [invoiceId, setInvoiceId] = useState<string | null>(null);
-  
+
   const { toast } = useToast();
   const navigate = useNavigate();
   const params = useParams();
@@ -96,12 +119,12 @@ const InvoiceGeneration = () => {
   const form = useForm({
     defaultValues: {
       invoiceNumber: `INV-${new Date().getFullYear()}-${String(
-        Math.floor(Math.random() * 1000)
+        Math.floor(Math.random() * 1000),
       ).padStart(3, "0")}`,
       invoiceDate: new Date().toISOString().split("T")[0],
-      dueDate: new Date(
-        new Date().setDate(new Date().getDate() + 14)
-      ).toISOString().split("T")[0],
+      dueDate: new Date(new Date().setDate(new Date().getDate() + 14))
+        .toISOString()
+        .split("T")[0],
       clientId: "",
       clientName: "",
       clientAddress: "",
@@ -130,7 +153,7 @@ const InvoiceGeneration = () => {
         try {
           setIsEditMode(true);
           setInvoiceId(params.id);
-          
+
           // Try to get invoice from location state first (for better UX)
           let invoiceData;
           if (location.state?.invoice) {
@@ -139,7 +162,7 @@ const InvoiceGeneration = () => {
             // Fetch from API if not in state
             invoiceData = await getInvoice(params.id);
           }
-          
+
           if (invoiceData) {
             // Set form values
             form.setValue("invoiceNumber", invoiceData.invoice_number);
@@ -148,7 +171,7 @@ const InvoiceGeneration = () => {
             form.setValue("clientId", invoiceData.client_id || "");
             form.setValue("notes", invoiceData.notes || "");
             form.setValue("terms", invoiceData.terms || "");
-            
+
             // Set client details if available
             if (invoiceData.client) {
               form.setValue("clientName", invoiceData.client.name || "");
@@ -156,17 +179,22 @@ const InvoiceGeneration = () => {
               form.setValue("clientEmail", invoiceData.client.email || "");
               form.setValue("clientPhone", invoiceData.client.phone || "");
             }
-            
+
             // Set invoice items
-            if (invoiceData.invoice_items && invoiceData.invoice_items.length > 0) {
-              setItems(invoiceData.invoice_items.map((item: any, index: number) => ({
-                id: index + 1,
-                description: item.description,
-                quantity: item.quantity,
-                rate: item.unit_price,
-                amount: item.amount,
-                serviceId: item.service_id || ""
-              })));
+            if (
+              invoiceData.invoice_items &&
+              invoiceData.invoice_items.length > 0
+            ) {
+              setItems(
+                invoiceData.invoice_items.map((item: any, index: number) => ({
+                  id: index + 1,
+                  description: item.description,
+                  quantity: item.quantity,
+                  rate: item.unit_price,
+                  amount: item.amount,
+                  serviceId: item.service_id || "",
+                })),
+              );
             }
 
             // If there are design settings stored in metadata
@@ -191,7 +219,8 @@ const InvoiceGeneration = () => {
 
             toast({
               title: "Invoice loaded",
-              description: "You are now editing invoice #" + invoiceData.invoice_number,
+              description:
+                "You are now editing invoice #" + invoiceData.invoice_number,
             });
           }
         } catch (error) {
@@ -199,7 +228,7 @@ const InvoiceGeneration = () => {
           toast({
             title: "Error",
             description: "Could not load invoice for editing",
-            variant: "destructive"
+            variant: "destructive",
           });
           navigate("/invoices");
         }
@@ -213,14 +242,16 @@ const InvoiceGeneration = () => {
   useEffect(() => {
     const fetchBusinessProfile = async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         if (session?.user) {
           const { data: profileData } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
             .single();
-            
+
           if (profileData) {
             // You could set business details here if needed
           }
@@ -251,15 +282,23 @@ const InvoiceGeneration = () => {
           return updatedItem;
         }
         return item;
-      })
+      }),
     );
   };
 
   const handleAddItem = () => {
-    const newId = items.length > 0 ? Math.max(...items.map((i) => i.id)) + 1 : 1;
+    const newId =
+      items.length > 0 ? Math.max(...items.map((i) => i.id)) + 1 : 1;
     setItems([
       ...items,
-      { id: newId, description: "", quantity: 1, rate: 0, amount: 0, serviceId: "" },
+      {
+        id: newId,
+        description: "",
+        quantity: 1,
+        rate: 0,
+        amount: 0,
+        serviceId: "",
+      },
     ]);
   };
 
@@ -309,9 +348,9 @@ const InvoiceGeneration = () => {
           poNumber: purchaseOrderNumber,
           refNumber: referenceNumber,
           currency: selectedCurrency,
-        }
+        },
       };
-      
+
       // Prepare invoice data
       const invoiceData = {
         invoice_number: data.invoiceNumber,
@@ -322,28 +361,28 @@ const InvoiceGeneration = () => {
         notes: data.notes,
         terms: data.terms,
         status: "pending",
-        metadata: JSON.stringify(metadata)
+        metadata: JSON.stringify(metadata),
       };
-      
+
       // Prepare invoice items
-      const invoiceItems = items.map(item => ({
+      const invoiceItems = items.map((item) => ({
         description: item.description,
         quantity: item.quantity,
         unit_price: item.rate,
         amount: item.amount,
-        service_id: item.serviceId || null
+        service_id: item.serviceId || null,
       }));
 
       if (isEditMode && invoiceId) {
         // Update existing invoice
-        await updateInvoice.mutateAsync({ 
-          id: invoiceId, 
+        await updateInvoice.mutateAsync({
+          id: invoiceId,
           invoiceData: {
             ...invoiceData,
-            invoice_items: invoiceItems
-          }
+            invoice_items: invoiceItems,
+          },
         });
-        
+
         toast({
           title: "Invoice updated",
           description: "Your invoice has been updated successfully.",
@@ -351,31 +390,33 @@ const InvoiceGeneration = () => {
       } else {
         // Create new invoice
         const result = await createInvoice.mutateAsync(invoiceData);
-        
+
         // If invoice was created successfully, add invoice items
         if (result && result.id) {
           // Insert invoice items
-          await supabase.from('invoice_items').insert(
-            invoiceItems.map(item => ({
+          await supabase.from("invoice_items").insert(
+            invoiceItems.map((item) => ({
               ...item,
-              invoice_id: result.id
-            }))
+              invoice_id: result.id,
+            })),
           );
-          
+
           toast({
             title: "Invoice created",
             description: "Your invoice has been created successfully.",
           });
         }
       }
-      
+
       navigate("/invoices");
     } catch (error: any) {
       console.error("Error with invoice:", error);
       toast({
         title: isEditMode ? "Error updating invoice" : "Error creating invoice",
-        description: error.message || `An error occurred while ${isEditMode ? 'updating' : 'creating'} the invoice`,
-        variant: "destructive"
+        description:
+          error.message ||
+          `An error occurred while ${isEditMode ? "updating" : "creating"} the invoice`,
+        variant: "destructive",
       });
     }
   });
@@ -388,7 +429,7 @@ const InvoiceGeneration = () => {
             <div className="flex flex-col space-y-2">
               <div className="flex items-center space-x-2">
                 <FormItem className="w-full">
-                  <Input 
+                  <Input
                     className="text-2xl font-bold border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 font-playfair"
                     value={customInvoiceTitle}
                     onChange={(e) => setCustomInvoiceTitle(e.target.value)}
@@ -396,9 +437,9 @@ const InvoiceGeneration = () => {
                   />
                 </FormItem>
               </div>
-              
+
               <div>
-                <Input 
+                <Input
                   className="text-sm text-muted-foreground border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
                   value={customSubtitle}
                   onChange={(e) => setCustomSubtitle(e.target.value)}
@@ -406,12 +447,14 @@ const InvoiceGeneration = () => {
                 />
               </div>
             </div>
-          
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Invoice Info */}
               <div className="space-y-4">
-                <h3 className="text-lg font-medium font-playfair">Invoice Information</h3>
-                
+                <h3 className="text-lg font-medium font-playfair">
+                  Invoice Information
+                </h3>
+
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
@@ -452,36 +495,38 @@ const InvoiceGeneration = () => {
                     </FormItem>
                   )}
                 />
-                
-                <Button 
-                  type="button" 
-                  variant="ghost" 
+
+                <Button
+                  type="button"
+                  variant="ghost"
                   className="flex items-center text-sm"
                   onClick={() => setShowAdditionalFields(!showAdditionalFields)}
                 >
                   <Plus className="h-4 w-4 mr-1" /> Add More Fields
                 </Button>
-                
+
                 {showAdditionalFields && (
                   <div className="space-y-4 pt-2 border-t">
                     <FormItem>
                       <FormLabel>Purchase Order Number</FormLabel>
                       <FormControl>
-                        <Input 
+                        <Input
                           value={purchaseOrderNumber}
-                          onChange={(e) => setPurchaseOrderNumber(e.target.value)}
-                          placeholder="Enter PO number" 
+                          onChange={(e) =>
+                            setPurchaseOrderNumber(e.target.value)
+                          }
+                          placeholder="Enter PO number"
                         />
                       </FormControl>
                     </FormItem>
-                    
+
                     <FormItem>
                       <FormLabel>Reference Number</FormLabel>
                       <FormControl>
-                        <Input 
+                        <Input
                           value={referenceNumber}
                           onChange={(e) => setReferenceNumber(e.target.value)}
-                          placeholder="Enter reference number" 
+                          placeholder="Enter reference number"
                         />
                       </FormControl>
                     </FormItem>
@@ -493,27 +538,39 @@ const InvoiceGeneration = () => {
               <div className="space-y-8">
                 {/* Billed By Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium font-playfair">Billed By (Your Details)</h3>
-                  
+                  <h3 className="text-lg font-medium font-playfair">
+                    Billed By (Your Details)
+                  </h3>
+
                   <Card className="shadow-sm">
                     <CardContent className="p-4">
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
                           <p className="font-medium">Alakh Corporation</p>
-                          <Button variant="ghost" size="sm">Edit</Button>
+                          <Button variant="ghost" size="sm">
+                            Edit
+                          </Button>
                         </div>
-                        <p className="text-sm text-muted-foreground">Mirzapur, UP, India - 231312</p>
-                        <p className="text-sm text-muted-foreground">+91 9580813770</p>
-                        <p className="text-sm text-muted-foreground">alakh1304@gmail.com</p>
+                        <p className="text-sm text-muted-foreground">
+                          Mirzapur, UP, India - 231312
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          +91 9580813770
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          alakh1304@gmail.com
+                        </p>
                       </div>
                     </CardContent>
                   </Card>
                 </div>
-                
+
                 {/* Billed To Section */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium font-playfair">Billed To (Client's Details)</h3>
-                  
+                  <h3 className="text-lg font-medium font-playfair">
+                    Billed To (Client's Details)
+                  </h3>
+
                   <FormItem>
                     <FormLabel>Select Client</FormLabel>
                     <Select
@@ -524,53 +581,66 @@ const InvoiceGeneration = () => {
                         <SelectValue placeholder="Select a client" />
                       </SelectTrigger>
                       <SelectContent>
-                        {clients && clients.map((client) => (
-                          <SelectItem key={client.id} value={client.id}>
-                            {client.name}
-                          </SelectItem>
-                        ))}
+                        {clients &&
+                          clients.map((client) => (
+                            <SelectItem key={client.id} value={client.id}>
+                              {client.name}
+                            </SelectItem>
+                          ))}
                       </SelectContent>
                     </Select>
                   </FormItem>
-                  
+
                   <div className="flex items-center">
                     <Button type="button" variant="outline" size="sm">
                       <Plus className="h-4 w-4 mr-2" /> Add New Client
                     </Button>
                   </div>
-                  
+
                   {form.getValues("clientId") && (
                     <Card className="shadow-sm">
                       <CardContent className="p-4">
                         <div className="space-y-2">
                           <div className="flex justify-between items-center">
-                            <p className="font-medium">{form.getValues("clientName")}</p>
-                            <Button variant="ghost" size="sm">Edit</Button>
+                            <p className="font-medium">
+                              {form.getValues("clientName")}
+                            </p>
+                            <Button variant="ghost" size="sm">
+                              Edit
+                            </Button>
                           </div>
-                          <p className="text-sm text-muted-foreground">{form.getValues("clientAddress")}</p>
-                          <p className="text-sm text-muted-foreground">{form.getValues("clientEmail")}</p>
-                          <p className="text-sm text-muted-foreground">{form.getValues("clientPhone")}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {form.getValues("clientAddress")}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {form.getValues("clientEmail")}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {form.getValues("clientPhone")}
+                          </p>
                         </div>
                       </CardContent>
                     </Card>
                   )}
                 </div>
-                
+
                 {/* Shipping Details Toggle */}
                 <div className="flex items-center space-x-2">
-                  <Checkbox 
-                    id="shipping" 
-                    checked={showShippingDetails} 
-                    onCheckedChange={(checked) => setShowShippingDetails(!!checked)} 
+                  <Checkbox
+                    id="shipping"
+                    checked={showShippingDetails}
+                    onCheckedChange={(checked) =>
+                      setShowShippingDetails(!!checked)
+                    }
                   />
-                  <label 
-                    htmlFor="shipping" 
+                  <label
+                    htmlFor="shipping"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
                     Add Shipping Details
                   </label>
                 </div>
-                
+
                 {/* Shipping Details Section */}
                 {showShippingDetails && (
                   <div className="space-y-4 pt-2">
@@ -582,12 +652,16 @@ const InvoiceGeneration = () => {
                           <FormItem>
                             <FormLabel>Shipped From</FormLabel>
                             <FormControl>
-                              <Textarea rows={3} {...field} placeholder="Enter shipping address" />
+                              <Textarea
+                                rows={3}
+                                {...field}
+                                placeholder="Enter shipping address"
+                              />
                             </FormControl>
                           </FormItem>
                         )}
                       />
-                      
+
                       <FormField
                         control={form.control}
                         name="shippedTo"
@@ -595,13 +669,17 @@ const InvoiceGeneration = () => {
                           <FormItem>
                             <FormLabel>Shipped To</FormLabel>
                             <FormControl>
-                              <Textarea rows={3} {...field} placeholder="Enter delivery address" />
+                              <Textarea
+                                rows={3}
+                                {...field}
+                                placeholder="Enter delivery address"
+                              />
                             </FormControl>
                           </FormItem>
                         )}
                       />
                     </div>
-                    
+
                     <FormField
                       control={form.control}
                       name="transportDetails"
@@ -609,12 +687,15 @@ const InvoiceGeneration = () => {
                         <FormItem>
                           <FormLabel>Transport Details</FormLabel>
                           <FormControl>
-                            <Input {...field} placeholder="Enter transport details" />
+                            <Input
+                              {...field}
+                              placeholder="Enter transport details"
+                            />
                           </FormControl>
                         </FormItem>
                       )}
                     />
-                    
+
                     <FormField
                       control={form.control}
                       name="gstDetails"
@@ -635,8 +716,8 @@ const InvoiceGeneration = () => {
             <div>
               <FormItem>
                 <FormLabel>Currency</FormLabel>
-                <Select 
-                  value={selectedCurrency} 
+                <Select
+                  value={selectedCurrency}
                   onValueChange={setSelectedCurrency}
                 >
                   <SelectTrigger className="w-[280px]">
@@ -656,7 +737,9 @@ const InvoiceGeneration = () => {
 
             <div className="space-y-4">
               <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium font-playfair">Invoice Items</h3>
+                <h3 className="text-lg font-medium font-playfair">
+                  Invoice Items
+                </h3>
                 <Button
                   type="button"
                   variant="outline"
@@ -673,8 +756,12 @@ const InvoiceGeneration = () => {
                     <tr className="border-b">
                       <th className="text-left py-2 px-2 font-medium">Item</th>
                       <th className="text-right py-2 px-2 font-medium">Qty</th>
-                      <th className="text-right py-2 px-2 font-medium">Rate (₹)</th>
-                      <th className="text-right py-2 px-2 font-medium">Amount (₹)</th>
+                      <th className="text-right py-2 px-2 font-medium">
+                        Rate (₹)
+                      </th>
+                      <th className="text-right py-2 px-2 font-medium">
+                        Amount (₹)
+                      </th>
                       <th className="py-2 px-2 w-10"></th>
                     </tr>
                   </thead>
@@ -685,7 +772,11 @@ const InvoiceGeneration = () => {
                           <Input
                             value={item.description}
                             onChange={(e) =>
-                              handleItemChange(item.id, "description", e.target.value)
+                              handleItemChange(
+                                item.id,
+                                "description",
+                                e.target.value,
+                              )
                             }
                             className="w-full"
                             placeholder="Enter item description"
@@ -699,7 +790,7 @@ const InvoiceGeneration = () => {
                               handleItemChange(
                                 item.id,
                                 "quantity",
-                                parseInt(e.target.value) || 0
+                                parseInt(e.target.value) || 0,
                               )
                             }
                             className="w-20 text-right"
@@ -716,7 +807,7 @@ const InvoiceGeneration = () => {
                                 handleItemChange(
                                   item.id,
                                   "rate",
-                                  parseFloat(e.target.value) || 0
+                                  parseFloat(e.target.value) || 0,
                                 )
                               }
                               className="w-28 text-right"
@@ -774,8 +865,10 @@ const InvoiceGeneration = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium font-playfair">Bank Account Details</h3>
-                  
+                  <h3 className="text-lg font-medium font-playfair">
+                    Bank Account Details
+                  </h3>
+
                   <FormField
                     control={form.control}
                     name="bankName"
@@ -788,7 +881,7 @@ const InvoiceGeneration = () => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="accountNumber"
@@ -796,12 +889,15 @@ const InvoiceGeneration = () => {
                       <FormItem>
                         <FormLabel>Account Number</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Enter account number" />
+                          <Input
+                            {...field}
+                            placeholder="Enter account number"
+                          />
                         </FormControl>
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="ifscCode"
@@ -816,11 +912,13 @@ const InvoiceGeneration = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="space-y-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-medium font-playfair">UPI Payment Details</h3>
-                  
+                  <h3 className="text-lg font-medium font-playfair">
+                    UPI Payment Details
+                  </h3>
+
                   <FormField
                     control={form.control}
                     name="upiId"
@@ -833,18 +931,22 @@ const InvoiceGeneration = () => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <div className="flex items-center space-x-2 pt-4">
                     <Switch id="qrcode" />
-                    <label htmlFor="qrcode" className="text-sm">Show QR code on invoice</label>
+                    <label htmlFor="qrcode" className="text-sm">
+                      Show QR code on invoice
+                    </label>
                   </div>
                 </div>
               </div>
             </div>
-            
+
             <div className="space-y-4">
-              <h3 className="text-lg font-medium font-playfair">Additional Information</h3>
-              
+              <h3 className="text-lg font-medium font-playfair">
+                Additional Information
+              </h3>
+
               <FormField
                 control={form.control}
                 name="notes"
@@ -852,16 +954,16 @@ const InvoiceGeneration = () => {
                   <FormItem>
                     <FormLabel>Notes (visible to client)</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        rows={5} 
-                        {...field} 
+                      <Textarea
+                        rows={5}
+                        {...field}
                         placeholder="Enter any notes for the client"
                       />
                     </FormControl>
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="terms"
@@ -869,9 +971,9 @@ const InvoiceGeneration = () => {
                   <FormItem>
                     <FormLabel>Terms and Conditions</FormLabel>
                     <FormControl>
-                      <Textarea 
-                        rows={5} 
-                        {...field} 
+                      <Textarea
+                        rows={5}
+                        {...field}
                         placeholder="Enter terms and conditions"
                       />
                     </FormControl>
@@ -891,30 +993,33 @@ const InvoiceGeneration = () => {
                   <h3 className="text-lg font-medium font-playfair flex items-center">
                     <FileImage className="h-5 w-5 mr-2" /> Business Logo
                   </h3>
-                  <LogoUpload onUpload={setBusinessLogo} currentLogo={businessLogo} />
+                  <LogoUpload
+                    onUpload={setBusinessLogo}
+                    currentLogo={businessLogo}
+                  />
                 </div>
 
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium flex items-center font-playfair">
                     <LayoutTemplate className="h-5 w-5 mr-2" /> Template Design
                   </h3>
-                  
-                  <InvoiceTemplates 
-                    selectedTemplate={selectedTemplate} 
-                    setSelectedTemplate={setSelectedTemplate} 
+
+                  <InvoiceTemplates
+                    selectedTemplate={selectedTemplate}
+                    setSelectedTemplate={setSelectedTemplate}
                   />
                 </div>
-                
+
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium flex items-center font-playfair">
                     <PaintBucket className="h-5 w-5 mr-2" /> Color Theme
                   </h3>
-                  
+
                   <div className="flex flex-wrap gap-3">
                     {colorThemes.map((theme) => (
-                      <div 
+                      <div
                         key={theme.id}
-                        className={`w-8 h-8 rounded-full cursor-pointer ${selectedColor === theme.id ? 'ring-2 ring-offset-2 ring-black' : ''}`}
+                        className={`w-8 h-8 rounded-full cursor-pointer ${selectedColor === theme.id ? "ring-2 ring-offset-2 ring-black" : ""}`}
                         style={{ backgroundColor: theme.color }}
                         onClick={() => setSelectedColor(theme.id)}
                         title={theme.name}
@@ -922,17 +1027,17 @@ const InvoiceGeneration = () => {
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium flex items-center font-playfair">
                     <Type className="h-5 w-5 mr-2" /> Font Style
                   </h3>
-                  
+
                   <div className="flex flex-wrap gap-2">
                     {fontOptions.map((font) => (
-                      <div 
+                      <div
                         key={font.id}
-                        className={`px-3 py-2 border rounded-md cursor-pointer ${selectedFont === font.id ? 'bg-primary/10 border-primary' : ''}`}
+                        className={`px-3 py-2 border rounded-md cursor-pointer ${selectedFont === font.id ? "bg-primary/10 border-primary" : ""}`}
                         onClick={() => setSelectedFont(font.id)}
                       >
                         <span className="text-sm">{font.name}</span>
@@ -940,26 +1045,32 @@ const InvoiceGeneration = () => {
                     ))}
                   </div>
                 </div>
-                
+
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium flex items-center font-playfair">
                     <FileImage className="h-5 w-5 mr-2" /> Letterhead & Branding
                   </h3>
-                  
+
                   <div className="space-y-3">
                     <div className="flex items-center space-x-2">
                       <Switch id="letterhead" />
-                      <label htmlFor="letterhead" className="text-sm">Add letterhead</label>
+                      <label htmlFor="letterhead" className="text-sm">
+                        Add letterhead
+                      </label>
                     </div>
-                    
+
                     <div className="flex items-center space-x-2">
                       <Switch id="footer" />
-                      <label htmlFor="footer" className="text-sm">Add custom footer</label>
+                      <label htmlFor="footer" className="text-sm">
+                        Add custom footer
+                      </label>
                     </div>
-                    
+
                     <div className="flex items-center space-x-2">
                       <Switch id="watermark" />
-                      <label htmlFor="watermark" className="text-sm">Add watermark</label>
+                      <label htmlFor="watermark" className="text-sm">
+                        Add watermark
+                      </label>
                     </div>
 
                     <FormField
@@ -968,7 +1079,11 @@ const InvoiceGeneration = () => {
                       render={({ field }) => (
                         <FormItem>
                           <FormControl>
-                            <Input {...field} placeholder="Watermark text" className="mt-2" />
+                            <Input
+                              {...field}
+                              placeholder="Watermark text"
+                              className="mt-2"
+                            />
                           </FormControl>
                         </FormItem>
                       )}
@@ -976,28 +1091,33 @@ const InvoiceGeneration = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Page Setup */}
               <div>
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium flex items-center font-playfair">
                     <FileText className="h-5 w-5 mr-2" /> Page Setup
                   </h3>
-                  
+
                   <div>
                     <FormLabel>Paper Size</FormLabel>
-                    <Select value={selectedPaperSize} onValueChange={setSelectedPaperSize}>
+                    <Select
+                      value={selectedPaperSize}
+                      onValueChange={setSelectedPaperSize}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Select paper size" />
                       </SelectTrigger>
                       <SelectContent>
                         {paperSizes.map((size) => (
-                          <SelectItem key={size.id} value={size.id}>{size.name}</SelectItem>
+                          <SelectItem key={size.id} value={size.id}>
+                            {size.name}
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <FormField
                     control={form.control}
                     name="margins"
@@ -1017,7 +1137,7 @@ const InvoiceGeneration = () => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <FormField
                     control={form.control}
                     name="textScale"
@@ -1039,47 +1159,69 @@ const InvoiceGeneration = () => {
                       </FormItem>
                     )}
                   />
-                  
+
                   <div className="flex items-center space-x-2 pt-2">
                     <Checkbox id="pageless" />
-                    <label htmlFor="pageless" className="text-sm">Generate pageless PDF</label>
+                    <label htmlFor="pageless" className="text-sm">
+                      Generate pageless PDF
+                    </label>
                   </div>
                 </div>
-                
+
                 {/* Preview */}
                 <div className="mt-8">
-                  <h3 className="text-lg font-medium mb-4 font-playfair">Preview</h3>
-                  
+                  <h3 className="text-lg font-medium mb-4 font-playfair">
+                    Preview
+                  </h3>
+
                   <div className="border rounded-md bg-gray-50 p-4 flex items-center justify-center">
                     <div className="bg-white border shadow-sm w-full max-w-sm aspect-[3/4] p-4">
                       {/* Show logo if uploaded */}
                       {businessLogo && (
                         <div className="flex justify-end mb-4">
-                          <img src={businessLogo} alt="Business Logo" className="h-12 object-contain" />
+                          <img
+                            src={businessLogo}
+                            alt="Business Logo"
+                            className="h-12 object-contain"
+                          />
                         </div>
                       )}
 
                       <div className="text-center mb-8">
-                        <h2 className={`text-xl font-bold font-${selectedFont}`}>{customInvoiceTitle}</h2>
-                        {customSubtitle && <p className="text-sm text-muted-foreground">{customSubtitle}</p>}
+                        <h2
+                          className={`text-xl font-bold font-${selectedFont}`}
+                        >
+                          {customInvoiceTitle}
+                        </h2>
+                        {customSubtitle && (
+                          <p className="text-sm text-muted-foreground">
+                            {customSubtitle}
+                          </p>
+                        )}
                       </div>
-                      
+
                       <div className="text-xs text-muted-foreground">
                         <p>Invoice #: {form.getValues("invoiceNumber")}</p>
                         <p>Date: {form.getValues("invoiceDate")}</p>
                         <p>Due: {form.getValues("dueDate")}</p>
                       </div>
-                      
+
                       <div className="my-4 text-xs">
-                        <div className="font-medium">From: Alakh Corporation</div>
+                        <div className="font-medium">
+                          From: Alakh Corporation
+                        </div>
                         <div>Mirzapur, UP, India - 231312</div>
                       </div>
-                      
+
                       <div className="my-4 text-xs">
-                        <div className="font-medium">To: {form.getValues("clientName") || "Client Name"}</div>
-                        <div>{form.getValues("clientAddress") || "Client Address"}</div>
+                        <div className="font-medium">
+                          To: {form.getValues("clientName") || "Client Name"}
+                        </div>
+                        <div>
+                          {form.getValues("clientAddress") || "Client Address"}
+                        </div>
                       </div>
-                      
+
                       <table className="w-full text-xs border-t border-b my-4">
                         <thead>
                           <tr className="border-b">
@@ -1100,7 +1242,7 @@ const InvoiceGeneration = () => {
                           </tr>
                         </tfoot>
                       </table>
-                      
+
                       <div className="text-xs mt-8 text-center text-muted-foreground">
                         <p>Thank you for your business!</p>
                       </div>
@@ -1125,8 +1267,8 @@ const InvoiceGeneration = () => {
               {isEditMode ? "Edit Invoice" : "Create New Invoice"}
             </h1>
             <p className="text-muted-foreground">
-              {isEditMode 
-                ? "Update invoice details, items, and design" 
+              {isEditMode
+                ? "Update invoice details, items, and design"
                 : "Create a new invoice for your clients"}
             </p>
           </div>
@@ -1134,16 +1276,16 @@ const InvoiceGeneration = () => {
 
         <Card>
           <CardContent className="p-6">
-            <InvoiceSteps 
-              currentStep={currentStep} 
-              steps={steps} 
-              onChange={handleStepChange} 
+            <InvoiceSteps
+              currentStep={currentStep}
+              steps={steps}
+              onChange={handleStepChange}
             />
-            
+
             <Form {...form}>
               <form onSubmit={handleSubmit}>
                 {renderStepContent()}
-                
+
                 <div className="flex justify-between mt-8">
                   <Button
                     type="button"
@@ -1153,7 +1295,7 @@ const InvoiceGeneration = () => {
                   >
                     Previous
                   </Button>
-                  
+
                   <div className="space-x-2">
                     <Button
                       type="button"
@@ -1162,7 +1304,7 @@ const InvoiceGeneration = () => {
                     >
                       Cancel
                     </Button>
-                    
+
                     {currentStep < steps.length - 1 ? (
                       <Button type="button" onClick={handleNext}>
                         Next <ArrowRight className="ml-2 h-4 w-4" />

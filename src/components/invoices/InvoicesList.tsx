@@ -1,3 +1,4 @@
+<script src="http://192.168.29.168:8097"></script>;
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -83,7 +84,9 @@ const InvoicesList = () => {
     return (
       <div className="text-center py-10 border rounded-lg bg-white">
         <FileText className="h-12 w-12 mx-auto text-muted-foreground opacity-50" />
-        <h3 className="mt-4 text-lg font-medium font-playfair">No invoices found</h3>
+        <h3 className="mt-4 text-lg font-medium font-playfair">
+          No invoices found
+        </h3>
         <p className="mt-1 text-muted-foreground">
           Create your first invoice to get started.
         </p>
@@ -133,8 +136,14 @@ const InvoicesList = () => {
           </TableHeader>
           <TableBody>
             {invoices.map((invoice) => (
-              <TableRow key={invoice.id} className="hover:bg-muted/20 cursor-pointer" onClick={() => handleViewInvoice(invoice)}>
-                <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
+              <TableRow
+                key={invoice.id}
+                className="hover:bg-muted/20 cursor-pointer"
+                onClick={() => handleViewInvoice(invoice)}
+              >
+                <TableCell className="font-medium">
+                  {invoice.invoice_number}
+                </TableCell>
                 <TableCell>{invoice.client?.name || "N/A"}</TableCell>
                 <TableCell>
                   {new Date(invoice.invoice_date).toLocaleDateString()}
@@ -154,15 +163,15 @@ const InvoicesList = () => {
                       invoice.status === "paid"
                         ? "outline"
                         : invoice.status === "overdue"
-                        ? "destructive"
-                        : "outline"
+                          ? "destructive"
+                          : "outline"
                     }
                     className={`capitalize ${
                       invoice.status === "paid"
                         ? "bg-success/10 text-success border-success"
                         : invoice.status === "overdue"
-                        ? "bg-destructive/10"
-                        : "bg-warning/10 text-warning border-warning"
+                          ? "bg-destructive/10"
+                          : "bg-warning/10 text-warning border-warning"
                     }`}
                   >
                     {invoice.status}
@@ -170,30 +179,38 @@ const InvoicesList = () => {
                 </TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild onClick={(e) => e.stopPropagation()}>
+                    <DropdownMenuTrigger
+                      asChild
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <Button variant="ghost" size="icon">
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onClick={(e) => {
-                        e.stopPropagation();
-                        handleViewInvoice(invoice);
-                      }}>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleViewInvoice(invoice);
+                        }}
+                      >
                         <Eye className="h-4 w-4 mr-2" /> View
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={(e) => {
-                        e.stopPropagation();
-                        handleEditInvoice(invoice);
-                      }}>
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditInvoice(invoice);
+                        }}
+                      >
                         <Edit className="h-4 w-4 mr-2" /> Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={(e) => {
-                        e.stopPropagation();
-                        const printWindow = window.open('', '_blank');
-                        if (!printWindow) return;
-                        // Same download functionality as in InvoiceView
-                        const html = `
+                      <DropdownMenuItem
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const printWindow = window.open("", "_blank");
+                          if (!printWindow) return;
+                          // Same download functionality as in InvoiceView
+                          const html = `
                           <html>
                             <head>
                               <title>Invoice #${invoice.invoice_number}</title>
@@ -232,9 +249,9 @@ const InvoicesList = () => {
                                   </div>
                                   <div class="info-block">
                                     <h3>To:</h3>
-                                    <p>${invoice.client?.name || 'Client'}<br>
-                                    ${invoice.client?.address || ''}<br>
-                                    ${invoice.client?.email || ''}</p>
+                                    <p>${invoice.client?.name || "Client"}<br>
+                                    ${invoice.client?.address || ""}<br>
+                                    ${invoice.client?.email || ""}</p>
                                   </div>
                                 </div>
                                 
@@ -259,25 +276,31 @@ const InvoicesList = () => {
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    ${invoice.invoice_items?.map((item: any) => `
+                                    ${
+                                      invoice.invoice_items
+                                        ?.map(
+                                          (item: any) => `
                                     <tr>
                                       <td>${item.description}</td>
                                       <td>${item.quantity}</td>
                                       <td>${item.unit_price}</td>
                                       <td>${item.amount}</td>
                                     </tr>
-                                    `).join('') || ''}
+                                    `,
+                                        )
+                                        .join("") || ""
+                                    }
                                   </tbody>
                                   <tfoot>
                                     <tr>
                                       <th colspan="3">Total:</th>
-                                      <th>₹ ${invoice.total_amount.toLocaleString('en-IN')}</th>
+                                      <th>₹ ${invoice.total_amount.toLocaleString("en-IN")}</th>
                                     </tr>
                                   </tfoot>
                                 </table>
                                 
-                                ${invoice.notes ? `<div><h3>Notes:</h3><p>${invoice.notes}</p></div>` : ''}
-                                ${invoice.terms ? `<div><h3>Terms and Conditions:</h3><p>${invoice.terms}</p></div>` : ''}
+                                ${invoice.notes ? `<div><h3>Notes:</h3><p>${invoice.notes}</p></div>` : ""}
+                                ${invoice.terms ? `<div><h3>Terms and Conditions:</h3><p>${invoice.terms}</p></div>` : ""}
                                 
                                 <div class="footer">
                                   <p>Thank you for your business!</p>
@@ -286,13 +309,14 @@ const InvoicesList = () => {
                             </body>
                           </html>
                         `;
-                        
-                        printWindow.document.write(html);
-                        printWindow.document.close();
-                        setTimeout(() => {
-                          printWindow.print();
-                        }, 500);
-                      }}>
+
+                          printWindow.document.write(html);
+                          printWindow.document.close();
+                          setTimeout(() => {
+                            printWindow.print();
+                          }, 500);
+                        }}
+                      >
                         <Download className="h-4 w-4 mr-2" /> Download
                       </DropdownMenuItem>
                       <DropdownMenuItem>

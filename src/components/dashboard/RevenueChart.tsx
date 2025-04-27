@@ -1,4 +1,3 @@
-
 import { useMemo } from "react";
 import {
   AreaChart,
@@ -28,11 +27,11 @@ const RevenueChart = () => {
       { name: "Nov", revenue: 1890 },
       { name: "Dec", revenue: 3490 },
     ],
-    []
+    [],
   );
 
   const formatCurrency = (value: number) => {
-    return `₹${value.toLocaleString('en-IN')}`;
+    return `₹${value.toLocaleString("en-IN")}`;
   };
 
   return (

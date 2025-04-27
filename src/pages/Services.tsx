@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -7,9 +6,22 @@ import { Grid, Plus, Search, IndianRupee } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useServices } from "@/hooks/useServices";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useForm } from "react-hook-form";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
@@ -28,7 +40,7 @@ const Services = () => {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const { services: serviceData, createService, isLoading } = useServices();
   const { toast } = useToast();
-  
+
   const form = useForm({
     defaultValues: {
       name: "",
@@ -116,7 +128,7 @@ const Services = () => {
   });
 
   const formatCurrency = (value: number) => {
-    return `₹${value.toLocaleString('en-IN')}`;
+    return `₹${value.toLocaleString("en-IN")}`;
   };
 
   const categories = [
@@ -322,7 +334,7 @@ const Services = () => {
                           <div className="flex justify-between items-center mt-3">
                             <div className="font-bold text-primary flex items-center">
                               <IndianRupee className="h-4 w-4 mr-1" />
-                              {service.price.toLocaleString('en-IN')}
+                              {service.price.toLocaleString("en-IN")}
                             </div>
                             <Button variant="outline" size="sm">
                               Edit

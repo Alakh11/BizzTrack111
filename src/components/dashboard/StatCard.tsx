@@ -1,4 +1,3 @@
-
 import { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -32,9 +31,12 @@ const StatCard = ({
                   isPositive ? "text-success" : "text-destructive"
                 }`}
               >
-                {isPositive ? "+" : ""}{change}
+                {isPositive ? "+" : ""}
+                {change}
               </span>
-              <span className="text-xs text-muted-foreground ml-1">vs last month</span>
+              <span className="text-xs text-muted-foreground ml-1">
+                vs last month
+              </span>
             </div>
           )}
         </div>

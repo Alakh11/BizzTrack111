@@ -1,4 +1,3 @@
-
 import { useMemo } from "react";
 import {
   Table,
@@ -55,11 +54,11 @@ const TopClients = () => {
         initials: "NS",
       },
     ],
-    []
+    [],
   );
 
   const formatCurrency = (value: number) => {
-    return `₹${value.toLocaleString('en-IN')}`;
+    return `₹${value.toLocaleString("en-IN")}`;
   };
 
   return (

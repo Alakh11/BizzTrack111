@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -8,12 +7,12 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AuthFormProps {
-  mode: 'login' | 'signup';
+  mode: "login" | "signup";
 }
 
 export function AuthForm({ mode }: AuthFormProps) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -23,7 +22,7 @@ export function AuthForm({ mode }: AuthFormProps) {
     setLoading(true);
 
     try {
-      if (mode === 'signup') {
+      if (mode === "signup") {
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -39,7 +38,7 @@ export function AuthForm({ mode }: AuthFormProps) {
           password,
         });
         if (error) throw error;
-        navigate('/');
+        navigate("/");
       }
     } catch (error: any) {
       toast({
@@ -77,7 +76,7 @@ export function AuthForm({ mode }: AuthFormProps) {
         />
       </div>
       <Button type="submit" className="w-full" disabled={loading}>
-        {loading ? "Loading..." : mode === 'login' ? "Sign In" : "Sign Up"}
+        {loading ? "Loading..." : mode === "login" ? "Sign In" : "Sign Up"}
       </Button>
     </form>
   );

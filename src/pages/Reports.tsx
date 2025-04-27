@@ -1,18 +1,38 @@
-
 import MainLayout from "@/components/layout/MainLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  TableHead, 
-  TableHeader, 
-  TableRow, 
+import {
+  TableHead,
+  TableHeader,
+  TableRow,
   Table,
   TableBody,
-  TableCell 
+  TableCell,
 } from "@/components/ui/table";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Legend } from "recharts";
-import { ChartPie, Download, IndianRupee, FileBarChart, Receipt, Users } from "lucide-react";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+} from "recharts";
+import {
+  ChartPie,
+  Download,
+  IndianRupee,
+  FileBarChart,
+  Receipt,
+  Users,
+} from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Sample data for charts
@@ -33,7 +53,7 @@ const categoryExpenses = [
   { name: "Utilities", value: 45000 },
 ];
 
-const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A569BD'];
+const COLORS = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#A569BD"];
 
 const topClients = [
   { name: "Tech Solutions Inc.", revenue: 1250000 },
@@ -73,9 +93,9 @@ const financialRatios = [
 export default function Reports() {
   // Format currency as INR
   const formatCurrency = (value: number) => {
-    return `₹${value.toLocaleString('en-IN')}`;
+    return `₹${value.toLocaleString("en-IN")}`;
   };
-  
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -107,14 +127,16 @@ export default function Reports() {
               <Users className="h-4 w-4 mr-2" /> Clients
             </TabsTrigger>
           </TabsList>
-          
+
           {/* Overview Tab Content */}
           <TabsContent value="overview">
             {/* Financial Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-muted-foreground">Total Revenue</CardTitle>
+                  <CardTitle className="text-sm text-muted-foreground">
+                    Total Revenue
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-2xl font-bold flex items-center">
@@ -126,19 +148,25 @@ export default function Reports() {
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-muted-foreground">Total Expenses</CardTitle>
+                  <CardTitle className="text-sm text-muted-foreground">
+                    Total Expenses
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-2xl font-bold flex items-center">
                     <IndianRupee className="h-4 w-4 mr-1" />
                     11,20,000
                   </p>
-                  <p className="text-xs text-destructive">+5.2% from last month</p>
+                  <p className="text-xs text-destructive">
+                    +5.2% from last month
+                  </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-muted-foreground">Net Profit</CardTitle>
+                  <CardTitle className="text-sm text-muted-foreground">
+                    Net Profit
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-2xl font-bold flex items-center">
@@ -150,7 +178,9 @@ export default function Reports() {
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-muted-foreground">Outstanding Invoices</CardTitle>
+                  <CardTitle className="text-sm text-muted-foreground">
+                    Outstanding Invoices
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-2xl font-bold flex items-center">
@@ -174,7 +204,9 @@ export default function Reports() {
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="name" />
                       <YAxis />
-                      <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                      <Tooltip
+                        formatter={(value) => formatCurrency(Number(value))}
+                      />
                       <Legend />
                       <Bar dataKey="income" name="Revenue" fill="#4C9AFF" />
                       <Bar dataKey="expenses" name="Expenses" fill="#FF5630" />
@@ -204,13 +236,20 @@ export default function Reports() {
                           fill="#8884d8"
                           dataKey="value"
                           nameKey="name"
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          label={({ name, percent }) =>
+                            `${name}: ${(percent * 100).toFixed(0)}%`
+                          }
                         >
                           {categoryExpenses.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
                           ))}
                         </Pie>
-                        <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                        <Tooltip
+                          formatter={(value) => formatCurrency(Number(value))}
+                        />
                         <Legend />
                       </PieChart>
                     </ResponsiveContainer>
@@ -237,7 +276,7 @@ export default function Reports() {
                           <TableCell>{client.name}</TableCell>
                           <TableCell className="text-right flex justify-end items-center">
                             <IndianRupee className="h-3 w-3 mr-1" />
-                            {client.revenue.toLocaleString('en-IN')}
+                            {client.revenue.toLocaleString("en-IN")}
                           </TableCell>
                         </TableRow>
                       ))}
@@ -247,14 +286,16 @@ export default function Reports() {
               </Card>
             </div>
           </TabsContent>
-          
+
           {/* Financial Tab Content */}
           <TabsContent value="financial">
             {/* Financial Summary */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-muted-foreground">Gross Profit</CardTitle>
+                  <CardTitle className="text-sm text-muted-foreground">
+                    Gross Profit
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-2xl font-bold flex items-center">
@@ -266,7 +307,9 @@ export default function Reports() {
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-muted-foreground">Operating Expenses</CardTitle>
+                  <CardTitle className="text-sm text-muted-foreground">
+                    Operating Expenses
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-2xl font-bold flex items-center">
@@ -278,7 +321,9 @@ export default function Reports() {
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-muted-foreground">EBITDA</CardTitle>
+                  <CardTitle className="text-sm text-muted-foreground">
+                    EBITDA
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-2xl font-bold flex items-center">
@@ -289,7 +334,7 @@ export default function Reports() {
                 </CardContent>
               </Card>
             </div>
-            
+
             {/* Financial Ratios */}
             <Card className="mt-6">
               <CardHeader>
@@ -304,7 +349,7 @@ export default function Reports() {
                       margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
                     >
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis type="number" domain={[0, 'dataMax']} />
+                      <XAxis type="number" domain={[0, "dataMax"]} />
                       <YAxis dataKey="name" type="category" width={100} />
                       <Tooltip formatter={(value) => `${value}`} />
                       <Bar dataKey="value" fill="#8884d8" />
@@ -313,7 +358,7 @@ export default function Reports() {
                 </div>
               </CardContent>
             </Card>
-            
+
             {/* Monthly P&L */}
             <Card className="mt-6">
               <CardHeader>
@@ -326,26 +371,28 @@ export default function Reports() {
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="name" />
                       <YAxis />
-                      <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                      <Tooltip
+                        formatter={(value) => formatCurrency(Number(value))}
+                      />
                       <Legend />
-                      <Line 
-                        type="monotone" 
-                        dataKey="income" 
-                        name="Revenue" 
-                        stroke="#4C9AFF" 
-                        activeDot={{ r: 8 }} 
+                      <Line
+                        type="monotone"
+                        dataKey="income"
+                        name="Revenue"
+                        stroke="#4C9AFF"
+                        activeDot={{ r: 8 }}
                       />
-                      <Line 
-                        type="monotone" 
-                        dataKey="expenses" 
-                        name="Expenses" 
-                        stroke="#FF5630" 
+                      <Line
+                        type="monotone"
+                        dataKey="expenses"
+                        name="Expenses"
+                        stroke="#FF5630"
                       />
-                      <Line 
-                        type="monotone" 
-                        dataKey={(data) => data.income - data.expenses} 
-                        name="Profit" 
-                        stroke="#36B37E" 
+                      <Line
+                        type="monotone"
+                        dataKey={(data) => data.income - data.expenses}
+                        name="Profit"
+                        stroke="#36B37E"
                         strokeWidth={2}
                       />
                     </LineChart>
@@ -354,14 +401,16 @@ export default function Reports() {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           {/* Tax Tab Content */}
           <TabsContent value="tax">
             {/* GST Summary */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-muted-foreground">GST Collected (YTD)</CardTitle>
+                  <CardTitle className="text-sm text-muted-foreground">
+                    GST Collected (YTD)
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-2xl font-bold flex items-center">
@@ -372,7 +421,9 @@ export default function Reports() {
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-muted-foreground">GST Paid (YTD)</CardTitle>
+                  <CardTitle className="text-sm text-muted-foreground">
+                    GST Paid (YTD)
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-2xl font-bold flex items-center">
@@ -383,7 +434,9 @@ export default function Reports() {
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm text-muted-foreground">GST Balance</CardTitle>
+                  <CardTitle className="text-sm text-muted-foreground">
+                    GST Balance
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-2xl font-bold flex items-center">
@@ -394,7 +447,7 @@ export default function Reports() {
                 </CardContent>
               </Card>
             </div>
-            
+
             {/* GST Breakdown Chart */}
             <Card className="mt-6">
               <CardHeader>
@@ -407,9 +460,15 @@ export default function Reports() {
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="month" />
                       <YAxis />
-                      <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                      <Tooltip
+                        formatter={(value) => formatCurrency(Number(value))}
+                      />
                       <Legend />
-                      <Bar dataKey="collected" name="GST Collected" fill="#4C9AFF" />
+                      <Bar
+                        dataKey="collected"
+                        name="GST Collected"
+                        fill="#4C9AFF"
+                      />
                       <Bar dataKey="paid" name="GST Paid" fill="#FF5630" />
                       <Bar dataKey="net" name="GST Balance" fill="#36B37E" />
                     </BarChart>
@@ -417,7 +476,7 @@ export default function Reports() {
                 </div>
               </CardContent>
             </Card>
-            
+
             {/* Tax Filing Schedule */}
             <Card className="mt-6">
               <CardHeader>
@@ -439,7 +498,10 @@ export default function Reports() {
                       <TableCell>Apr 2023</TableCell>
                       <TableCell>May 11, 2023</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="bg-success-light text-success border-success">
+                        <Badge
+                          variant="outline"
+                          className="bg-success-light text-success border-success"
+                        >
                           Filed
                         </Badge>
                       </TableCell>
@@ -449,7 +511,10 @@ export default function Reports() {
                       <TableCell>Apr 2023</TableCell>
                       <TableCell>May 20, 2023</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="bg-success-light text-success border-success">
+                        <Badge
+                          variant="outline"
+                          className="bg-success-light text-success border-success"
+                        >
                           Filed
                         </Badge>
                       </TableCell>
@@ -459,7 +524,10 @@ export default function Reports() {
                       <TableCell>May 2023</TableCell>
                       <TableCell>Jun 11, 2023</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="bg-warning-light text-warning border-warning">
+                        <Badge
+                          variant="outline"
+                          className="bg-warning-light text-warning border-warning"
+                        >
                           Pending
                         </Badge>
                       </TableCell>
@@ -469,7 +537,10 @@ export default function Reports() {
                       <TableCell>Q1 2023-24</TableCell>
                       <TableCell>Jul 31, 2023</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="bg-warning-light text-warning border-warning">
+                        <Badge
+                          variant="outline"
+                          className="bg-warning-light text-warning border-warning"
+                        >
                           Upcoming
                         </Badge>
                       </TableCell>
@@ -479,7 +550,7 @@ export default function Reports() {
               </CardContent>
             </Card>
           </TabsContent>
-          
+
           {/* Clients Tab Content */}
           <TabsContent value="clients">
             {/* Client Summary Metrics */}
@@ -487,14 +558,17 @@ export default function Reports() {
               {clientMetrics.map((metric, index) => (
                 <Card key={index}>
                   <CardHeader className="pb-2">
-                    <CardTitle className="text-sm text-muted-foreground">{metric.metric}</CardTitle>
+                    <CardTitle className="text-sm text-muted-foreground">
+                      {metric.metric}
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-2xl font-bold">
-                      {typeof metric.value === 'number' && metric.value > 1000 ? (
+                      {typeof metric.value === "number" &&
+                      metric.value > 1000 ? (
                         <span className="flex items-center">
                           <IndianRupee className="h-4 w-4 mr-1" />
-                          {metric.value.toLocaleString('en-IN')}
+                          {metric.value.toLocaleString("en-IN")}
                         </span>
                       ) : (
                         metric.value
@@ -504,7 +578,7 @@ export default function Reports() {
                 </Card>
               ))}
             </div>
-            
+
             {/* Client Revenue Distribution */}
             <Card className="mt-6">
               <CardHeader>
@@ -523,20 +597,27 @@ export default function Reports() {
                         fill="#8884d8"
                         dataKey="revenue"
                         nameKey="name"
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        label={({ name, percent }) =>
+                          `${name}: ${(percent * 100).toFixed(0)}%`
+                        }
                       >
                         {topClients.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]}
+                          />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(value) => formatCurrency(Number(value))} />
+                      <Tooltip
+                        formatter={(value) => formatCurrency(Number(value))}
+                      />
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
-            
+
             {/* Client Performance */}
             <Card className="mt-6">
               <CardHeader>
@@ -550,7 +631,9 @@ export default function Reports() {
                       <TableHead>Projects</TableHead>
                       <TableHead>Avg. Project Value</TableHead>
                       <TableHead>Payment Status</TableHead>
-                      <TableHead className="text-right">Total Revenue</TableHead>
+                      <TableHead className="text-right">
+                        Total Revenue
+                      </TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -559,44 +642,64 @@ export default function Reports() {
                       <TableCell>5</TableCell>
                       <TableCell>{formatCurrency(250000)}</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="bg-success-light text-success border-success">
+                        <Badge
+                          variant="outline"
+                          className="bg-success-light text-success border-success"
+                        >
                           On Time
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">{formatCurrency(1250000)}</TableCell>
+                      <TableCell className="text-right">
+                        {formatCurrency(1250000)}
+                      </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Global Traders Ltd.</TableCell>
                       <TableCell>3</TableCell>
                       <TableCell>{formatCurrency(326667)}</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="bg-success-light text-success border-success">
+                        <Badge
+                          variant="outline"
+                          className="bg-success-light text-success border-success"
+                        >
                           On Time
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">{formatCurrency(980000)}</TableCell>
+                      <TableCell className="text-right">
+                        {formatCurrency(980000)}
+                      </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Innovate Systems</TableCell>
                       <TableCell>4</TableCell>
                       <TableCell>{formatCurrency(181250)}</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="bg-warning-light text-warning border-warning">
+                        <Badge
+                          variant="outline"
+                          className="bg-warning-light text-warning border-warning"
+                        >
                           Delayed
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">{formatCurrency(725000)}</TableCell>
+                      <TableCell className="text-right">
+                        {formatCurrency(725000)}
+                      </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>Reliable Services</TableCell>
                       <TableCell>2</TableCell>
                       <TableCell>{formatCurrency(325000)}</TableCell>
                       <TableCell>
-                        <Badge variant="outline" className="bg-success-light text-success border-success">
+                        <Badge
+                          variant="outline"
+                          className="bg-success-light text-success border-success"
+                        >
                           On Time
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">{formatCurrency(650000)}</TableCell>
+                      <TableCell className="text-right">
+                        {formatCurrency(650000)}
+                      </TableCell>
                     </TableRow>
                   </TableBody>
                 </Table>

@@ -1,8 +1,7 @@
-
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Upload, ImagePlus } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Upload, ImagePlus } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface LogoUploadProps {
   onUpload: (logoUrl: string) => void;
@@ -10,7 +9,9 @@ interface LogoUploadProps {
 }
 
 const LogoUpload: React.FC<LogoUploadProps> = ({ onUpload, currentLogo }) => {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(currentLogo || null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(
+    currentLogo || null,
+  );
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const fileInputRef = React.useRef<HTMLInputElement>(null);
@@ -20,11 +21,11 @@ const LogoUpload: React.FC<LogoUploadProps> = ({ onUpload, currentLogo }) => {
     if (!file) return;
 
     // Check file type
-    if (!file.type.startsWith('image/')) {
+    if (!file.type.startsWith("image/")) {
       toast({
         title: "Invalid file type",
         description: "Please upload an image file (JPG, PNG, or SVG)",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -34,7 +35,7 @@ const LogoUpload: React.FC<LogoUploadProps> = ({ onUpload, currentLogo }) => {
       toast({
         title: "File too large",
         description: "Please upload an image smaller than 2MB",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -64,36 +65,44 @@ const LogoUpload: React.FC<LogoUploadProps> = ({ onUpload, currentLogo }) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-4">
-        <div 
+        <div
           className="w-24 h-24 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center bg-gray-50 overflow-hidden"
           onClick={triggerFileInput}
         >
           {previewUrl ? (
-            <img src={previewUrl} alt="Business logo" className="w-full h-full object-contain" />
+            <img
+              src={previewUrl}
+              alt="Business logo"
+              className="w-full h-full object-contain"
+            />
           ) : (
             <ImagePlus className="h-8 w-8 text-gray-400" />
           )}
         </div>
-        
+
         <div className="space-y-2">
-          <Button 
-            type="button" 
-            variant="outline" 
+          <Button
+            type="button"
+            variant="outline"
             onClick={triggerFileInput}
             disabled={isUploading}
             className="w-full"
           >
             <Upload className="h-4 w-4 mr-2" />
-            {isUploading ? "Uploading..." : previewUrl ? "Change Logo" : "Upload Logo"}
+            {isUploading
+              ? "Uploading..."
+              : previewUrl
+                ? "Change Logo"
+                : "Upload Logo"}
           </Button>
-          
+
           {previewUrl && (
-            <Button 
-              type="button" 
-              variant="ghost" 
+            <Button
+              type="button"
+              variant="ghost"
               onClick={() => {
                 setPreviewUrl(null);
-                onUpload('');
+                onUpload("");
               }}
               className="w-full text-destructive hover:text-destructive"
             >
@@ -102,15 +111,15 @@ const LogoUpload: React.FC<LogoUploadProps> = ({ onUpload, currentLogo }) => {
           )}
         </div>
       </div>
-      
-      <input 
+
+      <input
         type="file"
         ref={fileInputRef}
         onChange={handleFileChange}
         accept="image/png, image/jpeg, image/jpg, image/svg+xml"
         className="hidden"
       />
-      
+
       <p className="text-xs text-muted-foreground">
         Upload your business logo (JPG, PNG, or SVG). Max size 2MB.
       </p>

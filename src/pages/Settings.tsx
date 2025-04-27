@@ -1,15 +1,9 @@
-
 import MainLayout from "@/components/layout/MainLayout";
 import ProfileSettings from "@/components/settings/ProfileSettings";
 import BusinessSettings from "@/components/settings/BusinessSettings";
 import NotificationSettings from "@/components/settings/NotificationSettings";
 import BillingSettings from "@/components/settings/BillingSettings";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Settings = () => {
   return (
@@ -29,19 +23,19 @@ const Settings = () => {
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
             <TabsTrigger value="billing">Billing</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="profile" className="space-y-4">
             <ProfileSettings />
           </TabsContent>
-          
+
           <TabsContent value="business" className="space-y-4">
             <BusinessSettings />
           </TabsContent>
-          
+
           <TabsContent value="notifications" className="space-y-4">
             <NotificationSettings />
           </TabsContent>
-          
+
           <TabsContent value="billing" className="space-y-4">
             <BillingSettings />
           </TabsContent>

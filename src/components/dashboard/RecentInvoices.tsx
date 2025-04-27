@@ -27,53 +27,54 @@ interface Invoice {
 
 const RecentInvoices = () => {
   const invoices = useMemo(
-    () => [
-      {
-        id: "1",
-        invoiceNumber: "INV-2024-001",
-        client: "Acme Inc",
-        amount: 3200,
-        date: "Apr 15, 2024",
-        status: { status: "paid", label: "Paid" },
-      },
-      {
-        id: "2",
-        invoiceNumber: "INV-2024-002",
-        client: "TechGiant Co",
-        amount: 1800,
-        date: "Apr 12, 2024",
-        status: { status: "pending", label: "Pending" },
-      },
-      {
-        id: "3",
-        invoiceNumber: "INV-2024-003",
-        client: "Globe Media",
-        amount: 2100,
-        date: "Apr 10, 2024",
-        status: { status: "paid", label: "Paid" },
-      },
-      {
-        id: "4",
-        invoiceNumber: "INV-2024-004",
-        client: "Bright Solutions",
-        amount: 950,
-        date: "Apr 05, 2024",
-        status: { status: "overdue", label: "Overdue" },
-      },
-      {
-        id: "5",
-        invoiceNumber: "INV-2024-005",
-        client: "Nova Systems",
-        amount: 2700,
-        date: "Apr 01, 2024",
-        status: { status: "paid", label: "Paid" },
-      },
-    ] as Invoice[],
-    []
+    () =>
+      [
+        {
+          id: "1",
+          invoiceNumber: "INV-2024-001",
+          client: "Acme Inc",
+          amount: 3200,
+          date: "Apr 15, 2024",
+          status: { status: "paid", label: "Paid" },
+        },
+        {
+          id: "2",
+          invoiceNumber: "INV-2024-002",
+          client: "TechGiant Co",
+          amount: 1800,
+          date: "Apr 12, 2024",
+          status: { status: "pending", label: "Pending" },
+        },
+        {
+          id: "3",
+          invoiceNumber: "INV-2024-003",
+          client: "Globe Media",
+          amount: 2100,
+          date: "Apr 10, 2024",
+          status: { status: "paid", label: "Paid" },
+        },
+        {
+          id: "4",
+          invoiceNumber: "INV-2024-004",
+          client: "Bright Solutions",
+          amount: 950,
+          date: "Apr 05, 2024",
+          status: { status: "overdue", label: "Overdue" },
+        },
+        {
+          id: "5",
+          invoiceNumber: "INV-2024-005",
+          client: "Nova Systems",
+          amount: 2700,
+          date: "Apr 01, 2024",
+          status: { status: "paid", label: "Paid" },
+        },
+      ] as Invoice[],
+    [],
   );
 
   const formatCurrency = (value: number) => {
-    return `₹${value.toLocaleString('en-IN')}`;
+    return `₹${value.toLocaleString("en-IN")}`;
   };
 
   const getStatusColor = (status: string) => {
@@ -119,7 +120,7 @@ const RecentInvoices = () => {
                   <Badge
                     variant="outline"
                     className={`${getStatusColor(
-                      invoice.status.status
+                      invoice.status.status,
                     )} border`}
                   >
                     {invoice.status.label}

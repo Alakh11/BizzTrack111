@@ -1,4 +1,3 @@
-
 import { IndianRupee, Users, FileText, CreditCard } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
 import StatCard from "@/components/dashboard/StatCard";

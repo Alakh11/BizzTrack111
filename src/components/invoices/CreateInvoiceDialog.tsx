@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -33,11 +32,15 @@ interface CreateInvoiceDialogProps {
   onSubmit: (data: z.infer<typeof formSchema>) => void;
 }
 
-const CreateInvoiceDialog = ({ open, onOpenChange, onSubmit }: CreateInvoiceDialogProps) => {
+const CreateInvoiceDialog = ({
+  open,
+  onOpenChange,
+  onSubmit,
+}: CreateInvoiceDialogProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      invoiceNumber: `INV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`,
+      invoiceNumber: `INV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, "0")}`,
       clientName: "",
       amount: "",
     },
@@ -59,7 +62,10 @@ const CreateInvoiceDialog = ({ open, onOpenChange, onSubmit }: CreateInvoiceDial
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+          <form
+            onSubmit={form.handleSubmit(handleSubmit)}
+            className="space-y-4"
+          >
             <FormField
               control={form.control}
               name="invoiceNumber"
@@ -95,7 +101,11 @@ const CreateInvoiceDialog = ({ open, onOpenChange, onSubmit }: CreateInvoiceDial
                 <FormItem>
                   <FormLabel>Amount</FormLabel>
                   <FormControl>
-                    <Input {...field} type="number" placeholder="Enter amount" />
+                    <Input
+                      {...field}
+                      type="number"
+                      placeholder="Enter amount"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -103,7 +113,11 @@ const CreateInvoiceDialog = ({ open, onOpenChange, onSubmit }: CreateInvoiceDial
             />
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit">Create Invoice</Button>

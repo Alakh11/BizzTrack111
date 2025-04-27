@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -67,7 +66,9 @@ const BillingSettings = () => {
                 }`}
               >
                 <div className="flex justify-between items-start">
-                  <h3 className="font-semibold text-lg font-playfair">{plan.name}</h3>
+                  <h3 className="font-semibold text-lg font-playfair">
+                    {plan.name}
+                  </h3>
                   {plan.current && (
                     <Badge className="bg-primary/10 text-primary border-primary">
                       Current Plan
@@ -177,7 +178,10 @@ const BillingSettings = () => {
                       499.00
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-sm">
-                      <Badge variant="outline" className="bg-success/10 text-success border-success">
+                      <Badge
+                        variant="outline"
+                        className="bg-success/10 text-success border-success"
+                      >
                         Paid
                       </Badge>
                     </td>
@@ -194,7 +198,10 @@ const BillingSettings = () => {
                       499.00
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-sm">
-                      <Badge variant="outline" className="bg-success/10 text-success border-success">
+                      <Badge
+                        variant="outline"
+                        className="bg-success/10 text-success border-success"
+                      >
                         Paid
                       </Badge>
                     </td>
@@ -211,7 +218,10 @@ const BillingSettings = () => {
                       499.00
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap text-sm">
-                      <Badge variant="outline" className="bg-success/10 text-success border-success">
+                      <Badge
+                        variant="outline"
+                        className="bg-success/10 text-success border-success"
+                      >
                         Paid
                       </Badge>
                     </td>
