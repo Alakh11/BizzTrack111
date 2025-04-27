@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -11,13 +12,13 @@ interface Step {
 interface InvoiceStepsProps {
   currentStep: number;
   steps: Step[];
-  onChange: (step: number) => void;
+  onStepChange: (step: number) => void;
 }
 
 export function InvoiceSteps({
   currentStep,
   steps,
-  onChange,
+  onStepChange,
 }: InvoiceStepsProps) {
   return (
     <nav aria-label="Progress" className="mb-8">
@@ -52,7 +53,7 @@ export function InvoiceSteps({
                   )}
                 </span>
                 <button
-                  onClick={() => onChange(index)}
+                  onClick={() => onStepChange(index)}
                   className={cn(
                     "text-sm font-medium",
                     index <= currentStep
