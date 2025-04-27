@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -9,7 +9,6 @@ import {
   FormField,
   FormItem,
   FormLabel,
-  FormMessage,
 } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
@@ -56,6 +55,10 @@ import GstDetails from "@/components/invoices/GstDetails";
 import PaymentOptions from "@/components/invoices/PaymentOptions";
 import EditableBillingSection from "@/components/invoices/EditableBillingSection";
 import CreateClientDialog from "@/components/clients/CreateClientDialog";
+import InvoiceHeader from "@/components/invoices/InvoiceHeader";
+import InvoiceDetails from "@/components/invoices/InvoiceDetails";
+import InvoiceItems from "@/components/invoices/InvoiceItems";
+import CurrencySelector from "@/components/invoices/CurrencySelector";
 
 const steps = [
   {
@@ -570,159 +573,64 @@ const InvoiceGeneration = () => {
       case 0: // Invoice Details
         return (
           <div className="space-y-8">
-            <div className="flex flex-col space-y-2">
-              <div className="flex items-center space-x-2">
-                <FormItem className="w-full">
-                  <Input
-                    className="text-2xl font-bold border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0 font-playfair"
-                    value={customInvoiceTitle}
-                    onChange={(e) => setCustomInvoiceTitle(e.target.value)}
-                    placeholder="INVOICE"
-                  />
-                </FormItem>
-              </div>
-
-              <div>
-                <Input
-                  className="text-sm text-muted-foreground border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-                  value={customSubtitle}
-                  onChange={(e) => setCustomSubtitle(e.target.value)}
-                  placeholder="Add Subtitle (Optional)"
-                />
-              </div>
-            </div>
+            <InvoiceHeader
+              customInvoiceTitle={customInvoiceTitle}
+              customSubtitle={customSubtitle}
+              onTitleChange={setCustomInvoiceTitle}
+              onSubtitleChange={setCustomSubtitle}
+            />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Invoice Info */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium font-playfair">
-                  Invoice Information
-                </h3>
+              <InvoiceDetails
+                form={form}
+                showAdditionalFields={showAdditionalFields}
+                setShowAdditionalFields={setShowAdditionalFields}
+                purchaseOrderNumber={purchaseOrderNumber}
+                setPurchaseOrderNumber={setPurchaseOrderNumber}
+                referenceNumber={referenceNumber}
+                setReferenceNumber={setReferenceNumber}
+              />
 
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="invoiceNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Invoice Number</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="invoiceDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Invoice Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="dueDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Due Date</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="flex items-center text-sm"
-                  onClick={() => setShowAdditionalFields(!showAdditionalFields)}
-                >
-                  <Plus className="h-4 w-4 mr-1" /> Add More Fields
-                </Button>
-
-                {showAdditionalFields && (
-                  <div className="space-y-4 pt-2 border-t">
-                    <FormItem>
-                      <FormLabel>Purchase Order Number</FormLabel>
-                      <FormControl>
-                        <Input
-                          value={purchaseOrderNumber}
-                          onChange={(e) =>
-                            setPurchaseOrderNumber(e.target.value)
-                          }
-                          placeholder="Enter PO number"
-                        />
-                      </FormControl>
-                    </FormItem>
-
-                    <FormItem>
-                      <FormLabel>Reference Number</FormLabel>
-                      <FormControl>
-                        <Input
-                          value={referenceNumber}
-                          onChange={(e) => setReferenceNumber(e.target.value)}
-                          placeholder="Enter reference number"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  </div>
-                )}
-              </div>
-
-              {/* Billing Info */}
               <div className="space-y-8">
-                {/* Billed By Section */}
                 <EditableBillingSection 
                   title="Billed By (Your Details)"
                   defaultDetails={businessDetails}
                   onSave={handleBusinessDetailsUpdate}
                 />
 
-                {/* Billed To Section */}
                 <div className="space-y-4">
                   <h3 className="text-lg font-medium font-playfair">
                     Billed To (Client's Details)
                   </h3>
 
-                  <div className="flex justify-between items-center">
-                    <FormItem className="w-full">
-                      <FormLabel>Select Client</FormLabel>
-                      <Select
-                        onValueChange={handleClientChange}
-                        value={form.getValues("clientId")}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a client" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {clients &&
-                            clients.map((client) => (
-                              <SelectItem key={client.id} value={client.id}>
-                                {client.name}
-                              </SelectItem>
-                            ))}
-                        </SelectContent>
-                      </Select>
-                    </FormItem>
-                  </div>
+                  <FormItem>
+                    <FormLabel>Select Client</FormLabel>
+                    <Select
+                      onValueChange={handleClientChange}
+                      value={form.getValues("clientId")}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a client" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {clients &&
+                          clients.map((client) => (
+                            <SelectItem key={client.id} value={client.id}>
+                              {client.name}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
 
                   <div className="flex items-center">
-                    <Button 
-                      type="button" 
-                      variant="outline" 
+                    <Button
+                      type="button"
+                      variant="outline"
                       size="sm"
                       onClick={() => setIsCreateClientDialogOpen(true)}
                     >
-                      <Plus className="h-4 w-4 mr-2" /> Add New Client
+                      Add New Client
                     </Button>
                   </div>
 
@@ -741,7 +649,7 @@ const InvoiceGeneration = () => {
                     <Card className="shadow-sm">
                       <CardContent className="p-4">
                         <div className="text-sm text-center text-muted-foreground py-6">
-                          Select a client to show details or click "Add New Client" to create one
+                          Select a client to show details or click "Add New Client"
                         </div>
                       </CardContent>
                     </Card>
@@ -750,244 +658,115 @@ const InvoiceGeneration = () => {
               </div>
             </div>
 
-            {/* Shipping Toggle */}
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="shipping"
-                checked={showShippingDetails}
-                onCheckedChange={(checked) =>
-                  setShowShippingDetails(!!checked)
-                }
-              />
-              <label
-                htmlFor="shipping"
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-              >
-                Add Shipping Details
-              </label>
-            </div>
-
-            {/* Shipping Details Section */}
-            {showShippingDetails && (
-              <div className="space-y-4 pt-2 border-t">
-                <ShippingDetails form={form} />
-              </div>
-            )}
-            
-            {/* Transporter Details Toggle */}
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="transporter"
-                checked={showTransporterDetails}
-                onCheckedChange={(checked) =>
-                  setShowTransporterDetails(!!checked)
-                }
-              />
-              <label
-                htmlFor="transporter"
-                className="text-sm font-medium leading-none flex items-center"
-              >
-                <Truck className="h-4 w-4 mr-2" /> Add Transporter Details
-              </label>
-            </div>
-            
-            {/* Transporter Details Section */}
-            {showTransporterDetails && (
-              <div className="space-y-4 pt-2 border-t">
-                <TransporterDetails form={form} />
-              </div>
-            )}
-            
-            {/* GST Toggle */}
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="gst"
-                checked={showGstDetails}
-                onCheckedChange={() => setShowGstDetails(true)}
-              />
-              <label
-                htmlFor="gst"
-                className="text-sm font-medium leading-none flex items-center"
-              >
-                <Receipt className="h-4 w-4 mr-2" /> Add GST
-              </label>
-            </div>
-            
-            {/* GST Dialog */}
-            <GstDetails 
-              open={showGstDetails} 
-              onOpenChange={setShowGstDetails}
-              onSave={handleGstConfigSave}
-            />
-            
-            {/* GST Configuration Display */}
-            {gstConfig && (
-              <div className="border p-4 rounded-md">
-                <div className="flex justify-between items-center">
-                  <h4 className="font-medium">GST Configuration</h4>
-                  <Button 
-                    variant="ghost" 
-                    size="sm" 
-                    onClick={() => setShowGstDetails(true)}
-                  >
-                    Edit
-                  </Button>
-                </div>
-                <div className="grid grid-cols-2 gap-4 mt-2">
-                  <div>
-                    <p className="text-sm text-muted-foreground">Tax Type:</p>
-                    <p className="text-sm">{gstConfig.taxType}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Place of Supply:</p>
-                    <p className="text-sm">{gstConfig.placeOfSupply}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            {/* Additional Options */}
-            <div className="flex flex-wrap gap-2">
-              <Button variant="outline" size="sm" className="flex items-center">
-                <FileSignature className="h-4 w-4 mr-2" /> Add Signature
-              </Button>
-              <Button variant="outline" size="sm" className="flex items-center">
-                <Paperclip className="h-4 w-4 mr-2" /> Add Attachments
-              </Button>
-              <Button variant="outline" size="sm" className="flex items-center">
-                <InfoIcon className="h-4 w-4 mr-2" /> Add Additional Info
-              </Button>
-              <Button variant="outline" size="sm" className="flex items-center">
-                <Phone className="h-4 w-4 mr-2" /> Add Contact Details
-              </Button>
-            </div>
-
-            <div>
-              <FormItem>
-                <FormLabel>Currency</FormLabel>
-                <Select
-                  value={selectedCurrency}
-                  onValueChange={setSelectedCurrency}
+            <div className="space-y-4 mt-8">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="shipping"
+                  checked={showShippingDetails}
+                  onCheckedChange={(checked) =>
+                    setShowShippingDetails(!!checked)
+                  }
+                />
+                <label
+                  htmlFor="shipping"
+                  className="text-sm font-medium leading-none"
                 >
-                  <SelectTrigger className="w-[280px]">
-                    <SelectValue placeholder="Select currency" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="inr">Indian Rupee (INR, ₹)</SelectItem>
-                    <SelectItem value="usd">US Dollar (USD, $)</SelectItem>
-                    <SelectItem value="eur">Euro (EUR, €)</SelectItem>
-                    <SelectItem value="gbp">British Pound (GBP, £)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormItem>
+                  Add Shipping Details
+                </label>
+              </div>
+
+              {showShippingDetails && (
+                <div className="space-y-4 pt-2 border-t">
+                  <ShippingDetails form={form} />
+                </div>
+              )}
             </div>
 
             <Separator className="my-6" />
 
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <h3 className="text-lg font-medium font-playfair">
-                  Invoice Items
-                </h3>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddItem}
-                >
-                  <Plus className="h-4 w-4 mr-2" /> Add Item
-                </Button>
-              </div>
+            <InvoiceItems
+              items={items}
+              onItemChange={handleItemChange}
+              onAddItem={handleAddItem}
+              onRemoveItem={handleRemoveItem}
+            />
 
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse">
-                  <thead>
-                    <tr className="border-b">
-                      <th className="text-left py-2 px-2 font-medium">Item</th>
-                      <th className="text-right py-2 px-2 font-medium">Qty</th>
-                      <th className="text-right py-2 px-2 font-medium">
-                        Rate (₹)
-                      </th>
-                      <th className="text-right py-2 px-2 font-medium">
-                        Amount (₹)
-                      </th>
-                      <th className="py-2 px-2 w-10"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {items.map((item, index) => (
-                      <tr key={item.id} className="border-b">
-                        <td className="py-2 px-2">
-                          <Input
-                            value={item.description}
-                            onChange={(e) =>
-                              handleItemChange(
-                                item.id,
-                                "description",
-                                e.target.value,
-                              )
-                            }
-                            className="w-full"
-                            placeholder="Enter item description"
-                          />
-                        </td>
-                        <td className="py-2 px-2">
-                          <Input
-                            type="number"
-                            value={item.quantity}
-                            onChange={(e) =>
-                              handleItemChange(
-                                item.id,
-                                "quantity",
-                                parseInt(e.target.value) || 0,
-                              )
-                            }
-                            className="w-20 text-right"
-                            min={1}
-                          />
-                        </td>
-                        <td className="py-2 px-2">
-                          <div className="flex items-center justify-end">
-                            <IndianRupee className="h-3 w-3 mr-1" />
-                            <Input
-                              type="number"
-                              value={item.rate}
-                              onChange={(e) =>
-                                handleItemChange(
-                                  item.id,
-                                  "rate",
-                                  parseFloat(e.target.value) || 0,
-                                )
-                              }
-                              className="w-28 text-right"
-                              min={0}
-                              step={0.01}
-                            />
-                          </div>
-                        </td>
-                        <td className="py-2 px-2 text-right">
-                          <div className="flex items-center justify-end">
-                            <IndianRupee className="h-3 w-3 mr-1" />
-                            {item.amount.toLocaleString("en-IN", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
-                          </div>
-                        </td>
-                        <td className="py-2 px-2">
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleRemoveItem(item.id)}
-                            disabled={items.length === 1}
-                          >
-                            <Trash className="h-4 w-4 text-gray-400 hover:text-red-500" />
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <td colSpan={2}>
+            <div className="mt-6">
+              <CurrencySelector
+                selectedCurrency={selectedCurrency}
+                onCurrencyChange={setSelectedCurrency}
+              />
+            </div>
+          </div>
+        );
+      case 1:
+        return (
+          <PaymentOptions form={form} />
+        );
+      case 2:
+        return (
+          <div className="space-y-8">
+            <InvoiceTemplates
+              selectedTemplate={selectedTemplate}
+              onTemplateSelect={setSelectedTemplate}
+              selectedColor={selectedColor}
+              onColorSelect={setSelectedColor}
+              selectedFont={selectedFont}
+              onFontSelect={setSelectedFont}
+              selectedPaperSize={selectedPaperSize}
+              onPaperSizeSelect={setSelectedPaperSize}
+            />
+            <LogoUpload
+              businessLogo={businessLogo}
+              onLogoUpload={setBusinessLogo}
+            />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <MainLayout>
+      <div className="container py-6">
+        <InvoiceSteps
+          steps={steps}
+          currentStep={currentStep}
+          onStepChange={handleStepChange}
+        />
+
+        <Form {...form}>
+          <form onSubmit={handleSubmit} className="space-y-8">
+            <Card>
+              <CardContent className="p-6">
+                {renderStepContent()}
+
+                <div className="flex justify-between mt-8">
+                  {currentStep > 0 && (
+                    <Button type="button" onClick={handlePrevious}>
+                      Previous
+                    </Button>
+                  )}
+                  <div className="flex justify-end flex-1">
+                    {currentStep < steps.length - 1 ? (
+                      <Button type="button" onClick={handleNext}>
+                        Next
+                      </Button>
+                    ) : (
+                      <Button type="submit">
+                        {isEditMode ? "Update" : "Create"} Invoice
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </form>
+        </Form>
+      </div>
+    </MainLayout>
+  );
+};
+
+export default InvoiceGeneration;
