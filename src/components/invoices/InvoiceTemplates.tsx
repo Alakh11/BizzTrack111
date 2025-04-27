@@ -3,7 +3,7 @@ import React from 'react';
 
 // Sample invoice template images
 const templateImages = {
-  standard: "https://i.imgur.com/cN9OKMR.png",
+  standard: "https://square-mailstrom-production.s3.amazonaws.com/invoices/templates/img/en-us-invoice-template-576474.jpg?v=2",
   professional: "https://i.imgur.com/l2O3M5j.png",
   modern: "https://i.imgur.com/DFg6QiK.png",
   classic: "https://i.imgur.com/CtbuDF6.png",
