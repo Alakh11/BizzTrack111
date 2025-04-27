@@ -990,4 +990,4 @@ const InvoiceGeneration = () => {
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colSpan
+                      <td colSpan={2}>
