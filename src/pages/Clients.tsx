@@ -25,6 +25,7 @@ import {
   MoreHorizontal,
   ChevronLeft,
   ChevronRight,
+  IndianRupee,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -59,7 +60,7 @@ const Clients = () => {
   );
 
   const formatCurrency = (value: number) => {
-    return `$${value.toLocaleString()}`;
+    return `₹${value.toLocaleString()}`;
   };
 
   // Helper to get client initials
@@ -106,7 +107,12 @@ const Clients = () => {
           </div>
           <div className="dashboard-card">
             <p className="text-sm text-muted-foreground">Total Revenue</p>
-            <p className="text-2xl font-bold">$45,231.89</p>
+            <p className="text-2xl font-bold">
+              <span className="inline-flex items-center">
+                <IndianRupee className="h-4 w-4 mr-1" />
+                45,231.89
+              </span>
+            </p>
           </div>
         </div>
 
