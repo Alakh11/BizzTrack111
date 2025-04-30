@@ -8,10 +8,9 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, Printer, Share2, Edit, ArrowLeft } from "lucide-react";
+import { Download, Printer, Share2, Edit, ArrowLeft, IndianRupee } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
-import { IndianRupee } from "lucide-react";
 
 interface InvoiceViewProps {
   open: boolean;

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
@@ -699,11 +700,11 @@ const InvoiceGeneration = () => {
             </div>
           </div>
         );
-      case 1:
+      case 1: // Banking
         return (
           <PaymentOptions form={form} />
         );
-      case 2:
+      case 2: // Design & Share
         return (
           <div className="space-y-8">
             <InvoiceTemplates
