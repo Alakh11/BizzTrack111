@@ -1,5 +1,6 @@
 
 import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
 
 // Sample invoice template images
 const templateImages = {
@@ -156,6 +157,23 @@ const InvoiceTemplates: React.FC<InvoiceTemplatesProps> = ({
             </div>
           ))}
         </div>
+      </div>
+
+      <div className="mt-6">
+        <h3 className="text-lg font-medium mb-4">Invoice Preview</h3>
+        <Card className="shadow-sm overflow-hidden">
+          <CardContent className="p-0">
+            <div className="aspect-[1/1.414] bg-gray-50 relative">
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="text-center p-4">
+                  <p className="text-muted-foreground">
+                    Preview will be available soon
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { IndianRupee } from "lucide-react";
 
 const formSchema = z.object({
   invoiceNumber: z.string().min(1, "Invoice number is required"),
@@ -101,11 +103,17 @@ const CreateInvoiceDialog = ({
                 <FormItem>
                   <FormLabel>Amount</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      type="number"
-                      placeholder="Enter amount"
-                    />
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <IndianRupee className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <Input
+                        {...field}
+                        type="number"
+                        placeholder="Enter amount"
+                        className="pl-9"
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

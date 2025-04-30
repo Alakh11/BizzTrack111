@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   IndianRupee,
   Plus,
@@ -264,7 +263,10 @@ const InvoiceGeneration = () => {
             // If there are design settings stored in metadata
             if (invoiceData.metadata) {
               try {
-                const metadata = JSON.parse(invoiceData.metadata);
+                const metadata = typeof invoiceData.metadata === 'string' 
+                  ? JSON.parse(invoiceData.metadata) 
+                  : invoiceData.metadata;
+                  
                 if (metadata.design) {
                   setSelectedTemplate(metadata.design.template || "standard");
                   setSelectedColor(metadata.design.color || "blue");
@@ -278,11 +280,53 @@ const InvoiceGeneration = () => {
                 }
                 if (metadata.shipping) {
                   setShowShippingDetails(true);
-                  // Set shipping fields
+                  // Set shipping fields from metadata
+                  if (metadata.shipping.shippedFrom) {
+                    form.setValue("shippedFromWarehouse", metadata.shipping.shippedFrom.warehouse || "");
+                    form.setValue("shippedFromName", metadata.shipping.shippedFrom.name || "");
+                    form.setValue("shippedFromCountry", metadata.shipping.shippedFrom.country || "in");
+                    form.setValue("shippedFromAddress", metadata.shipping.shippedFrom.address || "");
+                    form.setValue("shippedFromCity", metadata.shipping.shippedFrom.city || "");
+                    form.setValue("shippedFromPostalCode", metadata.shipping.shippedFrom.postalCode || "");
+                    form.setValue("shippedFromState", metadata.shipping.shippedFrom.state || "");
+                  }
+                  if (metadata.shipping.shippedTo) {
+                    form.setValue("shippedToName", metadata.shipping.shippedTo.name || "");
+                    form.setValue("shippedToCountry", metadata.shipping.shippedTo.country || "in");
+                    form.setValue("shippedToAddress", metadata.shipping.shippedTo.address || "");
+                    form.setValue("shippedToCity", metadata.shipping.shippedTo.city || "");
+                    form.setValue("shippedToPostalCode", metadata.shipping.shippedTo.postalCode || "");
+                    form.setValue("shippedToState", metadata.shipping.shippedTo.state || "");
+                  }
+                }
+                if (metadata.transporter) {
+                  setShowTransporterDetails(true);
+                  form.setValue("transporter", metadata.transporter.transporter || "");
+                  form.setValue("distance", metadata.transporter.distance || "");
+                  form.setValue("transportMode", metadata.transporter.transportMode || "");
+                  form.setValue("transportDocNo", metadata.transporter.transportDocNo || "");
+                  form.setValue("transportDocDate", metadata.transporter.transportDocDate || "");
+                  form.setValue("vehicleType", metadata.transporter.vehicleType || "");
+                  form.setValue("vehicleNumber", metadata.transporter.vehicleNumber || "");
+                  form.setValue("transactionType", metadata.transporter.transactionType || "");
+                  form.setValue("subSupplyType", metadata.transporter.subSupplyType || "");
                 }
                 if (metadata.gst) {
                   setGstConfig(metadata.gst);
                   setShowGstDetails(true);
+                }
+                if (metadata.payment) {
+                  if (metadata.payment.bank) {
+                    form.setValue("bankName", metadata.payment.bank.name || "");
+                    form.setValue("accountNumber", metadata.payment.bank.accountNumber || "");
+                    form.setValue("ifscCode", metadata.payment.bank.ifscCode || "");
+                    form.setValue("accountHolderName", metadata.payment.bank.accountHolderName || "");
+                    form.setValue("swiftCode", metadata.payment.bank.swiftCode || "");
+                  }
+                  if (metadata.payment.upi) {
+                    form.setValue("upiId", metadata.payment.upi.id || "");
+                    form.setValue("upiDisplayName", metadata.payment.upi.displayName || "");
+                  }
                 }
               } catch (e) {
                 console.error("Error parsing invoice metadata", e);
@@ -509,7 +553,7 @@ const InvoiceGeneration = () => {
         notes: data.notes,
         terms: data.terms,
         status: "pending",
-        metadata: JSON.stringify(metadata),
+        metadata: metadata, // Use the metadata directly without stringify
       };
 
       // Prepare invoice items
