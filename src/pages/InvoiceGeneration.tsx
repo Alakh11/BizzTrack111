@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
@@ -139,6 +138,14 @@ const InvoiceGeneration = () => {
     phone: "",
     email: "",
   });
+  const [margins, setMargins] = useState("normal");
+  const [textScale, setTextScale] = useState("100");
+  const [generatePagelessPDF, setGeneratePagelessPDF] = useState(false);
+  const [watermarkText, setWatermarkText] = useState("");
+  const [showFooter, setShowFooter] = useState(false);
+  const [footerText, setFooterText] = useState("");
+  const [showLetterhead, setShowLetterhead] = useState(false);
+  const [letterheadText, setLetterheadText] = useState("");
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -271,8 +278,17 @@ const InvoiceGeneration = () => {
                   setSelectedTemplate(metadata.design.template || "standard");
                   setSelectedColor(metadata.design.color || "blue");
                   setSelectedFont(metadata.design.font || "inter");
+                  setSelectedPaperSize(metadata.design.paperSize || "a4");
                   setCustomInvoiceTitle(metadata.design.title || "INVOICE");
                   setBusinessLogo(metadata.design.logo || "");
+                  setMargins(metadata.design.margins || "normal");
+                  setTextScale(metadata.design.textScale || "100");
+                  setGeneratePagelessPDF(metadata.design.generatePagelessPDF || false);
+                  setWatermarkText(metadata.design.watermarkText || "");
+                  setShowFooter(!!metadata.design.footerText);
+                  setFooterText(metadata.design.footerText || "");
+                  setShowLetterhead(!!metadata.design.letterheadText);
+                  setLetterheadText(metadata.design.letterheadText || "");
                 }
                 if (metadata.additional) {
                   setPurchaseOrderNumber(metadata.additional.poNumber || "");
@@ -490,6 +506,12 @@ const InvoiceGeneration = () => {
           title: customInvoiceTitle,
           subtitle: customSubtitle,
           logo: businessLogo,
+          margins: margins,
+          textScale: textScale,
+          generatePagelessPDF: generatePagelessPDF,
+          watermarkText: watermarkText || null,
+          footerText: showFooter ? footerText : null,
+          letterheadText: showLetterhead ? letterheadText : null,
         },
         additional: {
           poNumber: purchaseOrderNumber,
