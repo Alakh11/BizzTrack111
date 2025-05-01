@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
@@ -38,10 +37,10 @@ import { useClients } from "@/hooks/useClients";
 import { useInvoices } from "@/hooks/useInvoices";
 import { supabase } from "@/integrations/supabase/client";
 import { BillingDetailsForm } from "@/components/invoices/BillingDetailsForm";
-import { ShippingDetailsForm } from "@/components/invoices/ShippingDetailsForm";
-import { TransportDetailsForm } from "@/components/invoices/TransportDetailsForm";
-import { GstDetailsForm } from "@/components/invoices/GstDetailsForm";
-import { PaymentOptionsForm } from "@/components/invoices/PaymentOptionsForm";
+import ShippingDetailsForm from "@/components/invoices/ShippingDetailsForm";
+import TransportDetailsForm from "@/components/invoices/TransportDetailsForm";
+import GstDetailsForm from "@/components/invoices/GstDetailsForm";
+import PaymentOptionsForm from "@/components/invoices/PaymentOptionsForm";
 
 const steps = [
   {
