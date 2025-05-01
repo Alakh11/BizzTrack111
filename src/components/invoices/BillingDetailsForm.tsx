@@ -37,125 +37,79 @@ export const BillingDetailsForm = ({
   handleClientChange 
 }: BillingDetailsFormProps) => {
   const [isAddClientOpen, setIsAddClientOpen] = useState(false);
-  const [showBusinessForm, setShowBusinessForm] = useState(false);
-  const [showClientForm, setShowClientForm] = useState(false);
+  const [showBusinessForm, setShowBusinessForm] = useState(true);
+  const [showClientForm, setShowClientForm] = useState(true);
   
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Billed By Section */}
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
-            <h3 className="text-lg font-medium font-playfair">
-              Billed By (Your Details)
-            </h3>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => setShowBusinessForm(!showBusinessForm)}
-            >
-              {showBusinessForm ? "Hide Form" : "Edit"}
-            </Button>
-          </div>
+          <h3 className="text-lg font-medium font-playfair">
+            Billed By (Your Details)
+          </h3>
 
-          {!showBusinessForm ? (
-            <Card className="shadow-sm">
-              <CardContent className="p-4">
-                <div className="space-y-2">
-                  <p className="font-medium">{form.getValues("businessName") || "Alakh Corporation"}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {form.getValues("businessAddress") || "Mirzapur, UP, India - 231312"}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {form.getValues("businessPhone") || "+91 9580813770"}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {form.getValues("businessEmail") || "alakh1304@gmail.com"}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="businessName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Business Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter business name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="businessAddress"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Business Address</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} placeholder="Enter business address" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="businessPhone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Business Phone</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter business phone" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="businessEmail"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Business Email</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="email" 
-                        {...field} 
-                        placeholder="Enter business email" 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <div className="flex gap-2 justify-end">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setShowBusinessForm(false)}
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  type="button" 
-                  size="sm" 
-                  onClick={() => setShowBusinessForm(false)}
-                >
-                  Save
-                </Button>
-              </div>
-            </div>
-          )}
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="businessName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Business Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter business name" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="businessAddress"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Business Address</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} placeholder="Enter business address" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="businessPhone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Business Phone</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter business phone" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="businessEmail"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Business Email</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="email" 
+                      {...field} 
+                      placeholder="Enter business email" 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
         {/* Billed To Section */}
@@ -194,120 +148,67 @@ export const BillingDetailsForm = ({
             </div>
           </FormItem>
 
-          <div className="flex justify-between items-center">
-            <div className="font-medium">{form.getValues("clientName") || "Client Details"}</div>
-            <Button 
-              variant="ghost" 
-              size="sm"
-              onClick={() => setShowClientForm(!showClientForm)}
-              disabled={!form.getValues("clientId")}
-            >
-              {showClientForm ? "Hide Form" : "Edit"}
-            </Button>
+          <div className="space-y-4">
+            <FormField
+              control={form.control}
+              name="clientName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Client Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter client name" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="clientAddress"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Client Address</FormLabel>
+                  <FormControl>
+                    <Textarea {...field} placeholder="Enter client address" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="clientEmail"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Client Email</FormLabel>
+                  <FormControl>
+                    <Input 
+                      type="email" 
+                      {...field} 
+                      placeholder="Enter client email" 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="clientPhone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Client Phone</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Enter client phone" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
-
-          {!showClientForm ? (
-            form.getValues("clientId") && (
-              <Card className="shadow-sm">
-                <CardContent className="p-4">
-                  <div className="space-y-2">
-                    <p className="font-medium">
-                      {form.getValues("clientName")}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {form.getValues("clientAddress") || "No address provided"}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {form.getValues("clientEmail") || "No email provided"}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {form.getValues("clientPhone") || "No phone provided"}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            )
-          ) : (
-            <div className="space-y-4">
-              <FormField
-                control={form.control}
-                name="clientName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Client Name</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter client name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="clientAddress"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Client Address</FormLabel>
-                    <FormControl>
-                      <Textarea {...field} placeholder="Enter client address" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="clientEmail"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Client Email</FormLabel>
-                    <FormControl>
-                      <Input 
-                        type="email" 
-                        {...field} 
-                        placeholder="Enter client email" 
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <FormField
-                control={form.control}
-                name="clientPhone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Client Phone</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter client phone" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              
-              <div className="flex gap-2 justify-end">
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setShowClientForm(false)}
-                >
-                  Cancel
-                </Button>
-                <Button 
-                  type="button" 
-                  size="sm" 
-                  onClick={() => setShowClientForm(false)}
-                >
-                  Save
-                </Button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 

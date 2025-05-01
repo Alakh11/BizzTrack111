@@ -1,14 +1,13 @@
 
-import { 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormControl, 
-  FormMessage 
+import React from "react";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { MapPin } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -16,49 +15,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 
 interface TransportDetailsFormProps {
   form: any;
 }
 
-const transporters = [
-  { value: "fedex", label: "FedEx" },
-  { value: "dhl", label: "DHL" },
-  { value: "ups", label: "UPS" },
-  { value: "usps", label: "USPS" },
-  { value: "other", label: "Other" },
-];
+const TransportDetailsForm: React.FC<TransportDetailsFormProps> = ({ form }) => {
+  const handleCalculateDistance = () => {
+    // This would integrate with a maps API to calculate distance
+    console.log("Calculate distance");
+  };
 
-const transportModes = [
-  { value: "road", label: "Road" },
-  { value: "rail", label: "Rail" },
-  { value: "air", label: "Air" },
-  { value: "ship", label: "Ship" },
-];
-
-const vehicleTypes = [
-  { value: "regular", label: "Regular" },
-  { value: "over_dimensional_cargo", label: "Over Dimensional Cargo" },
-];
-
-const transactionTypes = [
-  { value: "regular", label: "Regular" },
-  { value: "bill_to", label: "Bill To" },
-  { value: "bill_from", label: "Bill From" },
-  { value: "combination", label: "Combination" },
-];
-
-const supplyTypes = [
-  { value: "supply", label: "Supply" },
-  { value: "export", label: "Export" },
-  { value: "import", label: "Import" },
-];
-
-export const TransportDetailsForm = ({ form }: TransportDetailsFormProps) => {
   return (
-    <div className="space-y-4">
-      <h3 className="text-lg font-medium font-playfair">Transport Details</h3>
-      
+    <div className="space-y-6">
+      <h3 className="text-lg font-medium">Transporter Details</h3>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           control={form.control}
@@ -66,21 +38,18 @@ export const TransportDetailsForm = ({ form }: TransportDetailsFormProps) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Select Transporter</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select transporter" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {transporters.map((transporter) => (
-                    <SelectItem key={transporter.value} value={transporter.value}>
-                      {transporter.label}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="bluedart">BlueDart</SelectItem>
+                  <SelectItem value="dhl">DHL</SelectItem>
+                  <SelectItem value="fedex">FedEx</SelectItem>
+                  <SelectItem value="dtdc">DTDC</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -96,15 +65,15 @@ export const TransportDetailsForm = ({ form }: TransportDetailsFormProps) => {
               <FormLabel>Distance (in Km)</FormLabel>
               <div className="flex gap-2">
                 <FormControl>
-                  <Input type="number" {...field} placeholder="Enter distance" />
+                  <Input {...field} type="number" min="0" />
                 </FormControl>
-                <Button 
-                  type="button" 
-                  variant="outline" 
-                  size="icon"
-                  title="Calculate distance"
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCalculateDistance}
+                  className="whitespace-nowrap"
                 >
-                  <MapPin className="h-4 w-4" />
+                  Calculate
                 </Button>
               </div>
               <FormMessage />
@@ -119,22 +88,18 @@ export const TransportDetailsForm = ({ form }: TransportDetailsFormProps) => {
           name="transportMode"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Mode of Transport</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
+              <FormLabel>Add Mode of Transport</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select transport mode" />
+                    <SelectValue placeholder="Select mode" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {transportModes.map((mode) => (
-                    <SelectItem key={mode.value} value={mode.value}>
-                      {mode.label}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="road">Road</SelectItem>
+                  <SelectItem value="rail">Rail</SelectItem>
+                  <SelectItem value="air">Air</SelectItem>
+                  <SelectItem value="ship">Ship</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -147,9 +112,9 @@ export const TransportDetailsForm = ({ form }: TransportDetailsFormProps) => {
           name="transportDocNo"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Transport Doc No.</FormLabel>
+              <FormLabel>Add Transport Doc No.</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter document number" />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -163,9 +128,9 @@ export const TransportDetailsForm = ({ form }: TransportDetailsFormProps) => {
           name="transportDocDate"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Transport Doc Date</FormLabel>
+              <FormLabel>Add Transport Doc Date</FormLabel>
               <FormControl>
-                <Input type="date" {...field} />
+                <Input {...field} type="date" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -178,21 +143,15 @@ export const TransportDetailsForm = ({ form }: TransportDetailsFormProps) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Vehicle Type</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select vehicle type" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {vehicleTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="regular">Regular</SelectItem>
+                  <SelectItem value="over-dimensional-cargo">Over Dimensional Cargo</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -209,7 +168,7 @@ export const TransportDetailsForm = ({ form }: TransportDetailsFormProps) => {
             <FormItem>
               <FormLabel>Vehicle Number</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Enter vehicle number" />
+                <Input {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -221,22 +180,18 @@ export const TransportDetailsForm = ({ form }: TransportDetailsFormProps) => {
           name="transactionType"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Transaction Type</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                defaultValue={field.value}
-              >
+              <FormLabel>Add Transaction Type</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select transaction type" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {transactionTypes.map((type) => (
-                    <SelectItem key={type.value} value={type.value}>
-                      {type.label}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="regular">Regular</SelectItem>
+                  <SelectItem value="bill-to-ship-to">Bill to - Ship to</SelectItem>
+                  <SelectItem value="deemed-export">Deemed Export</SelectItem>
+                  <SelectItem value="sez-supplies">SEZ Supplies</SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -245,33 +200,33 @@ export const TransportDetailsForm = ({ form }: TransportDetailsFormProps) => {
         />
       </div>
 
-      <FormField
-        control={form.control}
-        name="supplyType"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Sub Supply Type</FormLabel>
-            <Select
-              onValueChange={field.onChange}
-              defaultValue={field.value}
-            >
-              <FormControl>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select supply type" />
-                </SelectTrigger>
-              </FormControl>
-              <SelectContent>
-                {supplyTypes.map((type) => (
-                  <SelectItem key={type.value} value={type.value}>
-                    {type.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FormField
+          control={form.control}
+          name="supplyType"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Sub Supply Type</FormLabel>
+              <Select onValueChange={field.onChange} value={field.value}>
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select supply type" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem value="supply">Supply</SelectItem>
+                  <SelectItem value="import">Import</SelectItem>
+                  <SelectItem value="export">Export</SelectItem>
+                  <SelectItem value="job-work">Job Work</SelectItem>
+                </SelectContent>
+              </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
     </div>
   );
 };
+
+export default TransportDetailsForm;

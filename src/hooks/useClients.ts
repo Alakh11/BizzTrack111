@@ -80,9 +80,49 @@ export const useClients = () => {
     },
   });
 
+  const updateClient = useMutation({
+    mutationFn: async (client: Client) => {
+      if (!client.id) {
+        throw new Error("Client ID is required for update");
+      }
+
+      const { data, error } = await supabase
+        .from("clients")
+        .update({
+          name: client.name,
+          company: client.company,
+          email: client.email,
+          phone: client.phone,
+          address: client.address,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", client.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      toast({
+        title: "Success",
+        description: "Client updated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     clients,
     isLoading,
     createClient,
+    updateClient,
   };
 };

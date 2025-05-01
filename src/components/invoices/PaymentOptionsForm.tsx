@@ -1,5 +1,11 @@
 
-import { useState } from "react";
+import React, { useState } from "react";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import {
   FormField,
   FormItem,
@@ -8,48 +14,32 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { CreditCard, Banknote } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface PaymentOptionsFormProps {
   form: any;
 }
 
-export const PaymentOptionsForm = ({ form }: PaymentOptionsFormProps) => {
-  const [showQrCode, setShowQrCode] = useState(false);
-  const [activeTab, setActiveTab] = useState("bank");
-  
+const PaymentOptionsForm: React.FC<PaymentOptionsFormProps> = ({ form }) => {
+  const [paymentMethodTab, setPaymentMethodTab] = useState("bank");
+
   return (
     <div className="space-y-6">
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <h3 className="text-lg font-medium font-playfair">Payment Options</h3>
+      
+      <Tabs
+        value={paymentMethodTab}
+        onValueChange={setPaymentMethodTab}
+        className="w-full"
+      >
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="bank" className="flex items-center">
-            <Banknote className="h-4 w-4 mr-2" /> Bank Account
-          </TabsTrigger>
-          <TabsTrigger value="upi" className="flex items-center">
-            <CreditCard className="h-4 w-4 mr-2" /> UPI Payment
-          </TabsTrigger>
+          <TabsTrigger value="bank">Bank Transfer</TabsTrigger>
+          <TabsTrigger value="upi">UPI Payment</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="bank" className="space-y-4 mt-4">
+        
+        <TabsContent value="bank">
           <Card>
-            <CardHeader>
-              <CardTitle>Bank Account Details</CardTitle>
-              <CardDescription>
-                Add your bank account details for receiving payments
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="pt-4 space-y-4">
               <FormField
                 control={form.control}
                 name="bankName"
@@ -63,7 +53,7 @@ export const PaymentOptionsForm = ({ form }: PaymentOptionsFormProps) => {
                   </FormItem>
                 )}
               />
-
+              
               <FormField
                 control={form.control}
                 name="accountNumber"
@@ -71,16 +61,13 @@ export const PaymentOptionsForm = ({ form }: PaymentOptionsFormProps) => {
                   <FormItem>
                     <FormLabel>Account Number</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Enter account number"
-                      />
+                      <Input {...field} placeholder="Enter account number" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
+              
               <FormField
                 control={form.control}
                 name="ifscCode"
@@ -94,7 +81,7 @@ export const PaymentOptionsForm = ({ form }: PaymentOptionsFormProps) => {
                   </FormItem>
                 )}
               />
-
+              
               <FormField
                 control={form.control}
                 name="accountHolderName"
@@ -108,7 +95,7 @@ export const PaymentOptionsForm = ({ form }: PaymentOptionsFormProps) => {
                   </FormItem>
                 )}
               />
-
+              
               <FormField
                 control={form.control}
                 name="branchName"
@@ -125,16 +112,10 @@ export const PaymentOptionsForm = ({ form }: PaymentOptionsFormProps) => {
             </CardContent>
           </Card>
         </TabsContent>
-
-        <TabsContent value="upi" className="space-y-4 mt-4">
+        
+        <TabsContent value="upi">
           <Card>
-            <CardHeader>
-              <CardTitle>UPI Payment Details</CardTitle>
-              <CardDescription>
-                Add your UPI ID for receiving payments
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="pt-4 space-y-4">
               <FormField
                 control={form.control}
                 name="upiId"
@@ -142,43 +123,21 @@ export const PaymentOptionsForm = ({ form }: PaymentOptionsFormProps) => {
                   <FormItem>
                     <FormLabel>UPI ID</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="username@upi" />
+                      <Input {...field} placeholder="username@bankname" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
-              <div className="flex items-center space-x-2 pt-4">
-                <Switch
-                  id="qrcode"
-                  checked={showQrCode}
-                  onCheckedChange={setShowQrCode}
-                />
-                <label htmlFor="qrcode" className="text-sm">
-                  Show QR code on invoice
-                </label>
-              </div>
-
-              {showQrCode && (
-                <div className="flex flex-col items-center justify-center p-4 border rounded-md">
-                  <div className="w-32 h-32 bg-gray-200 flex items-center justify-center">
-                    <p className="text-xs text-gray-500">QR Preview</p>
-                  </div>
-                  <p className="text-sm text-muted-foreground mt-2">
-                    QR code will be generated on the invoice
-                  </p>
-                </div>
-              )}
-
+              
               <FormField
                 control={form.control}
                 name="upiName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name for UPI</FormLabel>
+                    <FormLabel>UPI Display Name</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter name for UPI" />
+                      <Input {...field} placeholder="Name shown during payment" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -188,6 +147,50 @@ export const PaymentOptionsForm = ({ form }: PaymentOptionsFormProps) => {
           </Card>
         </TabsContent>
       </Tabs>
+
+      <div className="space-y-4 mt-6">
+        <h3 className="text-lg font-medium">Additional Information</h3>
+
+        <FormField
+          control={form.control}
+          name="notes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Notes (visible to client)</FormLabel>
+              <FormControl>
+                <textarea
+                  className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                  rows={5}
+                  {...field}
+                  placeholder="Enter any notes for the client"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="terms"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Terms and Conditions</FormLabel>
+              <FormControl>
+                <textarea
+                  className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                  rows={5}
+                  {...field}
+                  placeholder="Enter terms and conditions"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
     </div>
   );
 };
+
+export default PaymentOptionsForm;

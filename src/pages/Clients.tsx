@@ -25,6 +25,7 @@ import {
   MoreHorizontal,
   ChevronLeft,
   ChevronRight,
+  IndianRupee,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -57,7 +58,7 @@ const Clients = () => {
   );
 
   const formatCurrency = (value: number) => {
-    return `$${value?.toLocaleString() || '0'}`;
+    return `₹${value?.toLocaleString() || '0'}`;
   };
 
   return (
@@ -86,7 +87,7 @@ const Clients = () => {
           </div>
           <div className="dashboard-card">
             <p className="text-sm text-muted-foreground">Total Revenue</p>
-            <p className="text-2xl font-bold">$45,231.89</p>
+            <p className="text-2xl font-bold">₹45,231.89</p>
           </div>
         </div>
 
@@ -161,7 +162,7 @@ const Clients = () => {
                         <TableCell>0</TableCell>
                         <TableCell>0</TableCell>
                         <TableCell className="text-right">
-                          $0.00
+                          ₹0.00
                         </TableCell>
                         <TableCell>
                           <DropdownMenu>
