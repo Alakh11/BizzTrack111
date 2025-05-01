@@ -147,9 +147,7 @@ const Clients = () => {
                               <p className="font-medium text-sm">
                                 {client.name}
                               </p>
-                              <p className="text-xs text-muted-foreground">
-                                {client.company || "—"}
-                              </p>
+                              {/* Company is removed from the type */}
                             </div>
                           </div>
                         </TableCell>
