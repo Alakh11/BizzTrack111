@@ -25,7 +25,6 @@ import {
   MoreHorizontal,
   ChevronLeft,
   ChevronRight,
-  IndianRupee,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -167,14 +166,13 @@ const Clients = () => {
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" size="icon">
                                 <MoreHorizontal className="h-4 w-4" />
+                                <span className="sr-only">Open menu</span>
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
                               <DropdownMenuItem>View Client</DropdownMenuItem>
                               <DropdownMenuItem>Edit Client</DropdownMenuItem>
-                              <DropdownMenuItem>
-                                Create Invoice
-                              </DropdownMenuItem>
+                              <DropdownMenuItem>Create Invoice</DropdownMenuItem>
                               <DropdownMenuItem className="text-destructive">
                                 Delete Client
                               </DropdownMenuItem>
