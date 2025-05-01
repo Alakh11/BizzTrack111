@@ -11,6 +11,8 @@ export interface Client {
   phone?: string;
   address?: string;
   user_id?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export const useClients = () => {

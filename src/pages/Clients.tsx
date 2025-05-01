@@ -33,7 +33,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import AddClientModal from "@/components/clients/AddClientModal";
-import { useClients } from "@/hooks/useClients";
+import { Client, useClients } from "@/hooks/useClients";
 
 const Clients = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -133,7 +133,7 @@ const Clients = () => {
                       </TableCell>
                     </TableRow>
                   ) : paginatedClients.length > 0 ? (
-                    paginatedClients.map((client) => (
+                    paginatedClients.map((client: Client) => (
                       <TableRow key={client.id}>
                         <TableCell>
                           <div className="flex items-center gap-3">
