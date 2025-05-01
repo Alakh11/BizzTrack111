@@ -1,7 +1,8 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -20,30 +21,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   IndianRupee,
   Plus,
   Trash,
   ArrowRight,
-  PenSquare,
-  LayoutTemplate,
-  PaintBucket,
-  Type,
-  FileImage,
   FileText,
+  Truck,
+  FileCheck,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import InvoiceSteps from "@/components/invoices/InvoiceSteps";
-import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useClients } from "@/hooks/useClients";
 import { useInvoices } from "@/hooks/useInvoices";
 import { supabase } from "@/integrations/supabase/client";
-import InvoiceTemplates from "@/components/invoices/InvoiceTemplates";
-import LogoUpload from "@/components/invoices/LogoUpload";
+import { BillingDetailsForm } from "@/components/invoices/BillingDetailsForm";
+import { ShippingDetailsForm } from "@/components/invoices/ShippingDetailsForm";
+import { TransportDetailsForm } from "@/components/invoices/TransportDetailsForm";
+import { GstDetailsForm } from "@/components/invoices/GstDetailsForm";
+import { PaymentOptionsForm } from "@/components/invoices/PaymentOptionsForm";
 
 const steps = [
   {
@@ -63,32 +61,6 @@ const steps = [
   },
 ];
 
-// Font options
-const fontOptions = [
-  { id: "inter", name: "Inter" },
-  { id: "roboto", name: "Roboto" },
-  { id: "poppins", name: "Poppins" },
-  { id: "opensans", name: "Open Sans" },
-  { id: "lato", name: "Lato" },
-];
-
-const paperSizes = [
-  { id: "a4", name: "A4" },
-  { id: "letter", name: "Letter" },
-  { id: "legal", name: "Legal" },
-  { id: "a3", name: "A3" },
-];
-
-// Color themes
-const colorThemes = [
-  { id: "blue", name: "Blue", color: "#3b82f6" },
-  { id: "green", name: "Green", color: "#10b981" },
-  { id: "purple", name: "Purple", color: "#8b5cf6" },
-  { id: "orange", name: "Orange", color: "#f97316" },
-  { id: "red", name: "Red", color: "#ef4444" },
-  { id: "gray", name: "Gray", color: "#6b7280" },
-];
-
 const InvoiceGeneration = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [items, setItems] = useState([
@@ -96,6 +68,8 @@ const InvoiceGeneration = () => {
   ]);
   const [showAdditionalFields, setShowAdditionalFields] = useState(false);
   const [showShippingDetails, setShowShippingDetails] = useState(false);
+  const [showTransportDetails, setShowTransportDetails] = useState(false);
+  const [isGstDialogOpen, setIsGstDialogOpen] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState("standard");
   const [selectedColor, setSelectedColor] = useState("blue");
   const [selectedFont, setSelectedFont] = useState("inter");
@@ -130,16 +104,63 @@ const InvoiceGeneration = () => {
       clientAddress: "",
       clientEmail: "",
       clientPhone: "",
-      shippedFrom: "",
-      shippedTo: "",
-      transportDetails: "",
-      gstDetails: "",
-      notes: "",
-      terms: "Payment is due within 14 days of issue.",
+      
+      // Business details
+      businessName: "Alakh Corporation",
+      businessAddress: "Mirzapur, UP, India - 231312",
+      businessPhone: "+91 9580813770",
+      businessEmail: "alakh1304@gmail.com",
+      
+      // Shipping details
+      shippedFromName: "",
+      shippedFromAddress: "",
+      shippedFromCity: "",
+      shippedFromState: "",
+      shippedFromPostal: "",
+      shippedFromCountry: "india",
+      shippedFromWarehouse: "",
+      
+      shippedToName: "",
+      shippedToAddress: "",
+      shippedToCity: "",
+      shippedToState: "",
+      shippedToPostal: "",
+      shippedToCountry: "india",
+      
+      // Transport details
+      transporterName: "",
+      distance: "",
+      transportMode: "",
+      transportDocNo: "",
+      transportDocDate: "",
+      vehicleType: "",
+      vehicleNumber: "",
+      transactionType: "",
+      supplyType: "",
+      
+      // GST details
+      taxType: "gst",
+      placeOfSupply: "",
+      gstType: "",
+      gstNumber: "",
+      gstReverseCharge: false,
+      nonGstClient: false,
+      
+      // Payment details - Bank
       bankName: "",
       accountNumber: "",
       ifscCode: "",
+      accountHolderName: "",
+      branchName: "",
+      
+      // Payment details - UPI
       upiId: "",
+      upiName: "",
+      
+      notes: "",
+      terms: "Payment is due within 14 days of issue.",
+      
+      // Design details
       watermarkText: "",
       margins: "normal",
       textScale: "100",
@@ -253,7 +274,13 @@ const InvoiceGeneration = () => {
             .single();
 
           if (profileData) {
-            // You could set business details here if needed
+            // Set business details from profile
+            if (profileData.business_name) {
+              form.setValue("businessName", profileData.business_name);
+            }
+            if (profileData.business_address) {
+              form.setValue("businessAddress", profileData.business_address);
+            }
           }
         }
       } catch (error) {
@@ -262,7 +289,7 @@ const InvoiceGeneration = () => {
     };
 
     fetchBusinessProfile();
-  }, []);
+  }, [form]);
 
   const calculateTotal = () => {
     return items.reduce((total, item) => total + item.amount, 0);
@@ -349,6 +376,57 @@ const InvoiceGeneration = () => {
           refNumber: referenceNumber,
           currency: selectedCurrency,
         },
+        shipping: showShippingDetails ? {
+          from: {
+            name: data.shippedFromName,
+            address: data.shippedFromAddress,
+            city: data.shippedFromCity,
+            state: data.shippedFromState,
+            postal: data.shippedFromPostal,
+            country: data.shippedFromCountry,
+            warehouse: data.shippedFromWarehouse,
+          },
+          to: {
+            name: data.shippedToName,
+            address: data.shippedToAddress,
+            city: data.shippedToCity,
+            state: data.shippedToState,
+            postal: data.shippedToPostal,
+            country: data.shippedToCountry,
+          }
+        } : null,
+        transport: showTransportDetails ? {
+          transporter: data.transporterName,
+          distance: data.distance,
+          mode: data.transportMode,
+          docNo: data.transportDocNo,
+          docDate: data.transportDocDate,
+          vehicleType: data.vehicleType,
+          vehicleNumber: data.vehicleNumber,
+          transactionType: data.transactionType,
+          supplyType: data.supplyType,
+        } : null,
+        gst: {
+          type: data.taxType,
+          placeOfSupply: data.placeOfSupply,
+          gstType: data.gstType,
+          gstNumber: data.gstNumber,
+          reverseCharge: data.gstReverseCharge,
+          nonGstClient: data.nonGstClient,
+        },
+        payment: {
+          bank: {
+            name: data.bankName,
+            accountNumber: data.accountNumber,
+            ifscCode: data.ifscCode,
+            accountHolderName: data.accountHolderName,
+            branchName: data.branchName,
+          },
+          upi: {
+            id: data.upiId,
+            name: data.upiName,
+          }
+        }
       };
 
       // Prepare invoice data
@@ -448,270 +526,167 @@ const InvoiceGeneration = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Invoice Info */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-medium font-playfair">
-                  Invoice Information
-                </h3>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="invoiceNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Invoice Number</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="invoiceDate"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Invoice Date</FormLabel>
-                        <FormControl>
-                          <Input type="date" {...field} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="dueDate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Due Date</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="flex items-center text-sm"
-                  onClick={() => setShowAdditionalFields(!showAdditionalFields)}
-                >
-                  <Plus className="h-4 w-4 mr-1" /> Add More Fields
-                </Button>
-
-                {showAdditionalFields && (
-                  <div className="space-y-4 pt-2 border-t">
-                    <FormItem>
-                      <FormLabel>Purchase Order Number</FormLabel>
-                      <FormControl>
-                        <Input
-                          value={purchaseOrderNumber}
-                          onChange={(e) =>
-                            setPurchaseOrderNumber(e.target.value)
-                          }
-                          placeholder="Enter PO number"
-                        />
-                      </FormControl>
-                    </FormItem>
-
-                    <FormItem>
-                      <FormLabel>Reference Number</FormLabel>
-                      <FormControl>
-                        <Input
-                          value={referenceNumber}
-                          onChange={(e) => setReferenceNumber(e.target.value)}
-                          placeholder="Enter reference number"
-                        />
-                      </FormControl>
-                    </FormItem>
-                  </div>
-                )}
-              </div>
-
-              {/* Billing Info */}
-              <div className="space-y-8">
-                {/* Billed By Section */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium font-playfair">
-                    Billed By (Your Details)
-                  </h3>
-
-                  <Card className="shadow-sm">
-                    <CardContent className="p-4">
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <p className="font-medium">Alakh Corporation</p>
-                          <Button variant="ghost" size="sm">
-                            Edit
-                          </Button>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          Mirzapur, UP, India - 231312
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          +91 9580813770
-                        </p>
-                        <p className="text-sm text-muted-foreground">
-                          alakh1304@gmail.com
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Billed To Section */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium font-playfair">
-                    Billed To (Client's Details)
-                  </h3>
-
+            {/* Invoice Info Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <FormField
+                control={form.control}
+                name="invoiceNumber"
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Select Client</FormLabel>
-                    <Select
-                      onValueChange={handleClientChange}
-                      value={form.getValues("clientId")}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a client" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {clients &&
-                          clients.map((client) => (
-                            <SelectItem key={client.id} value={client.id}>
-                              {client.name}
-                            </SelectItem>
-                          ))}
-                      </SelectContent>
-                    </Select>
+                    <FormLabel>Invoice Number</FormLabel>
+                    <FormControl>
+                      <Input {...field} />
+                    </FormControl>
                   </FormItem>
-
-                  <div className="flex items-center">
-                    <Button type="button" variant="outline" size="sm">
-                      <Plus className="h-4 w-4 mr-2" /> Add New Client
-                    </Button>
-                  </div>
-
-                  {form.getValues("clientId") && (
-                    <Card className="shadow-sm">
-                      <CardContent className="p-4">
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <p className="font-medium">
-                              {form.getValues("clientName")}
-                            </p>
-                            <Button variant="ghost" size="sm">
-                              Edit
-                            </Button>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            {form.getValues("clientAddress")}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {form.getValues("clientEmail")}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            {form.getValues("clientPhone")}
-                          </p>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
-                </div>
-
-                {/* Shipping Details Toggle */}
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="shipping"
-                    checked={showShippingDetails}
-                    onCheckedChange={(checked) =>
-                      setShowShippingDetails(!!checked)
-                    }
-                  />
-                  <label
-                    htmlFor="shipping"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Add Shipping Details
-                  </label>
-                </div>
-
-                {/* Shipping Details Section */}
-                {showShippingDetails && (
-                  <div className="space-y-4 pt-2">
-                    <div className="grid grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="shippedFrom"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Shipped From</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                rows={3}
-                                {...field}
-                                placeholder="Enter shipping address"
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={form.control}
-                        name="shippedTo"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Shipped To</FormLabel>
-                            <FormControl>
-                              <Textarea
-                                rows={3}
-                                {...field}
-                                placeholder="Enter delivery address"
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-
-                    <FormField
-                      control={form.control}
-                      name="transportDetails"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Transport Details</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Enter transport details"
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="gstDetails"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>GST Details</FormLabel>
-                          <FormControl>
-                            <Input {...field} placeholder="Enter GST details" />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
                 )}
-              </div>
+              />
+
+              <FormField
+                control={form.control}
+                name="invoiceDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Invoice Date</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="dueDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Due Date</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
             </div>
+
+            <Button
+              type="button"
+              variant="ghost"
+              className="flex items-center text-sm"
+              onClick={() => setShowAdditionalFields(!showAdditionalFields)}
+            >
+              <Plus className="h-4 w-4 mr-1" /> Add More Fields
+            </Button>
+
+            {showAdditionalFields && (
+              <div className="space-y-4 pt-2 border-t grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormItem>
+                  <FormLabel>Purchase Order Number</FormLabel>
+                  <FormControl>
+                    <Input
+                      value={purchaseOrderNumber}
+                      onChange={(e) =>
+                        setPurchaseOrderNumber(e.target.value)
+                      }
+                      placeholder="Enter PO number"
+                    />
+                  </FormControl>
+                </FormItem>
+
+                <FormItem>
+                  <FormLabel>Reference Number</FormLabel>
+                  <FormControl>
+                    <Input
+                      value={referenceNumber}
+                      onChange={(e) => setReferenceNumber(e.target.value)}
+                      placeholder="Enter reference number"
+                    />
+                  </FormControl>
+                </FormItem>
+              </div>
+            )}
+
+            <Separator className="my-6" />
+
+            {/* Billing Info */}
+            <BillingDetailsForm 
+              form={form} 
+              clients={clients} 
+              handleClientChange={handleClientChange} 
+            />
+
+            <Separator className="my-6" />
+
+            {/* Shipping Details Toggle */}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="shipping"
+                checked={showShippingDetails}
+                onCheckedChange={(checked) =>
+                  setShowShippingDetails(!!checked)
+                }
+              />
+              <label
+                htmlFor="shipping"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Add Shipping Details
+              </label>
+            </div>
+
+            {/* Shipping Details Section */}
+            {showShippingDetails && (
+              <ShippingDetailsForm 
+                form={form} 
+                clientName={form.getValues("clientName")}
+                clientAddress={form.getValues("clientAddress")}
+              />
+            )}
+
+            <Separator className="my-6" />
+
+            {/* Transport Details Toggle */}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="transport"
+                checked={showTransportDetails}
+                onCheckedChange={(checked) =>
+                  setShowTransportDetails(!!checked)
+                }
+              />
+              <label
+                htmlFor="transport"
+                className="flex items-center text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                <Truck className="h-4 w-4 mr-1" /> Add Transport Details
+              </label>
+            </div>
+
+            {showTransportDetails && (
+              <TransportDetailsForm form={form} />
+            )}
+
+            <Separator className="my-6" />
+
+            {/* GST Details Button */}
+            <div className="flex items-center space-x-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => setIsGstDialogOpen(true)}
+                className="flex items-center"
+              >
+                <FileCheck className="h-4 w-4 mr-2" /> Add GST Details
+              </Button>
+            </div>
+
+            {/* GST Details Dialog */}
+            <GstDetailsForm 
+              open={isGstDialogOpen} 
+              onOpenChange={setIsGstDialogOpen} 
+              form={form} 
+            />
+
+            <Separator className="my-6" />
 
             <div>
               <FormItem>
@@ -766,7 +741,7 @@ const InvoiceGeneration = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {items.map((item, index) => (
+                    {items.map((item) => (
                       <tr key={item.id} className="border-b">
                         <td className="py-2 px-2">
                           <Input
@@ -862,87 +837,9 @@ const InvoiceGeneration = () => {
       case 1: // Banking Details
         return (
           <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-6">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium font-playfair">
-                    Bank Account Details
-                  </h3>
+            <PaymentOptionsForm form={form} />
 
-                  <FormField
-                    control={form.control}
-                    name="bankName"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Bank Name</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter bank name" />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="accountNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Account Number</FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            placeholder="Enter account number"
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="ifscCode"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>IFSC Code</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter IFSC code" />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-6">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium font-playfair">
-                    UPI Payment Details
-                  </h3>
-
-                  <FormField
-                    control={form.control}
-                    name="upiId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>UPI ID</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter UPI ID" />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="flex items-center space-x-2 pt-4">
-                    <Switch id="qrcode" />
-                    <label htmlFor="qrcode" className="text-sm">
-                      Show QR code on invoice
-                    </label>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
+            <div className="space-y-4 mt-8">
               <h3 className="text-lg font-medium font-playfair">
                 Additional Information
               </h3>
@@ -954,7 +851,8 @@ const InvoiceGeneration = () => {
                   <FormItem>
                     <FormLabel>Notes (visible to client)</FormLabel>
                     <FormControl>
-                      <Textarea
+                      <textarea
+                        className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                         rows={5}
                         {...field}
                         placeholder="Enter any notes for the client"
@@ -971,7 +869,8 @@ const InvoiceGeneration = () => {
                   <FormItem>
                     <FormLabel>Terms and Conditions</FormLabel>
                     <FormControl>
-                      <Textarea
+                      <textarea
+                        className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
                         rows={5}
                         {...field}
                         placeholder="Enter terms and conditions"
@@ -989,266 +888,19 @@ const InvoiceGeneration = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Design Options */}
               <div className="space-y-6">
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium font-playfair flex items-center">
-                    <FileImage className="h-5 w-5 mr-2" /> Business Logo
-                  </h3>
-                  <LogoUpload
-                    onUpload={setBusinessLogo}
-                    currentLogo={businessLogo}
-                  />
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium flex items-center font-playfair">
-                    <LayoutTemplate className="h-5 w-5 mr-2" /> Template Design
-                  </h3>
-
-                  <InvoiceTemplates
-                    selectedTemplate={selectedTemplate}
-                    setSelectedTemplate={setSelectedTemplate}
-                  />
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium flex items-center font-playfair">
-                    <PaintBucket className="h-5 w-5 mr-2" /> Color Theme
-                  </h3>
-
-                  <div className="flex flex-wrap gap-3">
-                    {colorThemes.map((theme) => (
-                      <div
-                        key={theme.id}
-                        className={`w-8 h-8 rounded-full cursor-pointer ${selectedColor === theme.id ? "ring-2 ring-offset-2 ring-black" : ""}`}
-                        style={{ backgroundColor: theme.color }}
-                        onClick={() => setSelectedColor(theme.id)}
-                        title={theme.name}
-                      />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium flex items-center font-playfair">
-                    <Type className="h-5 w-5 mr-2" /> Font Style
-                  </h3>
-
-                  <div className="flex flex-wrap gap-2">
-                    {fontOptions.map((font) => (
-                      <div
-                        key={font.id}
-                        className={`px-3 py-2 border rounded-md cursor-pointer ${selectedFont === font.id ? "bg-primary/10 border-primary" : ""}`}
-                        onClick={() => setSelectedFont(font.id)}
-                      >
-                        <span className="text-sm">{font.name}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium flex items-center font-playfair">
-                    <FileImage className="h-5 w-5 mr-2" /> Letterhead & Branding
-                  </h3>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center space-x-2">
-                      <Switch id="letterhead" />
-                      <label htmlFor="letterhead" className="text-sm">
-                        Add letterhead
-                      </label>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <Switch id="footer" />
-                      <label htmlFor="footer" className="text-sm">
-                        Add custom footer
-                      </label>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <Switch id="watermark" />
-                      <label htmlFor="watermark" className="text-sm">
-                        Add watermark
-                      </label>
-                    </div>
-
-                    <FormField
-                      control={form.control}
-                      name="watermarkText"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Watermark text"
-                              className="mt-2"
-                            />
-                          </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
+                <div className="text-center p-6 border rounded-lg bg-muted/10">
+                  <FileText className="h-12 w-12 mx-auto text-muted-foreground" />
+                  <p className="mt-4">
+                    Design options will be available in the next update
+                  </p>
                 </div>
               </div>
 
-              {/* Page Setup */}
-              <div>
-                <div className="space-y-4">
-                  <h3 className="text-lg font-medium flex items-center font-playfair">
-                    <FileText className="h-5 w-5 mr-2" /> Page Setup
-                  </h3>
-
-                  <div>
-                    <FormLabel>Paper Size</FormLabel>
-                    <Select
-                      value={selectedPaperSize}
-                      onValueChange={setSelectedPaperSize}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select paper size" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {paperSizes.map((size) => (
-                          <SelectItem key={size.id} value={size.id}>
-                            {size.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="margins"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Margins</FormLabel>
-                        <Select defaultValue={field.value}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select margins" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="narrow">Narrow</SelectItem>
-                            <SelectItem value="normal">Normal</SelectItem>
-                            <SelectItem value="wide">Wide</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="textScale"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Text Scale (%)</FormLabel>
-                        <Select defaultValue={field.value}>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select text scale" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="90">90%</SelectItem>
-                            <SelectItem value="95">95%</SelectItem>
-                            <SelectItem value="100">100%</SelectItem>
-                            <SelectItem value="105">105%</SelectItem>
-                            <SelectItem value="110">110%</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="flex items-center space-x-2 pt-2">
-                    <Checkbox id="pageless" />
-                    <label htmlFor="pageless" className="text-sm">
-                      Generate pageless PDF
-                    </label>
-                  </div>
-                </div>
-
-                {/* Preview */}
-                <div className="mt-8">
-                  <h3 className="text-lg font-medium mb-4 font-playfair">
-                    Preview
-                  </h3>
-
-                  <div className="border rounded-md bg-gray-50 p-4 flex items-center justify-center">
-                    <div className="bg-white border shadow-sm w-full max-w-sm aspect-[3/4] p-4">
-                      {/* Show logo if uploaded */}
-                      {businessLogo && (
-                        <div className="flex justify-end mb-4">
-                          <img
-                            src={businessLogo}
-                            alt="Business Logo"
-                            className="h-12 object-contain"
-                          />
-                        </div>
-                      )}
-
-                      <div className="text-center mb-8">
-                        <h2
-                          className={`text-xl font-bold font-${selectedFont}`}
-                        >
-                          {customInvoiceTitle}
-                        </h2>
-                        {customSubtitle && (
-                          <p className="text-sm text-muted-foreground">
-                            {customSubtitle}
-                          </p>
-                        )}
-                      </div>
-
-                      <div className="text-xs text-muted-foreground">
-                        <p>Invoice #: {form.getValues("invoiceNumber")}</p>
-                        <p>Date: {form.getValues("invoiceDate")}</p>
-                        <p>Due: {form.getValues("dueDate")}</p>
-                      </div>
-
-                      <div className="my-4 text-xs">
-                        <div className="font-medium">
-                          From: Alakh Corporation
-                        </div>
-                        <div>Mirzapur, UP, India - 231312</div>
-                      </div>
-
-                      <div className="my-4 text-xs">
-                        <div className="font-medium">
-                          To: {form.getValues("clientName") || "Client Name"}
-                        </div>
-                        <div>
-                          {form.getValues("clientAddress") || "Client Address"}
-                        </div>
-                      </div>
-
-                      <table className="w-full text-xs border-t border-b my-4">
-                        <thead>
-                          <tr className="border-b">
-                            <th className="text-left py-1">Item</th>
-                            <th className="text-right py-1">Amount</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td className="py-1">Sample Item</td>
-                            <td className="text-right py-1">₹ 1,000.00</td>
-                          </tr>
-                        </tbody>
-                        <tfoot>
-                          <tr className="border-t">
-                            <th className="text-left py-1">Total</th>
-                            <th className="text-right py-1">₹ 1,000.00</th>
-                          </tr>
-                        </tfoot>
-                      </table>
-
-                      <div className="text-xs mt-8 text-center text-muted-foreground">
-                        <p>Thank you for your business!</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              {/* Design Preview */}
+              <div className="text-center p-6 border rounded-lg bg-muted/10">
+                <p className="mt-4">
+                  Preview will be available in the next update
+                </p>
               </div>
             </div>
           </div>

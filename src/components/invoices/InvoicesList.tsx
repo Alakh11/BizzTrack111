@@ -1,4 +1,4 @@
-<script src="http://192.168.29.168:8097"></script>;
+
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -45,8 +45,8 @@ import { Dialog } from "@/components/ui/dialog";
 interface Client {
   id?: string;
   name: string;
-  email: string;
-  address: string;
+  email?: string;
+  address?: string;
   phone?: string;
 }
 
@@ -209,7 +209,6 @@ const InvoicesList = () => {
                           e.stopPropagation();
                           const printWindow = window.open("", "_blank");
                           if (!printWindow) return;
-                          // Same download functionality as in InvoiceView
                           const html = `
                           <html>
                             <head>
