@@ -1,10 +1,10 @@
 
-import React, { useState } from "react";
+import React from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
-import { InvoicesList } from "@/components/invoices/InvoicesList";
+import InvoicesList from "@/components/invoices/InvoicesList";
 
 const Invoices = () => {
   const navigate = useNavigate();

@@ -25,16 +25,33 @@ import { useToast } from "@/hooks/use-toast";
 import { useState, useEffect } from "react";
 import { Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Profile } from "@/types/profile";
 
 const ProfileSettings = () => {
   const { toast } = useToast();
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [userData, setUserData] = useState({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    phone: "+91 98765 43210",
-    address: "123 Main St., Mumbai, Maharashtra",
-    bio: "Freelance designer and developer with 5+ years of experience.",
+  const [userData, setUserData] = useState<Profile & {
+    email: string;
+    displayName: string;
+    bio: string;
+  }>({
+    id: '',
+    avatar_url: null,
+    username: null,
+    business_name: null,
+    business_address: null,
+    city: null,
+    state: null,
+    pincode: null,
+    gst_number: null,
+    website: null,
+    phone: null,
+    created_at: null,
+    updated_at: null,
+    // Additional UI fields
+    email: '',
+    displayName: '',
+    bio: '',
   });
 
   useEffect(() => {
@@ -52,11 +69,10 @@ const ProfileSettings = () => {
 
           if (data) {
             setUserData({
-              name: data.name || data.username || session.user.email.split('@')[0],
-              email: session.user.email,
-              phone: data.phone || "+91 98765 43210",
-              address: data.address || "123 Main St., Mumbai, Maharashtra",
-              bio: data.bio || "Freelance designer and developer",
+              ...data,
+              email: session.user.email || '',
+              displayName: data.username || data.business_name || session.user.email?.split('@')[0] || '',
+              bio: 'Freelance designer and developer with 5+ years of experience.',
             });
           }
         }
@@ -69,11 +85,23 @@ const ProfileSettings = () => {
   }, []);
 
   const form = useForm({
-    defaultValues: userData,
+    defaultValues: {
+      displayName: userData.displayName || '',
+      email: userData.email || '',
+      phone: userData.phone || '',
+      address: userData.business_address || '',
+      bio: userData.bio || '',
+    },
   });
 
   useEffect(() => {
-    form.reset(userData);
+    form.reset({
+      displayName: userData.displayName || '',
+      email: userData.email || '',
+      phone: userData.phone || '',
+      address: userData.business_address || '',
+      bio: userData.bio || '',
+    });
   }, [userData, form]);
 
   const passwordForm = useForm({
@@ -93,10 +121,9 @@ const ProfileSettings = () => {
         const { error } = await supabase
           .from('profiles')
           .update({
-            name: data.name,
+            username: data.displayName,
             phone: data.phone,
-            address: data.address,
-            bio: data.bio,
+            business_address: data.address,
             updated_at: new Date().toISOString(),
           })
           .eq('id', session.user.id);
@@ -165,8 +192,8 @@ const ProfileSettings = () => {
               <div className="flex flex-col md:flex-row gap-6 items-start">
                 <div className="flex flex-col items-center space-y-2">
                   <Avatar className="h-24 w-24">
-                    <AvatarImage src="https://github.com/shadcn.png" />
-                    <AvatarFallback>{userData.name.substring(0, 2).toUpperCase()}</AvatarFallback>
+                    <AvatarImage src={userData.avatar_url || "https://github.com/shadcn.png"} />
+                    <AvatarFallback>{userData.displayName.substring(0, 2).toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <Button variant="outline" size="sm">
                     Change Photo
@@ -176,7 +203,7 @@ const ProfileSettings = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={form.control}
-                      name="name"
+                      name="displayName"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Full Name</FormLabel>
@@ -219,10 +246,10 @@ const ProfileSettings = () => {
                     name="address"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Address</FormLabel>
+                        <FormLabel>Business Address</FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="Enter your address"
+                            placeholder="Enter your business address"
                             className="resize-none"
                             {...field}
                           />

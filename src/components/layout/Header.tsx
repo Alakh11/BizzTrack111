@@ -12,14 +12,17 @@ import {
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 interface HeaderProps {
   toggleSidebar: () => void;
 }
 
 const Header = ({ toggleSidebar }: HeaderProps) => {
+  const { user, signOut } = useAuth();
+
   return (
-    <header className="flex h-16 items-center px-6 border-b">
+    <header className="flex h-16 items-center px-6 border-b dark:border-gray-800">
       {/* Mobile menu button */}
       <button
         className="lg:hidden mr-2"
@@ -97,7 +100,9 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
                   </AvatarFallback>
                 </Avatar>
                 <div className="hidden md:flex flex-col items-start">
-                  <span className="text-sm font-medium">John Doe</span>
+                  <span className="text-sm font-medium">
+                    {user?.email?.split('@')[0] || 'John Doe'}
+                  </span>
                   <span className="text-xs text-muted-foreground">Admin</span>
                 </div>
                 <ChevronDown className="h-4 w-4 opacity-50 hidden md:block" />
@@ -111,7 +116,7 @@ const Header = ({ toggleSidebar }: HeaderProps) => {
               </Link>
               <DropdownMenuItem>Support</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Log out</DropdownMenuItem>
+              <DropdownMenuItem onClick={signOut}>Log out</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
