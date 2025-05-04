@@ -48,9 +48,9 @@ interface InvoiceDetailsStepProps {
   referenceNumber: string;
   setReferenceNumber: (ref: string) => void;
   handleClientChange: (clientId: string) => void;
-  handleItemChange: (index: number, itemId: string) => void;
+  handleItemChange: (id: number, field: string, value: any) => void;
   handleAddItem: () => void;
-  handleRemoveItem: (index: number) => void;
+  handleRemoveItem: (id: number) => void;
   calculateTotal: () => number;
 }
 
@@ -91,7 +91,7 @@ const InvoiceDetailsStep = ({
         <h3 className="text-lg font-semibold mb-2">Client Information</h3>
         <FormField
           control={form.control}
-          name="client_id"
+          name="clientId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Client</FormLabel>
@@ -192,10 +192,10 @@ const InvoiceDetailsStep = ({
                   <SelectValue placeholder="Select currency" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="INR">Indian Rupee (₹)</SelectItem>
-                  <SelectItem value="USD">US Dollar ($)</SelectItem>
-                  <SelectItem value="EUR">Euro (€)</SelectItem>
-                  <SelectItem value="GBP">British Pound (£)</SelectItem>
+                  <SelectItem value="inr">Indian Rupee (₹)</SelectItem>
+                  <SelectItem value="usd">US Dollar ($)</SelectItem>
+                  <SelectItem value="eur">Euro (€)</SelectItem>
+                  <SelectItem value="gbp">British Pound (£)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -225,65 +225,40 @@ const InvoiceDetailsStep = ({
       <div>
         <h3 className="text-lg font-semibold mb-2">Invoice Items</h3>
         {items.map((item, index) => (
-          <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-            <FormField
-              control={form.control}
-              name={`items.${index}.product_id`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Item {index + 1}</FormLabel>
-                  <Select
-                    onValueChange={(value) => {
-                      field.onChange(value);
-                      handleItemChange(index, value);
-                    }}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select an item" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {products.map((product) => (
-                        <SelectItem key={product.id} value={product.id}>
-                          {product.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name={`items.${index}.quantity`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Quantity</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="Quantity" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name={`items.${index}.unit_price`}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Unit Price</FormLabel>
-                  <FormControl>
-                    <Input type="number" placeholder="Unit Price" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <div key={item.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+            <div className="col-span-1">
+              <Label>Description</Label>
+              <Input
+                value={item.description}
+                onChange={(e) => handleItemChange(item.id, "description", e.target.value)}
+                placeholder="Item description"
+              />
+            </div>
+            <div>
+              <Label>Quantity</Label>
+              <Input
+                type="number"
+                value={item.quantity}
+                onChange={(e) => handleItemChange(item.id, "quantity", Number(e.target.value))}
+                placeholder="Quantity"
+              />
+            </div>
+            <div>
+              <Label>Rate</Label>
+              <Input
+                type="number"
+                value={item.rate}
+                onChange={(e) => handleItemChange(item.id, "rate", Number(e.target.value))}
+                placeholder="Rate"
+              />
+            </div>
             <div className="flex items-end">
-              <Button type="button" variant="destructive" size="sm" onClick={() => handleRemoveItem(index)}>
+              <Button
+                type="button"
+                variant="destructive"
+                size="sm"
+                onClick={() => handleRemoveItem(item.id)}
+              >
                 <Trash className="h-4 w-4 mr-2" />
                 Remove
               </Button>

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
@@ -292,6 +291,7 @@ export const useInvoiceForm = () => {
     }
   };
 
+  // Modified handleFormSubmit to ensure shipping and transport details are saved
   const handleFormSubmit = async (data: any) => {
     try {
       // Prepare metadata for design settings

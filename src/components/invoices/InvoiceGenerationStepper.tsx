@@ -32,13 +32,13 @@ const InvoiceGenerationStepper = ({
   };
 
   const handleNext = () => {
-    // Fixed: Pass the actual next step number instead of a function
+    // Pass the actual next step number instead of a function
     const nextStep = Math.min(currentStep + 1, steps.length - 1);
     setCurrentStep(nextStep);
   };
 
   const handlePrevious = () => {
-    // Fixed: Pass the actual previous step number instead of a function
+    // Pass the actual previous step number instead of a function
     const prevStep = Math.max(currentStep - 1, 0);
     setCurrentStep(prevStep);
   };

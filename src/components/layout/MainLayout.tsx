@@ -1,34 +1,37 @@
 
 import React, { useState } from "react";
-import Sidebar from "@/components/layout/Sidebar";
-import Header from "@/components/layout/Header";
-import { useIsMobile } from "@/hooks/use-mobile";
+import Header from "./Header";
+import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 
-const MainLayout = ({ children }: { children: React.ReactNode }) => {
-  const isMobile = useIsMobile();
-  const [isSidebarOpen, setSidebarOpen] = useState(true);
+interface MainLayoutProps {
+  children: React.ReactNode;
+  className?: string;
+}
 
-  // Toggle sidebar
+const MainLayout = ({ children, className }: MainLayoutProps) => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
   const toggleSidebar = () => {
-    setSidebarOpen(!isSidebarOpen);
+    setIsSidebarOpen(!isSidebarOpen);
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      <div className="flex-1 flex">
-        {/* Sidebar with conditional rendering based on state */}
-        {!isMobile && <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} />}
-        <div
-          className={`flex-1 flex flex-col transition-all duration-300 ${!isMobile && isSidebarOpen ? "ml-64" : "ml-0"}`}
+    <div className="flex min-h-screen flex-col">
+      <Header toggleSidebar={toggleSidebar} isSidebarOpen={isSidebarOpen} />
+
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar isOpen={isSidebarOpen} />
+        <main
+          className={`flex-1 overflow-y-auto p-4 md:p-6 transition-all ${
+            isSidebarOpen ? "md:pl-64" : ""
+          } ${className}`}
         >
-          <Header toggleSidebar={toggleSidebar} />
-          <main className="flex-1 p-4 md:p-6 bg-gray-50 dark:bg-gray-900">
-            <div className="container mx-auto">{children}</div>
-          </main>
-          <Footer />
-        </div>
+          <div className="mx-auto max-w-6xl">{children}</div>
+        </main>
       </div>
+
+      <Footer />
     </div>
   );
 };

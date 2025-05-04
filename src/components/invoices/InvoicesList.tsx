@@ -1,6 +1,5 @@
 
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import {
   Table,
   TableBody,
@@ -9,14 +8,35 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
+import { useInvoices } from "@/hooks/useInvoices";
+import {
+  MoreHorizontal,
+  Eye,
+  Download,
+  Send,
+  Clock,
+  ArrowDown,
+  ArrowUp,
+  Check,
+  X,
+  Search,
+  Trash,
+  FileEdit,
+} from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -24,264 +44,335 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
-  Download,
-  Eye,
-  FileText,
-  Filter,
-  MoreHorizontal,
-  Plus,
-  Send,
-  Trash,
-  IndianRupee,
-  Edit,
-} from "lucide-react";
-import { useInvoices } from "@/hooks/useInvoices";
-import InvoiceView from "./InvoiceView";
-import { Dialog } from "@/components/ui/dialog";
-import InvoicePrintRenderer from "./InvoicePrintRenderer";
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
-interface InvoicesListProps {
-  filterStatus?: string;
-}
-
-const InvoicesList = ({ filterStatus = "all" }: InvoicesListProps) => {
-  const { invoices, isLoading, deleteInvoice } = useInvoices();
-  const [viewingInvoice, setViewingInvoice] = useState<any>(null);
-  const [isViewOpen, setIsViewOpen] = useState(false);
+const InvoicesList = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
+  const [isEditStatusModalOpen, setIsEditStatusModalOpen] = useState(false);
+  const [newStatus, setNewStatus] = useState("");
 
-  const handleViewInvoice = (invoice: any) => {
-    setViewingInvoice(invoice);
-    setIsViewOpen(true);
-  };
-
-  const handleEditInvoice = (invoice: any) => {
-    navigate(`/invoices/edit/${invoice.id}`, { state: { invoice } });
-  };
-
-  const handlePrintInvoice = (invoice: any) => {
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
-    
-    printWindow.document.write(InvoicePrintRenderer.getHtml(invoice));
-    printWindow.document.close();
-    setTimeout(() => {
-      printWindow.print();
-    }, 500);
-  };
+  const { invoices, isLoading, deleteInvoice, updateInvoice } = useInvoices();
 
   if (isLoading) {
-    return <InvoicesListSkeleton />;
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <p>Loading invoices...</p>
+        </div>
+      </div>
+    );
   }
 
   if (!invoices || invoices.length === 0) {
-    return <EmptyInvoicesList />;
-  }
-
-  return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold font-playfair">All Invoices</h2>
-        <div className="flex items-center gap-2">
-          <Select defaultValue={filterStatus}>
-            <SelectTrigger className="w-[150px]">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="paid">Paid</SelectItem>
-              <SelectItem value="overdue">Overdue</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button variant="outline" size="icon">
-            <Filter className="h-4 w-4" />
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="text-center">
+          <h3 className="text-lg font-semibold">No invoices found</h3>
+          <p className="text-muted-foreground mt-1">
+            Create your first invoice to get started.
+          </p>
+          <Button
+            className="mt-4"
+            onClick={() => navigate("/invoices/new")}
+          >
+            Create Invoice
           </Button>
         </div>
       </div>
+    );
+  }
 
-      <div className="overflow-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="font-medium">Invoice #</TableHead>
-              <TableHead className="font-medium">Client</TableHead>
-              <TableHead className="font-medium">Date</TableHead>
-              <TableHead className="font-medium">Due Date</TableHead>
-              <TableHead className="font-medium">Amount</TableHead>
-              <TableHead className="font-medium">Status</TableHead>
-              <TableHead className="text-right font-medium">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {invoices.map((invoice) => (
-              <TableRow
-                key={invoice.id}
-                className="hover:bg-muted/20 cursor-pointer"
-                onClick={() => handleViewInvoice(invoice)}
-              >
-                <TableCell className="font-medium">
-                  {invoice.invoice_number}
-                </TableCell>
-                <TableCell>{invoice.client?.name || "N/A"}</TableCell>
-                <TableCell>
-                  {new Date(invoice.invoice_date).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  {new Date(invoice.due_date).toLocaleDateString()}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center">
-                    <IndianRupee className="h-3 w-3 mr-1 text-muted-foreground" />
-                    {invoice.total_amount.toLocaleString("en-IN")}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <InvoiceStatusBadge status={invoice.status} />
-                </TableCell>
-                <TableCell className="text-right">
-                  <InvoiceActions 
-                    invoice={invoice}
-                    onView={handleViewInvoice}
-                    onEdit={handleEditInvoice}
-                    onPrint={handlePrintInvoice}
-                    onDelete={() => deleteInvoice.mutate(invoice.id)}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
+  const handleSort = () => {
+    setSortDirection(sortDirection === "asc" ? "desc" : "asc");
+  };
 
-      {/* Invoice View Dialog */}
-      {viewingInvoice && (
-        <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
-          <InvoiceView invoice={viewingInvoice} open={isViewOpen} onOpenChange={setIsViewOpen} />
-        </Dialog>
-      )}
-    </div>
-  );
-};
+  const handleEditStatus = (id: string, currentStatus: string) => {
+    setSelectedInvoiceId(id);
+    setNewStatus(currentStatus);
+    setIsEditStatusModalOpen(true);
+  };
 
-const InvoiceStatusBadge = ({ status }: { status?: string }) => {
-  const getStatusStyle = () => {
+  const handleUpdateStatus = async () => {
+    if (selectedInvoiceId && newStatus) {
+      try {
+        await updateInvoice.mutateAsync({
+          id: selectedInvoiceId,
+          invoiceData: {
+            status: newStatus,
+          },
+        });
+        
+        toast({
+          title: "Status updated",
+          description: "Invoice status has been updated successfully.",
+        });
+        
+        setIsEditStatusModalOpen(false);
+      } catch (error) {
+        console.error("Error updating status:", error);
+        toast({
+          title: "Error",
+          description: "Failed to update invoice status.",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (selectedInvoiceId) {
+      deleteInvoice.mutate(selectedInvoiceId);
+    }
+    setDeleteConfirmOpen(false);
+  };
+
+  const handleDelete = (id: string) => {
+    setSelectedInvoiceId(id);
+    setDeleteConfirmOpen(true);
+  };
+
+  // Filtering and sorting
+  const filteredInvoices = invoices
+    .filter((invoice) => {
+      const matchesSearch =
+        (invoice.invoice_number &&
+          invoice.invoice_number.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (invoice.client?.name &&
+          invoice.client.name.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      const matchesStatus =
+        statusFilter === "all" || invoice.status === statusFilter;
+      
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      // Sort by date
+      const dateA = new Date(a.created_at).getTime();
+      const dateB = new Date(b.created_at).getTime();
+      
+      return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
+    });
+
+  // Status badge color mapping
+  const getStatusBadgeVariant = (status: string) => {
     switch (status) {
       case "paid":
-        return "bg-success/10 text-success border-success";
+        return "success";
+      case "pending":
+        return "warning";
       case "overdue":
-        return "bg-destructive/10 text-destructive border-destructive";
+        return "destructive";
+      case "draft":
+        return "secondary";
       default:
-        return "bg-warning/10 text-warning border-warning";
+        return "outline";
     }
   };
 
   return (
-    <Badge
-      variant="outline"
-      className={`capitalize ${getStatusStyle()}`}
-    >
-      {status || "pending"}
-    </Badge>
-  );
-};
+    <>
+      <div className="space-y-4">
+        <div className="flex flex-col md:flex-row gap-4 items-end">
+          <div className="relative w-full md:max-w-sm">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Search invoices..."
+              className="pl-10"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
 
-interface InvoiceActionsProps {
-  invoice: any;
-  onView: (invoice: any) => void;
-  onEdit: (invoice: any) => void;
-  onPrint: (invoice: any) => void;
-  onDelete: () => void;
-}
+          <div className="flex gap-2 w-full md:w-auto">
+            <Select
+              value={statusFilter}
+              onValueChange={setStatusFilter}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="overdue">Overdue</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            <Button variant="outline" size="icon" onClick={handleSort}>
+              {sortDirection === "desc" ? (
+                <ArrowDown className="h-4 w-4" />
+              ) : (
+                <ArrowUp className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+        </div>
 
-const InvoiceActions = ({ invoice, onView, onEdit, onPrint, onDelete }: InvoiceActionsProps) => {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger
-        asChild
-        onClick={(e) => e.stopPropagation()}
-      >
-        <Button variant="ghost" size="icon">
-          <MoreHorizontal className="h-4 w-4" />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem
-          onClick={(e) => {
-            e.stopPropagation();
-            onView(invoice);
-          }}
-        >
-          <Eye className="h-4 w-4 mr-2" /> View
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={(e) => {
-            e.stopPropagation();
-            onEdit(invoice);
-          }}
-        >
-          <Edit className="h-4 w-4 mr-2" /> Edit
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={(e) => {
-            e.stopPropagation();
-            onPrint(invoice);
-          }}
-        >
-          <Download className="h-4 w-4 mr-2" /> Download
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Send className="h-4 w-4 mr-2" /> Send
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="text-red-600"
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete();
-          }}
-        >
-          <Trash className="h-4 w-4 mr-2" /> Delete
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
-
-const InvoicesListSkeleton = () => {
-  return (
-    <div className="space-y-4">
-      <div className="w-full overflow-auto">
-        <div className="space-y-4">
-          <Skeleton className="h-8 w-full" />
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
-          <Skeleton className="h-24 w-full" />
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Invoice #</TableHead>
+                <TableHead>Client</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>Due Date</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredInvoices.map((invoice) => (
+                <TableRow key={invoice.id}>
+                  <TableCell className="font-medium">
+                    {invoice.invoice_number}
+                  </TableCell>
+                  <TableCell>
+                    {invoice.client?.name || "No client"}
+                  </TableCell>
+                  <TableCell>
+                    {invoice.invoice_date
+                      ? format(new Date(invoice.invoice_date), "MMM d, yyyy")
+                      : "-"}
+                  </TableCell>
+                  <TableCell>
+                    {invoice.due_date
+                      ? format(new Date(invoice.due_date), "MMM d, yyyy")
+                      : "-"}
+                  </TableCell>
+                  <TableCell>
+                    {formatCurrency(Number(invoice.total_amount) || 0)}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={
+                        getStatusBadgeVariant(
+                          invoice.status
+                        ) as "default" | "secondary" | "outline" | "destructive" | "success" | "warning"
+                      }
+                      className="cursor-pointer"
+                      onClick={() => handleEditStatus(invoice.id, invoice.status)}
+                    >
+                      {invoice.status?.charAt(0).toUpperCase() + invoice.status?.slice(1)}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="sm">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => navigate(`/invoices/edit/${invoice.id}`)}
+                        >
+                          <FileEdit className="mr-2 h-4 w-4" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleEditStatus(invoice.id, invoice.status)}>
+                          <Clock className="mr-2 h-4 w-4" />
+                          Change Status
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Eye className="mr-2 h-4 w-4" />
+                          View
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Download className="mr-2 h-4 w-4" />
+                          Download
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Send className="mr-2 h-4 w-4" />
+                          Email
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => handleDelete(invoice.id)}
+                          className="text-destructive"
+                        >
+                          <Trash className="mr-2 h-4 w-4" />
+                          Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </div>
-    </div>
-  );
-};
 
-const EmptyInvoicesList = () => {
-  return (
-    <div className="text-center py-10 border rounded-lg bg-white">
-      <FileText className="h-12 w-12 mx-auto text-muted-foreground opacity-50" />
-      <h3 className="mt-4 text-lg font-medium font-playfair">
-        No invoices found
-      </h3>
-      <p className="mt-1 text-muted-foreground">
-        Create your first invoice to get started.
-      </p>
-      <Button asChild className="mt-4">
-        <Link to="/invoices/new">
-          <Plus className="h-4 w-4 mr-1" /> Create Invoice
-        </Link>
-      </Button>
-    </div>
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              invoice and all associated items.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Edit Status Dialog */}
+      <AlertDialog open={isEditStatusModalOpen} onOpenChange={setIsEditStatusModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Update Invoice Status</AlertDialogTitle>
+            <AlertDialogDescription>
+              Select the new status for this invoice.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Select value={newStatus} onValueChange={setNewStatus}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="overdue">Overdue</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleUpdateStatus}>Update</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 
