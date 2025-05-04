@@ -65,7 +65,7 @@ const Header = ({ onToggleSidebar, isSidebarOpen }: HeaderProps) => {
             ref={sidebarRef}
             className="fixed inset-y-0 left-0 z-50 w-64 bg-background shadow-lg animate-in slide-in-from-left duration-300"
           >
-            <Sidebar isOpen={true} />
+            <Sidebar isOpen={true} setIsOpen={setIsMobileSidebarOpen} />
           </div>
           <div
             className="fixed inset-0 z-40"

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   FormField,
@@ -29,7 +28,33 @@ import {
 import { useEffect } from "react";
 import { useInvoiceForm } from "@/hooks/useInvoiceForm";
 
-const InvoiceDetailsStep = () => {
+const InvoiceDetailsStep = ({ 
+  clients,
+  items,
+  showShippingDetails,
+  setShowShippingDetails,
+  showTransportDetails,
+  setShowTransportDetails,
+  isGstDialogOpen,
+  setIsGstDialogOpen,
+  showAdditionalFields,
+  setShowAdditionalFields,
+  customInvoiceTitle,
+  setCustomInvoiceTitle,
+  customSubtitle,
+  setCustomSubtitle,
+  selectedCurrency,
+  setSelectedCurrency,
+  purchaseOrderNumber,
+  setPurchaseOrderNumber,
+  referenceNumber,
+  setReferenceNumber,
+  handleClientChange,
+  handleItemChange,
+  handleAddItem,
+  handleRemoveItem,
+  calculateTotal
+}) => {
   const {
     form,
     clients,
@@ -156,7 +181,7 @@ const InvoiceDetailsStep = () => {
       </div>
 
       {/* Additional fields toggler */}
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-2 mt-4">
         <Checkbox
           id="additionalFields"
           checked={showAdditionalFields}
@@ -234,7 +259,7 @@ const InvoiceDetailsStep = () => {
       )}
 
       {/* Shipping details toggler */}
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-2 mt-4">
         <Checkbox
           id="shippingDetails"
           checked={showShippingDetails}
@@ -246,7 +271,7 @@ const InvoiceDetailsStep = () => {
       </div>
 
       {/* Transport details toggler */}
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-2 mt-2">
         <Checkbox
           id="transportDetails"
           checked={showTransportDetails}

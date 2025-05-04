@@ -1,9 +1,10 @@
+
 import {
   Home,
   LayoutDashboard,
   Settings,
   Users,
-  FileInvoice,
+  FileText,
   Coins,
   BarChart,
   Package,
@@ -42,7 +43,7 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
     },
     {
       title: "Invoices",
-      icon: FileInvoice,
+      icon: FileText,
       href: "/invoices",
     },
     {

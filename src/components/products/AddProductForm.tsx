@@ -42,6 +42,8 @@ const formSchema = z.object({
   barcode: z.string().optional(),
 });
 
+type ProductFormValues = z.infer<typeof formSchema>;
+
 interface AddProductFormProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -55,7 +57,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
 }) => {
   const { createProduct, updateProduct } = useProducts();
 
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<ProductFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: productToEdit?.name || "",
@@ -95,12 +97,12 @@ const AddProductForm: React.FC<AddProductFormProps> = ({
     }
   }, [productToEdit, form]);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  const onSubmit = async (values: ProductFormValues) => {
     if (productToEdit) {
       await updateProduct.mutateAsync({
         ...values,
         id: productToEdit.id,
-      });
+      } as Product);
     } else {
       await createProduct.mutateAsync(values);
     }

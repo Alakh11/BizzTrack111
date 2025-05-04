@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import Sidebar from "@/components/layout/Sidebar";
 import Header from "@/components/layout/Header";
@@ -17,7 +18,7 @@ const MainLayout = ({ children }: { children: React.ReactNode }) => {
     <div className="flex flex-col min-h-screen">
       <div className="flex-1 flex">
         {/* Sidebar with conditional rendering based on state */}
-        {!isMobile && <Sidebar isOpen={isSidebarOpen} />}
+        {!isMobile && <Sidebar isOpen={isSidebarOpen} setIsOpen={setSidebarOpen} />}
         <div
           className={`flex-1 flex flex-col transition-all duration-300 ${!isMobile && isSidebarOpen ? "ml-64" : "ml-0"}`}
         >
