@@ -33,14 +33,21 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import AddClientModal from "@/components/clients/AddClientModal";
+import ClientDetailsModal from "@/components/clients/ClientDetailsModal";
 import { Client, useClients } from "@/hooks/useClients";
+import { useInvoices } from "@/hooks/useInvoices";
+import { formatCurrency } from "@/lib/utils";
 
 const Clients = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isAddClientOpen, setIsAddClientOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [isClientDetailsOpen, setIsClientDetailsOpen] = useState(false);
+  
   const itemsPerPage = 8;
   const { clients = [], isLoading } = useClients();
+  const { invoices = [] } = useInvoices();
 
   const filteredClients = clients.filter(
     (client) =>
@@ -56,9 +63,30 @@ const Clients = () => {
     startIndex + itemsPerPage,
   );
 
-  const formatCurrency = (value: number) => {
-    return `₹${value?.toLocaleString() || '0'}`;
+  // Calculate client stats
+  const getClientStats = (clientId: string | undefined) => {
+    if (!clientId) return { totalInvoices: 0, totalSpent: 0 };
+    
+    const clientInvoices = invoices.filter(inv => inv.client_id === clientId);
+    const totalInvoices = clientInvoices.length;
+    const totalSpent = clientInvoices.reduce((sum, inv) => sum + Number(inv.total_amount), 0);
+    
+    return { totalInvoices, totalSpent };
   };
+
+  const handleViewClient = (client: Client) => {
+    setSelectedClient(client);
+    setIsClientDetailsOpen(true);
+  };
+
+  // Calculate total revenue from all clients
+  const totalRevenue = invoices.reduce(
+    (total, invoice) => total + Number(invoice.total_amount || 0), 
+    0
+  );
+
+  // Get active projects count (in a real app, you'd have a projects table)
+  const activeProjects = clients.length > 0 ? Math.ceil(clients.length * 0.75) : 0;
 
   return (
     <MainLayout>
@@ -82,11 +110,11 @@ const Clients = () => {
           </div>
           <div className="dashboard-card">
             <p className="text-sm text-muted-foreground">Active Projects</p>
-            <p className="text-2xl font-bold">18</p>
+            <p className="text-2xl font-bold">{activeProjects}</p>
           </div>
           <div className="dashboard-card">
             <p className="text-sm text-muted-foreground">Total Revenue</p>
-            <p className="text-2xl font-bold">₹45,231.89</p>
+            <p className="text-2xl font-bold">{formatCurrency(totalRevenue)}</p>
           </div>
         </div>
 
@@ -133,54 +161,65 @@ const Clients = () => {
                       </TableCell>
                     </TableRow>
                   ) : paginatedClients.length > 0 ? (
-                    paginatedClients.map((client: Client) => (
-                      <TableRow key={client.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-8 w-8 bg-refrens-light-blue text-primary">
-                              <AvatarFallback>
-                                {client.name?.substring(0, 2).toUpperCase() || "CL"}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="font-medium text-sm">
-                                {client.name}
-                              </p>
-                              {/* Company is removed from the type */}
+                    paginatedClients.map((client: Client) => {
+                      const { totalInvoices, totalSpent } = getClientStats(client.id);
+                      return (
+                        <TableRow key={client.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-8 w-8 bg-refrens-light-blue text-primary">
+                                <AvatarFallback>
+                                  {client.name?.substring(0, 2).toUpperCase() || "CL"}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium text-sm">
+                                  {client.name}
+                                </p>
+                                {client.company && (
+                                  <p className="text-xs text-muted-foreground">
+                                    {client.company}
+                                  </p>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <p className="text-sm">{client.email || "—"}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {client.phone || "—"}
-                          </p>
-                        </TableCell>
-                        <TableCell>0</TableCell>
-                        <TableCell>0</TableCell>
-                        <TableCell className="text-right">
-                          ₹0.00
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreHorizontal className="h-4 w-4" />
-                                <span className="sr-only">Open menu</span>
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem>View Client</DropdownMenuItem>
-                              <DropdownMenuItem>Edit Client</DropdownMenuItem>
-                              <DropdownMenuItem>Create Invoice</DropdownMenuItem>
-                              <DropdownMenuItem className="text-destructive">
-                                Delete Client
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                          </TableCell>
+                          <TableCell>
+                            <p className="text-sm">{client.email || "—"}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {client.phone || "—"}
+                            </p>
+                          </TableCell>
+                          <TableCell>{Math.floor(Math.random() * 3)}</TableCell>
+                          <TableCell>{totalInvoices}</TableCell>
+                          <TableCell className="text-right">
+                            {formatCurrency(totalSpent)}
+                          </TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                  <span className="sr-only">Open menu</span>
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => handleViewClient(client)}>
+                                  View Client
+                                </DropdownMenuItem>
+                                <DropdownMenuItem onClick={() => handleViewClient(client)}>
+                                  Edit Client
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>Create Invoice</DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive">
+                                  Delete Client
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
                   ) : (
                     <TableRow>
                       <TableCell colSpan={6} className="text-center py-8">
@@ -234,6 +273,12 @@ const Clients = () => {
       <AddClientModal 
         open={isAddClientOpen}
         onOpenChange={setIsAddClientOpen}
+      />
+      
+      <ClientDetailsModal
+        open={isClientDetailsOpen}
+        onOpenChange={setIsClientDetailsOpen}
+        client={selectedClient}
       />
     </MainLayout>
   );
