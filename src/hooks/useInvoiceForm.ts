@@ -4,27 +4,16 @@ import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useClients } from "@/hooks/useClients";
 import { useInvoices } from "@/hooks/useInvoices";
+import { useInvoiceItems } from "@/hooks/useInvoiceItems";
+import { useInvoiceDesign } from "@/hooks/useInvoiceDesign";
+import { useInvoiceAdditionalDetails } from "@/hooks/useInvoiceAdditionalDetails";
 import { supabase } from "@/integrations/supabase/client";
 
 export const useInvoiceForm = () => {
   const [currentStep, setCurrentStep] = useState(0);
-  const [items, setItems] = useState([
-    { id: 1, description: "", quantity: 1, rate: 0, amount: 0, serviceId: "" },
-  ]);
-  const [showAdditionalFields, setShowAdditionalFields] = useState(false);
   const [showShippingDetails, setShowShippingDetails] = useState(false);
   const [showTransportDetails, setShowTransportDetails] = useState(false);
   const [isGstDialogOpen, setIsGstDialogOpen] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState("standard");
-  const [selectedColor, setSelectedColor] = useState("blue");
-  const [selectedFont, setSelectedFont] = useState("inter");
-  const [selectedPaperSize, setSelectedPaperSize] = useState("a4");
-  const [customInvoiceTitle, setCustomInvoiceTitle] = useState("INVOICE");
-  const [customSubtitle, setCustomSubtitle] = useState("");
-  const [purchaseOrderNumber, setPurchaseOrderNumber] = useState("");
-  const [referenceNumber, setReferenceNumber] = useState("");
-  const [selectedCurrency, setSelectedCurrency] = useState("inr");
-  const [businessLogo, setBusinessLogo] = useState("");
   const [isEditMode, setIsEditMode] = useState(false);
   const [invoiceId, setInvoiceId] = useState<string | null>(null);
 
@@ -34,6 +23,38 @@ export const useInvoiceForm = () => {
   const location = useLocation();
   const { clients = [], isLoading: clientsLoading } = useClients();
   const { createInvoice, updateInvoice, getInvoice } = useInvoices();
+  
+  const { 
+    items, 
+    setItems, 
+    handleItemChange, 
+    handleAddItem, 
+    handleRemoveItem, 
+    calculateTotal 
+  } = useInvoiceItems();
+
+  const {
+    selectedTemplate,
+    selectedColor,
+    selectedFont,
+    selectedPaperSize,
+    businessLogo
+  } = useInvoiceDesign();
+
+  const {
+    showAdditionalFields, 
+    setShowAdditionalFields,
+    customInvoiceTitle, 
+    setCustomInvoiceTitle,
+    customSubtitle, 
+    setCustomSubtitle,
+    selectedCurrency, 
+    setSelectedCurrency,
+    purchaseOrderNumber, 
+    setPurchaseOrderNumber,
+    referenceNumber, 
+    setReferenceNumber
+  } = useInvoiceAdditionalDetails();
 
   const form = useForm({
     defaultValues: {
@@ -56,7 +77,7 @@ export const useInvoiceForm = () => {
       businessPhone: "+91 9580813770",
       businessEmail: "alakh1304@gmail.com",
       
-      // Shipping details
+      // Shipping details - moved to useInvoiceForm to keep core details
       shippedFromName: "",
       shippedFromAddress: "",
       shippedFromCity: "",
@@ -72,7 +93,7 @@ export const useInvoiceForm = () => {
       shippedToPostal: "",
       shippedToCountry: "india",
       
-      // Transport details
+      // Transport details - moved to useInvoiceForm to keep core details
       transporterName: "",
       distance: "",
       transportMode: "",
@@ -202,7 +223,7 @@ export const useInvoiceForm = () => {
     };
 
     fetchInvoice();
-  }, [params.id, form, navigate, toast, getInvoice, location.state]);
+  }, [params.id, form, navigate, toast, getInvoice, location.state, setItems]);
 
   // Fetch business profile data
   useEffect(() => {
@@ -235,50 +256,6 @@ export const useInvoiceForm = () => {
 
     fetchBusinessProfile();
   }, [form]);
-
-  const calculateTotal = () => {
-    return items.reduce((total, item) => total + item.amount, 0);
-  };
-
-  const handleItemChange = (id: number, field: string, value: any) => {
-    setItems(
-      items.map((item) => {
-        if (item.id === id) {
-          const updatedItem = { ...item, [field]: value };
-
-          // Recalculate amount if quantity or rate changes
-          if (field === "quantity" || field === "rate") {
-            updatedItem.amount = updatedItem.quantity * updatedItem.rate;
-          }
-
-          return updatedItem;
-        }
-        return item;
-      }),
-    );
-  };
-
-  const handleAddItem = () => {
-    const newId =
-      items.length > 0 ? Math.max(...items.map((i) => i.id)) + 1 : 1;
-    setItems([
-      ...items,
-      {
-        id: newId,
-        description: "",
-        quantity: 1,
-        rate: 0,
-        amount: 0,
-        serviceId: "",
-      },
-    ]);
-  };
-
-  const handleRemoveItem = (id: number) => {
-    if (items.length > 1) {
-      setItems(items.filter((item) => item.id !== id));
-    }
-  };
 
   const handleClientChange = (clientId: string) => {
     const selectedClient = clients.find((c) => c.id === clientId);
