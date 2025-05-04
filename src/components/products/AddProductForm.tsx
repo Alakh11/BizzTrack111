@@ -20,8 +20,9 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select";
-import { useProducts, PRODUCT_CATEGORIES } from "@/hooks/useProducts";
+import { useProducts, PRODUCT_CATEGORIES, Product } from "@/hooks/useProducts";
 import { Textarea } from "@/components/ui/textarea";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 const productSchema = z.object({
   name: z.string().min(1, "Product name is required"),
@@ -36,12 +37,27 @@ const productSchema = z.object({
 
 type ProductFormValues = z.infer<typeof productSchema>;
 
-const AddProductForm = ({ onClose }: { onClose: () => void }) => {
-  const { createProduct } = useProducts();
+interface AddProductFormProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  productToEdit: Product | null;
+}
+
+const AddProductForm = ({ open, onOpenChange, productToEdit }: AddProductFormProps) => {
+  const { createProduct, updateProduct } = useProducts();
   
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
-    defaultValues: {
+    defaultValues: productToEdit ? {
+      name: productToEdit.name,
+      sku: productToEdit.sku,
+      price: productToEdit.price,
+      quantity: productToEdit.quantity,
+      category: productToEdit.category,
+      low_stock_threshold: productToEdit.low_stock_threshold || 10,
+      description: productToEdit.description || "",
+      barcode: productToEdit.barcode || "",
+    } : {
       name: "",
       sku: generateSku(),
       price: 0,
@@ -52,6 +68,32 @@ const AddProductForm = ({ onClose }: { onClose: () => void }) => {
       barcode: "",
     },
   });
+  
+  React.useEffect(() => {
+    if (productToEdit) {
+      form.reset({
+        name: productToEdit.name,
+        sku: productToEdit.sku,
+        price: productToEdit.price,
+        quantity: productToEdit.quantity,
+        category: productToEdit.category,
+        low_stock_threshold: productToEdit.low_stock_threshold || 10,
+        description: productToEdit.description || "",
+        barcode: productToEdit.barcode || "",
+      });
+    } else {
+      form.reset({
+        name: "",
+        sku: generateSku(),
+        price: 0,
+        quantity: 0,
+        category: "",
+        low_stock_threshold: 10,
+        description: "",
+        barcode: "",
+      });
+    }
+  }, [productToEdit, form]);
   
   function generateSku() {
     const prefix = "SKU";
@@ -72,169 +114,188 @@ const AddProductForm = ({ onClose }: { onClose: () => void }) => {
       barcode: data.barcode || "",
     };
     
-    createProduct.mutate(productData, {
-      onSuccess: () => {
-        onClose();
-      },
-    });
+    if (productToEdit) {
+      updateProduct.mutate({
+        ...productData,
+        id: productToEdit.id
+      }, {
+        onSuccess: () => {
+          onOpenChange(false);
+        }
+      });
+    } else {
+      createProduct.mutate(productData, {
+        onSuccess: () => {
+          onOpenChange(false);
+        },
+      });
+    }
   };
   
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Product Name*</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Product name" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="sku"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>SKU/Code*</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Product SKU" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="overflow-y-auto">
+        <SheetHeader>
+          <SheetTitle>{productToEdit ? "Edit Product" : "Add New Product"}</SheetTitle>
+        </SheetHeader>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="price"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Price*</FormLabel>
-                <FormControl>
-                  <Input type="number" min="0" step="0.01" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="quantity"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Quantity in Stock*</FormLabel>
-                <FormControl>
-                  <Input type="number" min="0" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Product Name*</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Product name" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="sku"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>SKU/Code*</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Product SKU" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Price*</FormLabel>
+                    <FormControl>
+                      <Input type="number" min="0" step="0.01" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="quantity"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Quantity in Stock*</FormLabel>
+                    <FormControl>
+                      <Input type="number" min="0" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="category"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Category*</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value}
-                >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="category"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Category*</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a category" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {PRODUCT_CATEGORIES.map((category) => (
+                          <SelectItem key={category} value={category}>{category}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="low_stock_threshold"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Low Stock Threshold</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        min="0" 
+                        {...field} 
+                        placeholder="10"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+            
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
+                    <Textarea 
+                      {...field} 
+                      placeholder="Product description" 
+                    />
                   </FormControl>
-                  <SelectContent>
-                    {PRODUCT_CATEGORIES.map((category) => (
-                      <SelectItem key={category} value={category}>{category}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="low_stock_threshold"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Low Stock Threshold</FormLabel>
-                <FormControl>
-                  <Input 
-                    type="number" 
-                    min="0" 
-                    {...field} 
-                    placeholder="10"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-        
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea 
-                  {...field} 
-                  placeholder="Product description" 
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <FormField
-          control={form.control}
-          name="barcode"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Barcode</FormLabel>
-              <FormControl>
-                <Input 
-                  {...field} 
-                  placeholder="Leave empty for auto-generation" 
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        
-        <div className="flex justify-end space-x-2">
-          <Button 
-            type="button" 
-            variant="outline" 
-            onClick={onClose}
-          >
-            Cancel
-          </Button>
-          <Button type="submit">Save Product</Button>
-        </div>
-      </form>
-    </Form>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <FormField
+              control={form.control}
+              name="barcode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Barcode</FormLabel>
+                  <FormControl>
+                    <Input 
+                      {...field} 
+                      placeholder="Leave empty for auto-generation" 
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
+            <div className="flex justify-end space-x-2">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => onOpenChange(false)}
+              >
+                Cancel
+              </Button>
+              <Button type="submit">{productToEdit ? "Update" : "Save"} Product</Button>
+            </div>
+          </form>
+        </Form>
+      </SheetContent>
+    </Sheet>
   );
 };
 
