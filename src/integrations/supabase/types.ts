@@ -42,6 +42,39 @@ export type Database = {
         }
         Relationships: []
       }
+      expenses: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string | null
+          date: string
+          description: string | null
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string | null
+          date: string
+          description?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string | null
+          date?: string
+          description?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       invoice_items: {
         Row: {
           amount: number

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   FormField,
@@ -159,7 +160,7 @@ const InvoiceDetailsStep = () => {
         <Checkbox
           id="additionalFields"
           checked={showAdditionalFields}
-          onCheckedChange={setShowAdditionalFields}
+          onCheckedChange={(checked) => setShowAdditionalFields(checked === true)}
         />
         <label htmlFor="additionalFields" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
           Show Additional Fields
@@ -237,7 +238,7 @@ const InvoiceDetailsStep = () => {
         <Checkbox
           id="shippingDetails"
           checked={showShippingDetails}
-          onCheckedChange={setShowShippingDetails}
+          onCheckedChange={(checked) => setShowShippingDetails(checked === true)}
         />
         <label htmlFor="shippingDetails" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
           Include Shipping Details
@@ -249,7 +250,7 @@ const InvoiceDetailsStep = () => {
         <Checkbox
           id="transportDetails"
           checked={showTransportDetails}
-          onCheckedChange={setShowTransportDetails}
+          onCheckedChange={(checked) => setShowTransportDetails(checked === true)}
         />
         <label htmlFor="transportDetails" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
           Include Transport Details
