@@ -26,9 +26,11 @@ import { useState, useEffect } from "react";
 import { Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Profile } from "@/types/profile";
+import { useAuth } from "@/hooks/useAuth";
 
 const ProfileSettings = () => {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const [userData, setUserData] = useState<Profile & {
     email: string;
