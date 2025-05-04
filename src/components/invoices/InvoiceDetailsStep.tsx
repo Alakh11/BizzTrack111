@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useEffect } from "react";
 import {
   FormField,
   FormItem,
@@ -22,39 +23,11 @@ import { Separator } from "@/components/ui/separator";
 import { 
   IndianRupee,
   Trash2,
-  Plus,
-  ChevronsUpDown
+  Plus
 } from "lucide-react";
-import { useEffect } from "react";
 import { useInvoiceForm } from "@/hooks/useInvoiceForm";
 
-const InvoiceDetailsStep = ({ 
-  clients,
-  items,
-  showShippingDetails,
-  setShowShippingDetails,
-  showTransportDetails,
-  setShowTransportDetails,
-  isGstDialogOpen,
-  setIsGstDialogOpen,
-  showAdditionalFields,
-  setShowAdditionalFields,
-  customInvoiceTitle,
-  setCustomInvoiceTitle,
-  customSubtitle,
-  setCustomSubtitle,
-  selectedCurrency,
-  setSelectedCurrency,
-  purchaseOrderNumber,
-  setPurchaseOrderNumber,
-  referenceNumber,
-  setReferenceNumber,
-  handleClientChange,
-  handleItemChange,
-  handleAddItem,
-  handleRemoveItem,
-  calculateTotal
-}) => {
+const InvoiceDetailsStep = () => {
   const {
     form,
     clients,
