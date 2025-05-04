@@ -1,116 +1,80 @@
+
 import { Button } from "@/components/ui/button";
-import {
-  Bell,
-  ChevronDown,
-  Menu,
-  Search,
-  UserCircle2,
-  Settings,
-  LogOut,
-  User,
-} from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Menu } from "lucide-react";
+import { useRef, useState } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import Sidebar from "./Sidebar";
 
 interface HeaderProps {
-  onToggleSidebar?: () => void;
-  isSidebarOpen?: boolean;
+  onToggleSidebar: () => void;
+  isSidebarOpen: boolean;
 }
 
-const Header = ({ onToggleSidebar, isSidebarOpen = true }: HeaderProps) => {
-  const { user, signOut } = useAuth();
-  const navigate = useNavigate();
+const Header = ({ onToggleSidebar, isSidebarOpen }: HeaderProps) => {
+  const isMobile = useIsMobile();
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/login");
+  const toggleMobileSidebar = () => {
+    setIsMobileSidebarOpen(!isMobileSidebarOpen);
   };
 
   return (
-    <header className="border-b py-3 px-4 md:px-6 bg-white">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onToggleSidebar}
-            className="hidden lg:flex"
-          >
-            <Menu className="h-5 w-5" />
-          </Button>
-          <div className="relative hidden md:flex">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <input
-              type="search"
-              placeholder="Search..."
-              className="w-64 rounded-md border border-input bg-transparent pl-8 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="icon" className="relative">
-            <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-[10px] font-medium text-white flex items-center justify-center">
-              3
-            </span>
-          </Button>
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+    <>
+      <header className="border-b bg-background sticky top-0 z-30">
+        <div className="flex h-16 items-center px-4 md:px-6">
+          <div className="mr-4">
+            {!isMobile && (
               <Button
                 variant="ghost"
-                className="flex items-center space-x-2 rounded-full"
+                size="icon"
+                onClick={onToggleSidebar}
+                aria-label="Toggle sidebar"
               >
-                <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
-                  <span className="font-medium text-primary">
-                    {user?.email?.[0].toUpperCase() || "U"}
-                  </span>
-                </div>
-                <div className="hidden md:block text-left">
-                  <div className="text-sm font-medium">{user?.email}</div>
-                </div>
-                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                <Menu className="h-5 w-5" />
               </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => navigate("/settings")}
+            )}
+            {isMobile && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleMobileSidebar}
+                aria-label="Open mobile sidebar"
               >
-                <User className="h-4 w-4 mr-2" />
-                Profile
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={() => navigate("/settings")}
-              >
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="cursor-pointer"
-                onClick={handleSignOut}
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <Menu className="h-5 w-5" />
+              </Button>
+            )}
+          </div>
+          <div className="flex-1">
+            <h1 className="text-xl font-semibold">Invoicify</h1>
+          </div>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button size="sm" className="hidden md:flex">
+              Upgrade
+            </Button>
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+
+      {/* Mobile sidebar */}
+      {isMobile && isMobileSidebarOpen && (
+        <div className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm">
+          <div
+            ref={sidebarRef}
+            className="fixed inset-y-0 left-0 z-50 w-64 bg-background shadow-lg animate-in slide-in-from-left duration-300"
+          >
+            <Sidebar isOpen={true} />
+          </div>
+          <div
+            className="fixed inset-0 z-40"
+            onClick={toggleMobileSidebar}
+            aria-hidden="true"
+          ></div>
+        </div>
+      )}
+    </>
   );
 };
 

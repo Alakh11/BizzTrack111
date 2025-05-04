@@ -7,6 +7,7 @@ import BankingDetailsStep from "@/components/invoices/BankingDetailsStep";
 import DesignStep from "@/components/invoices/DesignStep";
 import InvoiceGenerationStepper from "@/components/invoices/InvoiceGenerationStepper";
 import { useInvoiceForm } from "@/hooks/useInvoiceForm";
+import EmailPreviewStep from "@/components/invoices/EmailPreviewStep";
 
 const steps = [
   {
@@ -24,6 +25,11 @@ const steps = [
     name: "Design & Share",
     description: "Customize and send",
   },
+  {
+    id: "preview",
+    name: "Preview & Send",
+    description: "Review and send",
+  },
 ];
 
 const InvoiceGeneration = () => {
@@ -31,72 +37,20 @@ const InvoiceGeneration = () => {
     form,
     currentStep,
     setCurrentStep,
-    items,
-    showShippingDetails,
-    setShowShippingDetails,
-    showTransportDetails,
-    setShowTransportDetails,
-    isGstDialogOpen,
-    setIsGstDialogOpen,
-    showAdditionalFields,
-    setShowAdditionalFields,
-    customInvoiceTitle,
-    setCustomInvoiceTitle,
-    customSubtitle,
-    setCustomSubtitle,
-    selectedCurrency,
-    setSelectedCurrency,
-    purchaseOrderNumber,
-    setPurchaseOrderNumber,
-    referenceNumber,
-    setReferenceNumber,
     isEditMode,
-    clients,
-    handleClientChange,
-    handleItemChange,
-    handleAddItem,
-    handleRemoveItem,
-    calculateTotal,
     handleFormSubmit
   } = useInvoiceForm();
 
   const renderStepContent = () => {
     switch (currentStep) {
       case 0: // Invoice Details
-        return (
-          <InvoiceDetailsStep
-            form={form}
-            clients={clients}
-            items={items}
-            showShippingDetails={showShippingDetails}
-            setShowShippingDetails={setShowShippingDetails}
-            showTransportDetails={showTransportDetails}
-            setShowTransportDetails={setShowTransportDetails}
-            isGstDialogOpen={isGstDialogOpen}
-            setIsGstDialogOpen={setIsGstDialogOpen}
-            showAdditionalFields={showAdditionalFields}
-            setShowAdditionalFields={setShowAdditionalFields}
-            customInvoiceTitle={customInvoiceTitle}
-            setCustomInvoiceTitle={setCustomInvoiceTitle}
-            customSubtitle={customSubtitle}
-            setCustomSubtitle={setCustomSubtitle}
-            selectedCurrency={selectedCurrency}
-            setSelectedCurrency={setSelectedCurrency}
-            purchaseOrderNumber={purchaseOrderNumber}
-            setPurchaseOrderNumber={setPurchaseOrderNumber}
-            referenceNumber={referenceNumber}
-            setReferenceNumber={setReferenceNumber}
-            handleClientChange={handleClientChange}
-            handleItemChange={handleItemChange}
-            handleAddItem={handleAddItem}
-            handleRemoveItem={handleRemoveItem}
-            calculateTotal={calculateTotal}
-          />
-        );
+        return <InvoiceDetailsStep />;
       case 1: // Banking Details
         return <BankingDetailsStep form={form} />;
       case 2: // Design and Share
         return <DesignStep />;
+      case 3: // Preview and Send
+        return <EmailPreviewStep />;
       default:
         return null;
     }
