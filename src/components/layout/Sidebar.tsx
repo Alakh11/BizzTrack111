@@ -1,230 +1,120 @@
-import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { cn } from "@/lib/utils";
 import {
   Home,
-  FileText,
-  Users,
-  ClipboardList,
+  LayoutDashboard,
   Settings,
-  LogOut,
-  Menu,
-  X,
-  Plus,
-  Receipt,
-  ChartPie,
+  Users,
+  FileInvoice,
+  Coins,
+  BarChart,
+  Package,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/hooks/useAuth";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { NavLink, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 
 interface SidebarProps {
-  isOpen?: boolean;
+  isOpen: boolean;
+  setIsOpen: (open: boolean) => void;
 }
 
-const Sidebar = ({ isOpen = true }: SidebarProps) => {
+const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
   const location = useLocation();
-  const { user, signOut } = useAuth();
-  const navigate = useNavigate();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeItem, setActiveItem] = useState(location.pathname);
 
-  const navItems = [
+  useEffect(() => {
+    setActiveItem(location.pathname);
+  }, [location.pathname]);
+
+  const toggleSidebar = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const closeSidebar = () => {
+    if (isOpen) {
+      setIsOpen(false);
+    }
+  };
+
+  const menuItems = [
     {
-      name: "Dashboard",
-      icon: <Home className="h-5 w-5" />,
+      title: "Dashboard",
+      icon: LayoutDashboard,
       href: "/",
     },
     {
-      name: "Invoices",
-      icon: <FileText className="h-5 w-5" />,
-      isDropdown: true,
-      items: [
-        {
-          name: "All Invoices",
-          href: "/invoices",
-        },
-        {
-          name: "Create Invoice",
-          href: "/invoices/new",
-        },
-      ],
+      title: "Invoices",
+      icon: FileInvoice,
+      href: "/invoices",
     },
     {
-      name: "Expenses",
-      icon: <Receipt className="h-5 w-5" />,
+      title: "Expenses",
+      icon: Coins,
       href: "/expenses",
     },
     {
-      name: "Reports",
-      icon: <ChartPie className="h-5 w-5" />,
+      title: "Reports",
+      icon: BarChart,
       href: "/reports",
     },
     {
-      name: "Clients",
-      icon: <Users className="h-5 w-5" />,
+      title: "Clients",
+      icon: Users,
       href: "/clients",
     },
     {
-      name: "Services",
-      icon: <ClipboardList className="h-5 w-5" />,
-      href: "/services",
+      title: "Products",
+      icon: Package,
+      href: "/products",
     },
     {
-      name: "Settings",
-      icon: <Settings className="h-5 w-5" />,
+      title: "Settings",
+      icon: Settings,
       href: "/settings",
     },
   ];
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/login");
-  };
-
-  const renderNavItem = (item: any) => {
-    if (item.isDropdown) {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className={cn(
-                "nav-link w-full",
-                location.pathname.startsWith(item.items[0].href) &&
-                  "nav-link-active",
-              )}
-            >
-              {item.icon}
-              <span>{item.name}</span>
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            {item.items.map((subItem: any) => (
-              <DropdownMenuItem key={subItem.href} asChild>
-                <Link
-                  to={subItem.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full"
-                >
-                  {subItem.name === "Create Invoice" && (
-                    <Plus className="mr-2 h-4 w-4" />
-                  )}
-                  {subItem.name}
-                </Link>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
-    }
-
-    return (
-      <Link
-        to={item.href}
-        className={cn(
-          "nav-link",
-          location.pathname === item.href && "nav-link-active",
-        )}
-        onClick={() => setIsMobileMenuOpen(false)}
-      >
-        {item.icon}
-        <span>{item.name}</span>
-      </Link>
-    );
-  };
-
   return (
-    <>
-      {/* Mobile Menu Button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={toggleMobileMenu}
-          className="relative"
-        >
-          {isMobileMenuOpen ? (
-            <X className="h-5 w-5" />
-          ) : (
-            <Menu className="h-5 w-5" />
-          )}
-        </Button>
+    <div
+      className={`fixed left-0 top-0 z-50 flex h-full flex-col border-r bg-white transition-transform dark:border-neutral-700 dark:bg-neutral-900  ${
+        isOpen ? "w-64 translate-x-0" : "-translate-x-full w-0 md:w-16"
+      } md:translate-x-0`}
+    >
+      <div className="px-4 py-6">
+        <NavLink to="/" className="flex items-center space-x-2">
+          <Home className="h-6 w-6" />
+          <span
+            className={`text-xl font-bold ${
+              isOpen ? "inline" : "hidden"
+            } dark:text-white`}
+          >
+            Invoicer
+          </span>
+        </NavLink>
       </div>
-
-      {/* Sidebar */}
-      <div
-        className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-border transform transition-transform duration-300 ease-in-out lg:translate-x-0",
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
-          !isOpen && "lg:-translate-x-full",
-        )}
-      >
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="p-4 border-b border-border">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center">
-                <span className="text-white font-bold">B</span>
-              </div>
-              <span className="text-primary font-bold text-xl font-playfair">
-                BizzTrack
-              </span>
-            </Link>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto p-4 space-y-1">
-            {navItems.map((item) => (
-              <div key={item.name} className="group/menu-item relative">
-                {renderNavItem(item)}
-              </div>
-            ))}
-          </nav>
-
-          {/* User Profile & Logout */}
-          <div className="border-t border-border p-4 bg-gray-50">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="font-medium text-primary text-xl">
-                  {user?.email?.[0].toUpperCase() || "U"}
+      <nav className="flex-grow px-4">
+        <ul className="space-y-2">
+          {menuItems.map((item) => (
+            <li key={item.title}>
+              <NavLink
+                to={item.href}
+                className={({ isActive }) =>
+                  `flex items-center space-x-2 rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800 ${
+                    isActive
+                      ? "bg-gray-100 dark:bg-neutral-800 font-medium"
+                      : ""
+                  }`
+                }
+                onClick={closeSidebar}
+              >
+                <item.icon className="h-4 w-4" />
+                <span className={isOpen ? "inline" : "hidden"}>
+                  {item.title}
                 </span>
-              </div>
-              <div>
-                <p className="font-semibold text-primary text-sm">
-                  {user?.email}
-                </p>
-                <p className="text-xs text-muted-foreground">Logged in</p>
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              className="w-full justify-start text-primary hover:bg-primary/5"
-              onClick={handleSignOut}
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Backdrop */}
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
-    </>
+              </NavLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    </div>
   );
 };
 

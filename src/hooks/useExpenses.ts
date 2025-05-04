@@ -28,26 +28,28 @@ export const useExpenses = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
+  const fetchExpenses = async () => {
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session) {
+      return [];
+    }
+
+    const { data, error } = await supabase
+      .from("expenses")
+      .select("*")
+      .eq("user_id", session.user.id)
+      .order("date", { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  };
+
   const { data: expenses = [], isLoading } = useQuery({
     queryKey: ["expenses"],
-    queryFn: async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (!session) {
-        return [];
-      }
-
-      const { data, error } = await supabase
-        .from("expenses")
-        .select("*")
-        .eq("user_id", session.user.id)
-        .order("date", { ascending: false });
-
-      if (error) throw error;
-      return data || [];
-    },
+    queryFn: fetchExpenses,
   });
 
   const createExpense = useMutation({

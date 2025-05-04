@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,7 @@ import NotFound from "./pages/NotFound";
 import Auth from "./pages/Auth";
 import Expenses from "./pages/Expenses";
 import Reports from "./pages/Reports";
+import Products from "./pages/Products";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,6 +45,7 @@ const App = () => (
             <Route path="/invoices/new" element={<InvoiceGeneration />} />
             <Route path="/invoices/edit/:id" element={<InvoiceGeneration />} />
             <Route path="/expenses" element={<Expenses />} />
+            <Route path="/products" element={<Products />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/clients" element={<Clients />} />
             <Route path="/services" element={<Services />} />
