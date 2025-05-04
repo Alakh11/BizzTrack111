@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Product, useProducts } from "@/hooks/useProducts";
 import { Input } from "@/components/ui/input";
@@ -119,6 +120,106 @@ const InvoiceDetailsStep = ({
           )}
         />
       </div>
+
+      {/* Additional Options */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+        <div className="flex items-center space-x-2">
+          <Switch
+            checked={showShippingDetails}
+            onCheckedChange={setShowShippingDetails}
+            id="shipping-details"
+          />
+          <Label htmlFor="shipping-details">Include Shipping Details</Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Switch
+            checked={showTransportDetails}
+            onCheckedChange={setShowTransportDetails}
+            id="transport-details"
+          />
+          <Label htmlFor="transport-details">Include Transport Details</Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Switch
+            checked={showAdditionalFields}
+            onCheckedChange={setShowAdditionalFields}
+            id="additional-fields"
+          />
+          <Label htmlFor="additional-fields">Show Additional Fields</Label>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Switch
+            checked={isGstDialogOpen}
+            onCheckedChange={setIsGstDialogOpen}
+            id="gst-details"
+          />
+          <Label htmlFor="gst-details">Include GST Details</Label>
+        </div>
+      </div>
+
+      {showAdditionalFields && (
+        <div className="space-y-4 border rounded-md p-4 bg-muted/20">
+          <h3 className="text-lg font-semibold mb-2">Custom Invoice Details</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="custom-title">Custom Invoice Title</Label>
+              <Input
+                id="custom-title"
+                value={customInvoiceTitle}
+                onChange={(e) => setCustomInvoiceTitle(e.target.value)}
+                placeholder="Invoice"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="custom-subtitle">Custom Subtitle</Label>
+              <Input
+                id="custom-subtitle"
+                value={customSubtitle}
+                onChange={(e) => setCustomSubtitle(e.target.value)}
+                placeholder="Thank you for your business"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="currency">Currency</Label>
+              <Select
+                value={selectedCurrency}
+                onValueChange={setSelectedCurrency}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select currency" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="INR">Indian Rupee (₹)</SelectItem>
+                  <SelectItem value="USD">US Dollar ($)</SelectItem>
+                  <SelectItem value="EUR">Euro (€)</SelectItem>
+                  <SelectItem value="GBP">British Pound (£)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="po-number">Purchase Order Number</Label>
+              <Input
+                id="po-number"
+                value={purchaseOrderNumber}
+                onChange={(e) => setPurchaseOrderNumber(e.target.value)}
+                placeholder="PO-123456"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="reference">Reference Number</Label>
+              <Input
+                id="reference"
+                value={referenceNumber}
+                onChange={(e) => setReferenceNumber(e.target.value)}
+                placeholder="REF-123456"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Invoice Items */}
       <div>

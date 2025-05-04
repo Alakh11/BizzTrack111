@@ -29,34 +29,41 @@ export const PRODUCT_CATEGORIES = [
   "Others"
 ];
 
+// Utility functions for products
+const generateBarcode = () => {
+  const prefix = "PRD";
+  const randomDigits = Math.floor(10000000000 + Math.random() * 90000000000);
+  return `${prefix}${randomDigits}`;
+};
+
 export const useProducts = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const fetchProducts = async () => {
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session) {
-      return [];
-    }
-
-    const { data, error } = await supabase
-      .from("products")
-      .select("*")
-      .eq("user_id", session.user.id)
-      .order("name", { ascending: true });
-
-    if (error) throw error;
-    return data || [];
-  };
-
+  // Query to fetch products
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["products"],
-    queryFn: fetchProducts,
+    queryFn: async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from("products")
+        .select("*")
+        .eq("user_id", session.user.id)
+        .order("name", { ascending: true });
+
+      if (error) throw error;
+      return data || [];
+    },
   });
 
+  // Mutation to create a new product
   const createProduct = useMutation({
     mutationFn: async (newProduct: Omit<Product, 'id' | 'user_id'>) => {
       const {
@@ -99,6 +106,7 @@ export const useProducts = () => {
     },
   });
 
+  // Mutation to update an existing product
   const updateProduct = useMutation({
     mutationFn: async (product: Product) => {
       if (!product.id) {
@@ -141,6 +149,7 @@ export const useProducts = () => {
     },
   });
 
+  // Mutation to delete a product
   const deleteProduct = useMutation({
     mutationFn: async (productId: string) => {
       const { error } = await supabase
@@ -166,13 +175,6 @@ export const useProducts = () => {
       });
     },
   });
-
-  // Generate random barcode (in a real app, this would be replaced with a proper barcode generator)
-  const generateBarcode = () => {
-    const prefix = "PRD";
-    const randomDigits = Math.floor(10000000000 + Math.random() * 90000000000);
-    return `${prefix}${randomDigits}`;
-  };
 
   // Filter products by category
   const filterByCategory = (category: string) => {
