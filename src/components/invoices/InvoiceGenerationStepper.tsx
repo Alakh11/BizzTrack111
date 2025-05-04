@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
@@ -33,11 +32,15 @@ const InvoiceGenerationStepper = ({
   };
 
   const handleNext = () => {
-    setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+    // Fixed: Pass the actual next step number instead of a function
+    const nextStep = Math.min(currentStep + 1, steps.length - 1);
+    setCurrentStep(nextStep);
   };
 
   const handlePrevious = () => {
-    setCurrentStep((prev) => Math.max(prev - 1, 0));
+    // Fixed: Pass the actual previous step number instead of a function
+    const prevStep = Math.max(currentStep - 1, 0);
+    setCurrentStep(prevStep);
   };
 
   return (
