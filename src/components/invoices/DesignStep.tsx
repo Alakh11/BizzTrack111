@@ -1,5 +1,5 @@
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { FileText } from "lucide-react";
 import InvoiceTemplates from "./InvoiceTemplates";
 import { UseFormReturn } from "react-hook-form";
@@ -47,6 +47,30 @@ const DesignStep: React.FC<DesignStepProps> = ({
   const [signature, setSignature] = useState<string>("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
+  const [previewData, setPreviewData] = useState<any>({
+    clientName: "Client Name",
+    invoiceNumber: "INV-2023-001",
+    invoiceDate: "May 5, 2025",
+    dueDate: "May 19, 2025",
+    total: "$200.00",
+    items: [{ description: "Product Name", quantity: 2, rate: "$100.00", amount: "$200.00" }]
+  });
+  
+  // Update preview with real form data
+  useEffect(() => {
+    const formValues = form.getValues();
+    if (formValues) {
+      const newPreviewData = {
+        clientName: formValues.clientName || "Client Name",
+        invoiceNumber: formValues.invoiceNumber || "INV-2023-001",
+        invoiceDate: formValues.invoiceDate ? new Date(formValues.invoiceDate).toLocaleDateString() : "May 5, 2025",
+        dueDate: formValues.dueDate ? new Date(formValues.dueDate).toLocaleDateString() : "May 19, 2025",
+        total: "$" + (form.getValues("items")?.reduce((sum: number, item: any) => sum + (parseFloat(item.amount) || 0), 0) || 0).toFixed(2),
+        items: form.getValues("items") || [{ description: "Product Name", quantity: 2, rate: "$100.00", amount: "$200.00" }]
+      };
+      setPreviewData(newPreviewData);
+    }
+  }, [form, form.watch]);
   
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -133,47 +157,10 @@ const DesignStep: React.FC<DesignStepProps> = ({
                   <TabsTrigger value="signature" className="flex-1">Signature</TabsTrigger>
                 </TabsList>
                 <TabsContent value="templates" className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div 
-                      className={`border p-2 rounded-md cursor-pointer aspect-[3/4] flex items-center justify-center ${selectedTemplate === 'standard' ? 'border-primary ring-2 ring-primary/20' : ''}`}
-                      onClick={() => setSelectedTemplate('standard')}
-                    >
-                      <div className="text-center">
-                        <p className="font-medium">Standard</p>
-                        <p className="text-xs text-muted-foreground">Basic invoice layout</p>
-                      </div>
-                    </div>
-                    
-                    <div 
-                      className={`border p-2 rounded-md cursor-pointer aspect-[3/4] flex items-center justify-center ${selectedTemplate === 'modern' ? 'border-primary ring-2 ring-primary/20' : ''}`}
-                      onClick={() => setSelectedTemplate('modern')}
-                    >
-                      <div className="text-center">
-                        <p className="font-medium">Modern</p>
-                        <p className="text-xs text-muted-foreground">Clean, modern design</p>
-                      </div>
-                    </div>
-                    
-                    <div 
-                      className={`border p-2 rounded-md cursor-pointer aspect-[3/4] flex items-center justify-center ${selectedTemplate === 'professional' ? 'border-primary ring-2 ring-primary/20' : ''}`}
-                      onClick={() => setSelectedTemplate('professional')}
-                    >
-                      <div className="text-center">
-                        <p className="font-medium">Professional</p>
-                        <p className="text-xs text-muted-foreground">Corporate style</p>
-                      </div>
-                    </div>
-                    
-                    <div 
-                      className={`border p-2 rounded-md cursor-pointer aspect-[3/4] flex items-center justify-center ${selectedTemplate === 'minimal' ? 'border-primary ring-2 ring-primary/20' : ''}`}
-                      onClick={() => setSelectedTemplate('minimal')}
-                    >
-                      <div className="text-center">
-                        <p className="font-medium">Minimal</p>
-                        <p className="text-xs text-muted-foreground">Simple and clean</p>
-                      </div>
-                    </div>
-                  </div>
+                  <InvoiceTemplates 
+                    selectedTemplate={selectedTemplate} 
+                    setSelectedTemplate={setSelectedTemplate} 
+                  />
                 </TabsContent>
                 
                 <TabsContent value="colors" className="space-y-4">
@@ -305,33 +292,33 @@ const DesignStep: React.FC<DesignStepProps> = ({
                   )}
                   <div className="text-right">
                     <h2 className="text-xl font-bold" style={{ color: selectedColor }}>INVOICE</h2>
-                    <p className="text-sm text-muted-foreground">#INV-2023-001</p>
+                    <p className="text-sm text-muted-foreground">#{previewData.invoiceNumber}</p>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div>
                     <p className="text-xs text-muted-foreground">From:</p>
-                    <p className="font-medium">Your Business Name</p>
-                    <p className="text-sm">123 Business Street</p>
-                    <p className="text-sm">City, State, ZIP</p>
+                    <p className="font-medium">Alakh Corporation</p>
+                    <p className="text-sm">Mirzapur, UP, India - 231312</p>
+                    <p className="text-sm">+91 9580813770</p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">To:</p>
-                    <p className="font-medium">Client Name</p>
-                    <p className="text-sm">456 Client Address</p>
-                    <p className="text-sm">City, State, ZIP</p>
+                    <p className="font-medium">{previewData.clientName}</p>
+                    <p className="text-sm">{form.getValues("clientAddress") || "Client Address"}</p>
+                    <p className="text-sm">{form.getValues("clientEmail") || "client@example.com"}</p>
                   </div>
                 </div>
                 
                 <div className="border-t border-b py-2 mb-4 grid grid-cols-4">
                   <div>
                     <p className="text-xs text-muted-foreground">Invoice Date</p>
-                    <p className="text-sm">May 5, 2025</p>
+                    <p className="text-sm">{previewData.invoiceDate}</p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Due Date</p>
-                    <p className="text-sm">May 19, 2025</p>
+                    <p className="text-sm">{previewData.dueDate}</p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Status</p>
@@ -339,7 +326,7 @@ const DesignStep: React.FC<DesignStepProps> = ({
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Amount Due</p>
-                    <p className="text-sm font-semibold">$1,234.56</p>
+                    <p className="text-sm font-semibold">{previewData.total}</p>
                   </div>
                 </div>
                 
@@ -350,25 +337,29 @@ const DesignStep: React.FC<DesignStepProps> = ({
                     <div className="col-span-2 text-right">Rate</div>
                     <div className="col-span-2 text-right">Amount</div>
                   </div>
-                  <div className="grid grid-cols-12 mb-1">
-                    <div className="col-span-6">Product Name</div>
-                    <div className="col-span-2 text-right">2</div>
-                    <div className="col-span-2 text-right">$100.00</div>
-                    <div className="col-span-2 text-right">$200.00</div>
-                  </div>
+                  {previewData.items && previewData.items.slice(0, 2).map((item: any, index: number) => (
+                    <div className="grid grid-cols-12 mb-1" key={index}>
+                      <div className="col-span-6">{item.description || "Product"}</div>
+                      <div className="col-span-2 text-right">{item.quantity || 1}</div>
+                      <div className="col-span-2 text-right">${item.rate || 0}</div>
+                      <div className="col-span-2 text-right">${item.amount || 0}</div>
+                    </div>
+                  ))}
                 </div>
                 
                 <div className="text-right text-sm mt-4 mb-2">
                   <div className="flex justify-between">
                     <span>Total:</span>
-                    <span className="font-bold">$200.00</span>
+                    <span className="font-bold">{previewData.total}</span>
                   </div>
                 </div>
                 
                 {signature && (
                   <div className="mt-6 border-t pt-4">
-                    <p className="text-xs text-muted-foreground mb-1">Signature:</p>
-                    <img src={signature} alt="Signature" className="max-h-16" />
+                    <div className="text-right">
+                      <img src={signature} alt="Signature" className="max-h-16 ml-auto" />
+                      <p className="text-xs mt-1 border-t border-gray-300 inline-block pt-1">Authorized Signature</p>
+                    </div>
                   </div>
                 )}
                 

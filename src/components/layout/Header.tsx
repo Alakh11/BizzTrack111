@@ -2,7 +2,7 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { Bell, Menu } from "lucide-react";
+import { Bell, Menu, Receipt } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 interface HeaderProps {
@@ -21,9 +21,14 @@ const Header = ({ toggleSidebar, isSidebarOpen }: HeaderProps) => {
             <Menu className="h-5 w-5" />
             <span className="sr-only">Toggle menu</span>
           </Button>
-          <span className="text-lg font-semibold tracking-tight">
-            BizzTrack
-          </span>
+          <div className="flex items-center">
+            <span className="h-8 w-8 rounded-md bg-primary flex items-center justify-center mr-2">
+              <Receipt size={18} className="text-white" />
+            </span>
+            <span className="text-lg font-semibold tracking-tight">
+              BizzTrack
+            </span>
+          </div>
         </div>
         <div className="ml-auto flex items-center gap-2">
           <ThemeToggle />

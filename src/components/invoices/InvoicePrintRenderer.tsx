@@ -39,6 +39,8 @@ class InvoicePrintRenderer {
     const additional = metadata.additional || {};
     const gst = metadata.gst || {};
     const payment = metadata.payment || {};
+    const shipping = metadata.shipping || {};
+    const transport = metadata.transport || {};
 
     // Format currency
     const currencySymbol = additional.currency === 'usd' ? '$' : 
@@ -103,8 +105,8 @@ class InvoicePrintRenderer {
             .info { display: flex; justify-content: space-between; margin-bottom: 30px; }
             .info-block { width: 45%; }
             .info-block h3 { margin-top: 0; color: #666; }
-            .dates { display: flex; justify-content: space-between; margin: 20px 0; }
-            .date-block { width: 30%; }
+            .dates { display: flex; justify-content: space-between; flex-wrap: wrap; margin: 20px 0; }
+            .date-block { width: 30%; margin-bottom: 10px; }
             table { width: 100%; border-collapse: collapse; margin: 20px 0; }
             th, td { padding: 10px; text-align: left; border-bottom: 1px solid #eee; }
             th { 
@@ -118,7 +120,7 @@ class InvoicePrintRenderer {
             .footer { margin-top: 30px; text-align: center; color: #666; font-size: 12px; }
             .payment { margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; }
             .signature { margin-top: 50px; text-align: right; }
-            .signature img { max-width: 200px; max-height: 50px; }
+            .signature img { max-width: 200px; max-height: 50px; margin-left: auto; margin-right: 0; display: block; }
             .signature p { margin-top: 10px; border-top: 1px solid #ccc; display: inline-block; padding-top: 5px; }
             .watermark {
               position: absolute;
@@ -137,6 +139,7 @@ class InvoicePrintRenderer {
             .gst-details h3 { margin-top: 0; }
             .additional-fields { margin-top: 10px; font-size: 0.9em; color: #666; }
             .additional-fields span { margin-right: 20px; }
+            .shipping-details, .transport-details { margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }
             
             @media print {
               body { padding: 0; }
@@ -148,12 +151,12 @@ class InvoicePrintRenderer {
         <body>
           <div class="invoice">
             ${design.template === 'classic' || design.template === 'modern' ? 
-              `<div class="watermark">${design.watermarkText || 'INVOICE'}</div>` : ''}
+              `<div class="watermark">${design.watermarkText || 'PREMIUM'}</div>` : ''}
             
             ${design.template === 'modern' ? 
               `<div class="bg-accent" style="margin: -30px -30px 30px -30px; padding: 20px 30px;">
                 <div class="header">
-                  <div class="logo">${design.logo ? `<img src="${design.logo}" alt="Business Logo">` : 'BizzTrack'}</div>
+                  <div class="logo">${design.logo ? `<img src="${design.logo}" alt="Business Logo">` : 'Invoice App'}</div>
                   <div>
                     <h1 style="color: white; font-size: 28px;">${design.title || 'INVOICE'}</h1>
                     <p style="color: white; opacity: 0.8;">#${invoice.invoice_number}</p>
@@ -162,7 +165,7 @@ class InvoicePrintRenderer {
               </div>` 
             : 
               `<div class="header">
-                <div class="logo">${design.logo ? `<img src="${design.logo}" alt="Business Logo">` : 'BizzTrack'}</div>
+                <div class="logo">${design.logo ? `<img src="${design.logo}" alt="Business Logo">` : 'Invoice App'}</div>
                 <div class="title">
                   <h1>${design.title || 'INVOICE'}</h1>
                   ${design.subtitle ? `<h2>${design.subtitle}</h2>` : ''}
@@ -215,6 +218,50 @@ class InvoicePrintRenderer {
               <p><strong>GST Number:</strong> ${gst.gstNumber}</p>
               <p><strong>GST Type:</strong> ${gst.gstType}</p>
               ${gst.placeOfSupply ? `<p><strong>Place of Supply:</strong> ${gst.placeOfSupply}</p>` : ''}
+              ${gst.reverseCharge ? `<p><strong>Reverse Charge:</strong> Yes</p>` : ''}
+              ${gst.nonGstClient ? `<p><strong>Non-GST Client:</strong> Yes</p>` : ''}
+            </div>` : ''}
+            
+            ${shipping && shipping.from ? `
+            <div class="shipping-details">
+              <h3>Shipping Details</h3>
+              <div style="display: flex; justify-content: space-between;">
+                <div style="width: 48%;">
+                  <h4>From:</h4>
+                  <p>
+                    ${shipping.from.name || ''}<br>
+                    ${shipping.from.address || ''}<br>
+                    ${shipping.from.city || ''}, ${shipping.from.state || ''} ${shipping.from.postal || ''}<br>
+                    ${shipping.from.country || ''}
+                    ${shipping.from.warehouse ? `<br>Warehouse: ${shipping.from.warehouse}` : ''}
+                  </p>
+                </div>
+                <div style="width: 48%;">
+                  <h4>To:</h4>
+                  <p>
+                    ${shipping.to.name || ''}<br>
+                    ${shipping.to.address || ''}<br>
+                    ${shipping.to.city || ''}, ${shipping.to.state || ''} ${shipping.to.postal || ''}<br>
+                    ${shipping.to.country || ''}
+                  </p>
+                </div>
+              </div>
+            </div>` : ''}
+            
+            ${transport && transport.transporter ? `
+            <div class="transport-details">
+              <h3>Transport Details</h3>
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px;">
+                ${transport.transporter ? `<p><strong>Transporter:</strong> ${transport.transporter}</p>` : ''}
+                ${transport.distance ? `<p><strong>Distance:</strong> ${transport.distance} km</p>` : ''}
+                ${transport.mode ? `<p><strong>Mode:</strong> ${transport.mode}</p>` : ''}
+                ${transport.docNo ? `<p><strong>Doc No:</strong> ${transport.docNo}</p>` : ''}
+                ${transport.docDate ? `<p><strong>Doc Date:</strong> ${transport.docDate}</p>` : ''}
+                ${transport.vehicleType ? `<p><strong>Vehicle Type:</strong> ${transport.vehicleType}</p>` : ''}
+                ${transport.vehicleNumber ? `<p><strong>Vehicle Number:</strong> ${transport.vehicleNumber}</p>` : ''}
+                ${transport.transactionType ? `<p><strong>Transaction Type:</strong> ${transport.transactionType}</p>` : ''}
+                ${transport.supplyType ? `<p><strong>Supply Type:</strong> ${transport.supplyType}</p>` : ''}
+              </div>
             </div>` : ''}
             
             <table>

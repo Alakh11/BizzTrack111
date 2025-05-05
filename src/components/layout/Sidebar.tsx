@@ -122,13 +122,14 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
       {/* Watermark Background */}
       <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none overflow-hidden z-0">
         <div className="rotate-[-15deg] text-[200px] text-gray-900 font-bold">
-          INVOICE
+          $$$
         </div>
       </div>
       
       {/* Logo Container */}
       <div className="relative z-10 p-4 flex flex-col h-full">
         <div className="flex items-center h-14 mb-8">
+          {/* Logo only, removed the BizzTrack text */}
           <div
             className={cn(
               "flex items-center transition-all duration-300",
@@ -138,9 +139,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
             <span className="h-8 w-8 rounded-md bg-primary flex items-center justify-center">
               <Receipt size={18} className="text-white" />
             </span>
-            {!isCollapsed && (
-              <span className="ml-2 font-semibold text-lg">BizzTrack</span>
-            )}
           </div>
         </div>
         

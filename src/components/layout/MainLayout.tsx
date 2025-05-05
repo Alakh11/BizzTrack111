@@ -19,9 +19,7 @@ const MainLayout = ({ children, className }: MainLayoutProps) => {
       <div className="flex flex-1 overflow-hidden">
         <Sidebar isCollapsed={!isSidebarOpen} setIsCollapsed={(collapsed) => setIsSidebarOpen(!collapsed)} />
         <main
-          className={`flex-1 overflow-y-auto p-4 md:p-6 transition-all duration-300 ${
-            isSidebarOpen ? "md:ml-0" : "md:ml-0"
-          } ${className}`}
+          className={`flex-1 overflow-y-auto p-4 md:p-6 transition-all duration-300 ${className}`}
         >
           <div className="mx-auto max-w-6xl">{children}</div>
         </main>

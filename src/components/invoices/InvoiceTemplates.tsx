@@ -1,3 +1,4 @@
+
 import React from "react";
 
 // Sample invoice template images
@@ -8,6 +9,9 @@ const templateImages = {
   modern: "https://i.imgur.com/DFg6QiK.png",
   classic: "https://i.imgur.com/CtbuDF6.png",
   simple: "https://i.imgur.com/sO17jcA.png",
+  minimal: "https://i.imgur.com/yH8vXNk.png",
+  elegant: "https://i.imgur.com/BpjcRZK.png",
+  corporate: "https://i.imgur.com/ZdT8nkL.png",
 };
 
 interface InvoiceTemplatesProps {
@@ -29,6 +33,9 @@ const InvoiceTemplates: React.FC<InvoiceTemplatesProps> = ({
     { id: "modern", name: "Modern", image: templateImages.modern },
     { id: "classic", name: "Classic", image: templateImages.classic },
     { id: "simple", name: "Simple", image: templateImages.simple },
+    { id: "minimal", name: "Minimal", image: templateImages.minimal },
+    { id: "elegant", name: "Elegant", image: templateImages.elegant },
+    { id: "corporate", name: "Corporate", image: templateImages.corporate },
   ];
 
   return (

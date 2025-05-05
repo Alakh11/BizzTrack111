@@ -122,7 +122,7 @@ const BankingDetailsStep: React.FC<BankingDetailsStepProps> = ({ form }) => {
         </CardContent>
       </Card>
 
-      <div className="space-y-4 mt-6">
+      <div className="space-y-4">
         <h3 className="text-lg font-medium">Additional Information</h3>
 
         <FormField
