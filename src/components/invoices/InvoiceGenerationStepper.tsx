@@ -34,13 +34,11 @@ const InvoiceGenerationStepper = ({
   };
 
   const handleNext = () => {
-    // Pass the actual next step number instead of a function
     const nextStep = Math.min(currentStep + 1, steps.length - 1);
     setCurrentStep(nextStep);
   };
 
   const handlePrevious = () => {
-    // Pass the actual previous step number instead of a function
     const prevStep = Math.max(currentStep - 1, 0);
     setCurrentStep(prevStep);
   };
@@ -48,14 +46,14 @@ const InvoiceGenerationStepper = ({
   const isLastStep = currentStep === steps.length - 1;
 
   return (
-    <>
+    <div className="space-y-6">
       <InvoiceSteps
         currentStep={currentStep}
         steps={steps}
         onChange={handleStepChange}
       />
       
-      {children}
+      <div>{children}</div>
 
       <div className="flex justify-between mt-8">
         <Button
@@ -77,7 +75,6 @@ const InvoiceGenerationStepper = ({
           </Button>
 
           {isLastStep && showFinalSubmitButton ? (
-            // Fix: Don't use both type="submit" and onClick for the same action
             <Button type="button" onClick={handleSubmit}>
               {isEditMode ? "Update Invoice" : "Save Invoice"}
             </Button>
@@ -88,7 +85,7 @@ const InvoiceGenerationStepper = ({
           )}
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

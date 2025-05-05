@@ -93,14 +93,14 @@ const InvoiceDetailsStep = ({
       {/* Shipping Details Collapsible Section */}
       {showShippingDetails && (
         <Collapsible defaultOpen={true} className="border rounded-md p-4 bg-background">
-          <CollapsibleTrigger asChild>
-            <div className="flex justify-between items-center cursor-pointer">
-              <h3 className="text-lg font-medium">Shipping Details</h3>
+          <div className="flex justify-between items-center cursor-pointer">
+            <h3 className="text-lg font-medium">Shipping Details</h3>
+            <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm">
                 <ChevronDown className="h-4 w-4" />
               </Button>
-            </div>
-          </CollapsibleTrigger>
+            </CollapsibleTrigger>
+          </div>
           <CollapsibleContent className="pt-2">
             <ShippingDetailsForm 
               form={form} 
@@ -114,14 +114,14 @@ const InvoiceDetailsStep = ({
       {/* Transport Details Collapsible Section */}
       {showTransportDetails && (
         <Collapsible defaultOpen={true} className="border rounded-md p-4 bg-background">
-          <CollapsibleTrigger asChild>
-            <div className="flex justify-between items-center cursor-pointer">
-              <h3 className="text-lg font-medium">Transport Details</h3>
+          <div className="flex justify-between items-center cursor-pointer">
+            <h3 className="text-lg font-medium">Transport Details</h3>
+            <CollapsibleTrigger asChild>
               <Button variant="ghost" size="sm">
                 <ChevronDown className="h-4 w-4" />
               </Button>
-            </div>
-          </CollapsibleTrigger>
+            </CollapsibleTrigger>
+          </div>
           <CollapsibleContent className="pt-2">
             <TransportDetailsForm form={form} />
           </CollapsibleContent>
