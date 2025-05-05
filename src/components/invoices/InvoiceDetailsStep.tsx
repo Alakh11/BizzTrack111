@@ -1,10 +1,11 @@
+
 import React, { useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown, ChevronUp, PlusCircle, Tag, Truck, Receipt } from "lucide-react";
 import { Client } from "@/hooks/useClients";
-import BillingDetailsForm from "./BillingDetailsForm";
+import { BillingDetailsForm } from "./BillingDetailsForm";
 import ShippingDetailsForm from "./ShippingDetailsForm";
 import TransportDetailsForm from "./TransportDetailsForm";
 import GstDetailsForm from "./GstDetailsForm";
