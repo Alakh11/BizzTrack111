@@ -35,10 +35,15 @@ export const useInvoiceForm = () => {
 
   const {
     selectedTemplate,
+    setSelectedTemplate,
     selectedColor,
+    setSelectedColor,
     selectedFont,
+    setSelectedFont,
     selectedPaperSize,
-    businessLogo
+    setSelectedPaperSize,
+    businessLogo,
+    setBusinessLogo
   } = useInvoiceDesign();
 
   const {
@@ -223,7 +228,7 @@ export const useInvoiceForm = () => {
     };
 
     fetchInvoice();
-  }, [params.id, form, navigate, toast, getInvoice, location.state, setItems]);
+  }, [params.id, form, navigate, toast, getInvoice, location.state, setItems, setSelectedTemplate, setSelectedColor, setSelectedFont, setCustomInvoiceTitle, setBusinessLogo, setPurchaseOrderNumber, setReferenceNumber]);
 
   // Fetch business profile data
   useEffect(() => {

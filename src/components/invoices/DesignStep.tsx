@@ -1,8 +1,26 @@
 
 import React from "react";
 import { FileText } from "lucide-react";
+import InvoiceTemplates from "./InvoiceTemplates";
+import { UseFormReturn } from "react-hook-form";
 
-const DesignStep: React.FC = () => {
+interface DesignStepProps {
+  form: UseFormReturn<any>;
+  selectedTemplate: string;
+  selectedColor: string;
+  selectedFont: string;
+  selectedPaperSize: string;
+  businessLogo: string;
+}
+
+const DesignStep: React.FC<DesignStepProps> = ({
+  form,
+  selectedTemplate,
+  selectedColor,
+  selectedFont,
+  selectedPaperSize,
+  businessLogo
+}) => {
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
