@@ -11,12 +11,15 @@ import {
   LogOut,
   LogIn,
   User,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -87,41 +90,52 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
 
   return (
     <div
-      className={`fixed left-0 top-0 z-50 flex h-full flex-col transition-transform dark:bg-neutral-900 bg-white border-r dark:border-neutral-700 shadow-md ${
-        isOpen ? "w-64 translate-x-0" : "-translate-x-full w-0 md:w-16"
+      className={`fixed left-0 top-0 z-50 flex h-full flex-col transition-all duration-300 ease-in-out dark:bg-neutral-900 bg-white border-r dark:border-neutral-700 shadow-md ${
+        isOpen ? "w-64 translate-x-0" : "w-[70px] translate-x-0"
       } md:translate-x-0`}
     >
-      <div className="px-4 py-6">
+      <div className="flex justify-between items-center px-4 py-6">
         <NavLink to="/" className="flex items-center space-x-2">
           <Home className="h-6 w-6 text-primary" />
-          <span
-            className={`text-xl font-bold ${
-              isOpen ? "inline" : "hidden"
-            } dark:text-white bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent`}
-          >
-            BizzTrack
-          </span>
+          {isOpen && (
+            <span
+              className="text-xl font-bold dark:text-white bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent transition-opacity duration-300"
+            >
+              BizzTrack
+            </span>
+          )}
         </NavLink>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="ml-auto hidden md:flex"
+          onClick={toggleSidebar}
+        >
+          {isOpen ? (
+            <ChevronLeft className="h-4 w-4" />
+          ) : (
+            <ChevronRight className="h-4 w-4" />
+          )}
+        </Button>
       </div>
-      <nav className="flex-grow px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-neutral-700">
-        <ul className="space-y-2">
+      <nav className="flex-grow px-2 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-neutral-700">
+        <ul className="space-y-1">
           {menuItems.map((item) => (
             <li key={item.title}>
               <NavLink
                 to={item.href}
                 className={({ isActive }) =>
-                  `flex items-center space-x-2 rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800 ${
+                  `flex items-center space-x-2 rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800 transition-colors ${
                     isActive
                       ? "bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-foreground font-medium border-l-2 border-primary"
                       : ""
-                  } transition-all duration-200 ease-in-out`
+                  }`
                 }
                 onClick={closeSidebar}
+                title={item.title}
               >
-                <item.icon className="h-4 w-4" />
-                <span className={isOpen ? "inline transition-opacity duration-200" : "hidden"}>
-                  {item.title}
-                </span>
+                <item.icon className={cn("h-5 w-5", isOpen ? "" : "mx-auto")} />
+                {isOpen && <span>{item.title}</span>}
               </NavLink>
             </li>
           ))}
@@ -148,12 +162,22 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 </div>
               )}
             </div>
-            {isOpen && (
+            {isOpen ? (
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={signOut}
                 className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive"
+                title="Logout"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={signOut}
+                className="h-8 w-8 mt-2 rounded-full hover:bg-destructive/10 hover:text-destructive"
                 title="Logout"
               >
                 <LogOut className="h-4 w-4" />
@@ -164,7 +188,8 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
           <div className="flex flex-col items-center gap-2">
             <NavLink
               to="/login"
-              className="flex items-center gap-2 w-full justify-center rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800 transition-all duration-200 ease-in-out"
+              className="flex items-center gap-2 w-full justify-center rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800 transition-all duration-200"
+              title="Login"
             >
               <LogIn className="h-4 w-4" />
               {isOpen && <span>Login</span>}

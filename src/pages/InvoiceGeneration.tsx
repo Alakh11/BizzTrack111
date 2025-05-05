@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card } from "@/components/ui/card";
@@ -62,6 +62,11 @@ const InvoiceGeneration = () => {
     selectedFont,
     selectedPaperSize,
     businessLogo,
+    setSelectedTemplate,
+    setSelectedColor,
+    setSelectedFont,
+    setSelectedPaperSize,
+    setBusinessLogo,
     isEditMode,
     invoiceId,
     clients,
@@ -73,6 +78,15 @@ const InvoiceGeneration = () => {
     calculateTotal,
     handleFormSubmit,
   } = useInvoiceForm();
+
+  // Add state to track if the user has submitted the form
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Wrapper for form submission
+  const onSubmit = (data: any) => {
+    setIsSubmitting(true);
+    handleFormSubmit(data);
+  };
 
   const methods = form;
 
@@ -118,6 +132,11 @@ const InvoiceGeneration = () => {
             selectedFont={selectedFont}
             selectedPaperSize={selectedPaperSize}
             businessLogo={businessLogo}
+            setSelectedTemplate={setSelectedTemplate}
+            setSelectedColor={setSelectedColor}
+            setSelectedFont={setSelectedFont}
+            setSelectedPaperSize={setSelectedPaperSize}
+            setBusinessLogo={setBusinessLogo}
           />
         );
       case 2:
@@ -145,13 +164,14 @@ const InvoiceGeneration = () => {
 
         <Card className="p-6">
           <FormProvider {...methods}>
-            <form onSubmit={form.handleSubmit(handleFormSubmit)}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
               <InvoiceGenerationStepper
                 steps={steps}
                 currentStep={currentStep}
                 setCurrentStep={setCurrentStep}
                 isEditMode={isEditMode}
-                handleSubmit={form.handleSubmit(handleFormSubmit)}
+                handleSubmit={form.handleSubmit(onSubmit)}
+                showFinalSubmitButton={true}
               >
                 {renderStep()}
               </InvoiceGenerationStepper>

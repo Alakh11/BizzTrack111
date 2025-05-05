@@ -1,7 +1,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 import InvoiceSteps from "@/components/invoices/InvoiceSteps";
 
 interface InvoiceGenerationStepperProps {
@@ -14,6 +14,7 @@ interface InvoiceGenerationStepperProps {
   setCurrentStep: (step: number) => void;
   isEditMode: boolean;
   handleSubmit: () => void;
+  showFinalSubmitButton?: boolean;
   children: React.ReactNode;
 }
 
@@ -23,6 +24,7 @@ const InvoiceGenerationStepper = ({
   setCurrentStep,
   isEditMode,
   handleSubmit,
+  showFinalSubmitButton = true,
   children,
 }: InvoiceGenerationStepperProps) => {
   const navigate = useNavigate();
@@ -43,6 +45,8 @@ const InvoiceGenerationStepper = ({
     setCurrentStep(prevStep);
   };
 
+  const isLastStep = currentStep === steps.length - 1;
+
   return (
     <>
       <InvoiceSteps
@@ -60,7 +64,7 @@ const InvoiceGenerationStepper = ({
           onClick={handlePrevious}
           disabled={currentStep === 0}
         >
-          Previous
+          <ArrowLeft className="mr-2 h-4 w-4" /> Previous
         </Button>
 
         <div className="space-x-2">
@@ -72,13 +76,13 @@ const InvoiceGenerationStepper = ({
             Cancel
           </Button>
 
-          {currentStep < steps.length - 1 ? (
-            <Button type="button" onClick={handleNext}>
-              Next <ArrowRight className="ml-2 h-4 w-4" />
+          {isLastStep && showFinalSubmitButton ? (
+            <Button type="submit">
+              {isEditMode ? "Update Invoice" : "Save Invoice"}
             </Button>
           ) : (
-            <Button type="submit" onClick={handleSubmit}>
-              {isEditMode ? "Update Invoice" : "Save Invoice"}
+            <Button type="button" onClick={handleNext}>
+              Next <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           )}
         </div>

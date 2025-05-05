@@ -5,6 +5,12 @@ import ClientSelection from "./invoice-details/ClientSelection";
 import InvoiceOptions from "./invoice-details/InvoiceOptions";
 import AdditionalFields from "./invoice-details/AdditionalFields";
 import InvoiceItems from "./invoice-details/InvoiceItems";
+import ShippingDetailsForm from "./ShippingDetailsForm";
+import TransportDetailsForm from "./TransportDetailsForm";
+import GstDetailsForm from "./GstDetailsForm";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Button } from "@/components/ui/button";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface InvoiceDetailsStepProps {
   form: any;
@@ -63,6 +69,7 @@ const InvoiceDetailsStep = ({
   handleRemoveItem
 }: InvoiceDetailsStepProps) => {
   const { products = [] } = useProducts();
+  const selectedClient = clients.find(client => client.id === form.getValues("clientId"));
 
   return (
     <div className="space-y-4">
@@ -81,6 +88,51 @@ const InvoiceDetailsStep = ({
         setShowAdditionalFields={setShowAdditionalFields}
         isGstDialogOpen={isGstDialogOpen}
         setIsGstDialogOpen={setIsGstDialogOpen}
+      />
+
+      {/* Shipping Details Collapsible Section */}
+      {showShippingDetails && (
+        <Collapsible defaultOpen={true} className="border rounded-md p-4 bg-background">
+          <CollapsibleTrigger asChild>
+            <div className="flex justify-between items-center cursor-pointer">
+              <h3 className="text-lg font-medium">Shipping Details</h3>
+              <Button variant="ghost" size="sm">
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-2">
+            <ShippingDetailsForm 
+              form={form} 
+              clientName={selectedClient?.name}
+              clientAddress={selectedClient?.address}
+            />
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+
+      {/* Transport Details Collapsible Section */}
+      {showTransportDetails && (
+        <Collapsible defaultOpen={true} className="border rounded-md p-4 bg-background">
+          <CollapsibleTrigger asChild>
+            <div className="flex justify-between items-center cursor-pointer">
+              <h3 className="text-lg font-medium">Transport Details</h3>
+              <Button variant="ghost" size="sm">
+                <ChevronDown className="h-4 w-4" />
+              </Button>
+            </div>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="pt-2">
+            <TransportDetailsForm form={form} />
+          </CollapsibleContent>
+        </Collapsible>
+      )}
+
+      {/* GST Details Dialog */}
+      <GstDetailsForm 
+        open={isGstDialogOpen} 
+        onOpenChange={setIsGstDialogOpen} 
+        form={form} 
       />
 
       {showAdditionalFields && (
