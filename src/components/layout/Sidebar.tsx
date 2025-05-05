@@ -8,9 +8,15 @@ import {
   Coins,
   BarChart,
   Package,
+  LogOut,
+  LogIn,
+  User,
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -20,6 +26,7 @@ interface SidebarProps {
 const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
   const location = useLocation();
   const [activeItem, setActiveItem] = useState(location.pathname);
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     setActiveItem(location.pathname);
@@ -67,6 +74,11 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
       href: "/products",
     },
     {
+      title: "Services",
+      icon: Package,
+      href: "/services",
+    },
+    {
       title: "Settings",
       icon: Settings,
       href: "/settings",
@@ -75,23 +87,23 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
 
   return (
     <div
-      className={`fixed left-0 top-0 z-50 flex h-full flex-col border-r bg-white transition-transform dark:border-neutral-700 dark:bg-neutral-900  ${
+      className={`fixed left-0 top-0 z-50 flex h-full flex-col transition-transform dark:bg-neutral-900 bg-white border-r dark:border-neutral-700 shadow-md ${
         isOpen ? "w-64 translate-x-0" : "-translate-x-full w-0 md:w-16"
       } md:translate-x-0`}
     >
       <div className="px-4 py-6">
         <NavLink to="/" className="flex items-center space-x-2">
-          <Home className="h-6 w-6" />
+          <Home className="h-6 w-6 text-primary" />
           <span
             className={`text-xl font-bold ${
               isOpen ? "inline" : "hidden"
-            } dark:text-white`}
+            } dark:text-white bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent`}
           >
-            Invoicer
+            BizzTrack
           </span>
         </NavLink>
       </div>
-      <nav className="flex-grow px-4">
+      <nav className="flex-grow px-4 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-neutral-700">
         <ul className="space-y-2">
           {menuItems.map((item) => (
             <li key={item.title}>
@@ -100,14 +112,14 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
                 className={({ isActive }) =>
                   `flex items-center space-x-2 rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800 ${
                     isActive
-                      ? "bg-gray-100 dark:bg-neutral-800 font-medium"
+                      ? "bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-foreground font-medium border-l-2 border-primary"
                       : ""
-                  }`
+                  } transition-all duration-200 ease-in-out`
                 }
                 onClick={closeSidebar}
               >
                 <item.icon className="h-4 w-4" />
-                <span className={isOpen ? "inline" : "hidden"}>
+                <span className={isOpen ? "inline transition-opacity duration-200" : "hidden"}>
                   {item.title}
                 </span>
               </NavLink>
@@ -115,6 +127,51 @@ const Sidebar = ({ isOpen, setIsOpen }: SidebarProps) => {
           ))}
         </ul>
       </nav>
+      
+      {/* User profile section at bottom */}
+      <div className="mt-auto border-t dark:border-neutral-700 p-4">
+        {user ? (
+          <div className={`flex ${isOpen ? "items-center justify-between" : "flex-col items-center"} gap-2`}>
+            <div className="flex items-center gap-2">
+              <Avatar className="h-8 w-8">
+                <AvatarImage src="" />
+                <AvatarFallback className="bg-primary/20 text-primary">
+                  {user.email?.charAt(0).toUpperCase() || "U"}
+                </AvatarFallback>
+              </Avatar>
+              {isOpen && (
+                <div className="flex flex-col">
+                  <span className="text-sm font-medium truncate max-w-[120px] dark:text-white">
+                    {user.email}
+                  </span>
+                  <span className="text-xs text-muted-foreground">Logged in</span>
+                </div>
+              )}
+            </div>
+            {isOpen && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={signOut}
+                className="h-8 w-8 rounded-full hover:bg-destructive/10 hover:text-destructive"
+                title="Logout"
+              >
+                <LogOut className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="flex flex-col items-center gap-2">
+            <NavLink
+              to="/login"
+              className="flex items-center gap-2 w-full justify-center rounded-md px-3 py-2 text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-neutral-800 transition-all duration-200 ease-in-out"
+            >
+              <LogIn className="h-4 w-4" />
+              {isOpen && <span>Login</span>}
+            </NavLink>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
