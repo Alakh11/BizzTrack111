@@ -10,7 +10,6 @@ import {
 import { Button } from "@/components/ui/button";
 import GstDetailsPreview from "./GstDetailsPreview";
 import GstFormSection from "../gst/GstFormSection";
-import { GstFormSectionProps } from "../gst/GstFormSectionProps";
 
 interface GstDetailsFormProps {
   open: boolean;
@@ -34,11 +33,11 @@ const GstDetailsForm = ({ open, onOpenChange, form }: GstDetailsFormProps) => {
     nonGstClient: form.getValues("nonGstClient"),
   };
 
-  const basicGstFields: GstFormSectionProps['fields'] = [
+  const basicGstFields = [
     {
       name: "taxType",
       label: "Select Tax Type",
-      type: "select",
+      type: "select" as const,
       options: [
         { value: "gst", label: "GST" },
         { value: "igst", label: "IGST" },
@@ -48,7 +47,7 @@ const GstDetailsForm = ({ open, onOpenChange, form }: GstDetailsFormProps) => {
     {
       name: "placeOfSupply",
       label: "Place of Supply",
-      type: "select",
+      type: "select" as const,
       options: [
         { value: "01-jammu", label: "01-Jammu & Kashmir" },
         { value: "02-himachal", label: "02-Himachal Pradesh" },
@@ -88,11 +87,11 @@ const GstDetailsForm = ({ open, onOpenChange, form }: GstDetailsFormProps) => {
     },
   ];
 
-  const gstTypeFields: GstFormSectionProps['fields'] = [
+  const gstTypeFields = [
     {
       name: "gstType",
       label: "GST Type",
-      type: "select",
+      type: "select" as const,
       options: [
         { value: "unregistered", label: "Unregistered" },
         { value: "registered", label: "Registered" },
@@ -104,20 +103,20 @@ const GstDetailsForm = ({ open, onOpenChange, form }: GstDetailsFormProps) => {
     {
       name: "gstNumber",
       label: "GST Number",
-      type: "input",
+      type: "input" as const,
     },
   ];
 
-  const checkboxFields: GstFormSectionProps['fields'] = [
+  const checkboxFields = [
     {
       name: "gstReverseCharge",
       label: "Is Reverse Charge Applicable?",
-      type: "checkbox",
+      type: "checkbox" as const,
     },
     {
       name: "nonGstClient",
       label: "You are billing to a Non-GST Registered client",
-      type: "checkbox",
+      type: "checkbox" as const,
     },
   ];
 

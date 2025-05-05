@@ -120,7 +120,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
       )}
     >
       <div className="relative z-10 p-4 flex flex-col h-full">
-        {/* User Profile */}
+        {/* User Profile - Simplified to only show name and email */}
         {user && (
           <div className={cn(
             "mb-6 border-b pb-4",
@@ -131,7 +131,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
               isCollapsed ? "flex-col" : "flex-row"
             )}>
               <Avatar className="h-10 w-10">
-                <AvatarImage src={userProfile?.avatar_url} alt="User" />
+                <AvatarImage src="" alt="User" />
                 <AvatarFallback>
                   <User size={20} />
                 </AvatarFallback>
@@ -140,7 +140,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
               {!isCollapsed && (
                 <div className="ml-3 overflow-hidden">
                   <p className="font-medium truncate">
-                    {userProfile?.business_name || user.email?.split('@')[0]}
+                    {user.email?.split('@')[0]}
                   </p>
                   <p className="text-sm text-muted-foreground truncate">
                     {user.email}

@@ -122,22 +122,15 @@ const BankingDetailsStep: React.FC<BankingDetailsStepProps> = ({ form }) => {
         </CardContent>
       </Card>
 
-      <div className="space-y-4">
-        <h3 className="text-lg font-medium">Additional Information</h3>
-
+      {/* Notes and Terms fields kept for the form to work */}
+      <div className="hidden">
         <FormField
           control={form.control}
           name="notes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Notes (visible to client)</FormLabel>
               <FormControl>
-                <textarea
-                  className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
-                  rows={5}
-                  {...field}
-                  placeholder="Enter any notes for the client"
-                />
+                <textarea {...field} />
               </FormControl>
             </FormItem>
           )}
@@ -148,14 +141,8 @@ const BankingDetailsStep: React.FC<BankingDetailsStepProps> = ({ form }) => {
           name="terms"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Terms and Conditions</FormLabel>
               <FormControl>
-                <textarea
-                  className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
-                  rows={5}
-                  {...field}
-                  placeholder="Enter terms and conditions"
-                />
+                <textarea {...field} />
               </FormControl>
             </FormItem>
           )}
