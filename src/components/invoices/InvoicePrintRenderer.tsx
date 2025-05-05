@@ -1,4 +1,3 @@
-
 import { Invoice } from "@/types/invoice";
 
 class InvoicePrintRenderer {
@@ -51,6 +50,12 @@ class InvoicePrintRenderer {
       const transport = metadata.transport || {};
       const gst = metadata.gst || {};
       const payment = metadata.payment || {};
+
+      // Get business details from metadata
+      const businessName = metadata.businessName || '';
+      const businessAddress = metadata.businessAddress || '';
+      const businessEmail = metadata.businessEmail || '';
+      const businessPhone = metadata.businessPhone || '';
       
       // Get template style variables
       const colorMap = {
@@ -444,10 +449,10 @@ class InvoicePrintRenderer {
             <div class="address-block">
               <div class="address-header">From</div>
               <div>
-                <div style="font-weight: bold;">${invoice.metadata?.businessName || 'Your Business'}</div>
-                <div>${invoice.metadata?.businessAddress?.replace(/\n/g, '<br>') || 'Business Address'}</div>
-                ${invoice.metadata?.businessEmail ? `<div>Email: ${invoice.metadata.businessEmail}</div>` : ''}
-                ${invoice.metadata?.businessPhone ? `<div>Phone: ${invoice.metadata.businessPhone}</div>` : ''}
+                <div style="font-weight: bold;">${businessName || 'Your Business'}</div>
+                <div>${businessAddress?.replace(/\n/g, '<br>') || 'Business Address'}</div>
+                ${businessEmail ? `<div>Email: ${businessEmail}</div>` : ''}
+                ${businessPhone ? `<div>Phone: ${businessPhone}</div>` : ''}
               </div>
             </div>
             <div class="address-block">

@@ -10,6 +10,7 @@ import { Eye, Download, Mail, Printer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import InvoicePrintRenderer from "./InvoicePrintRenderer";
 import { useEmailSender } from "@/hooks/useEmailSender";
+import { Invoice } from "@/types/invoice"; 
 
 interface EmailPreviewStepProps {
   form: UseFormReturn<any>;
@@ -31,11 +32,20 @@ const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
       totalAmount = formData.items.reduce((sum: number, item: any) => sum + (parseFloat(item.amount) || 0), 0);
     }
     
-    return {
+    // Create a valid invoice object that matches the Invoice interface
+    const invoice: Invoice = {
+      id: formData.id || "preview-invoice",
+      user_id: formData.user_id || "preview-user",
+      client_id: formData.clientId || null,
       invoice_number: formData.invoiceNumber,
       invoice_date: formData.invoiceDate,
       due_date: formData.dueDate,
       total_amount: totalAmount,
+      status: formData.status || "draft",
+      notes: formData.notes,
+      terms: formData.terms,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
       client: {
         name: formData.clientName,
         address: formData.clientAddress,
@@ -43,9 +53,11 @@ const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
         phone: formData.clientPhone
       },
       invoice_items: formData.items || [],
-      notes: formData.notes,
-      terms: formData.terms,
-      metadata: JSON.stringify({
+      metadata: {
+        businessName: formData.businessName,
+        businessAddress: formData.businessAddress,
+        businessEmail: formData.businessEmail,
+        businessPhone: formData.businessPhone,
         design: {
           template: form.getValues("template") || "standard",
           color: form.getValues("color") || "blue",
@@ -54,6 +66,7 @@ const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
           title: form.getValues("invoiceTitle") || "INVOICE",
           logo: form.getValues("logo") || "",
           signature: form.getValues("signature") || "",
+          watermarkText: form.getValues("watermarkText") || "",
         },
         payment: {
           bank: {
@@ -68,8 +81,10 @@ const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
             name: formData.upiName,
           }
         }
-      })
+      }
     };
+    
+    return invoice;
   };
 
   // Handle preview actions

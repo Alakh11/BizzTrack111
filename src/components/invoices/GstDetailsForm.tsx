@@ -131,17 +131,17 @@ const GstDetailsForm = ({ open, onOpenChange, form }: GstDetailsFormProps) => {
           <div className="space-y-4 py-4">
             <GstFormSection 
               form={form}
-              fields={basicGstFields}
+              fields={basicGstFields as GstFormSectionProps['fields']}
             />
             
             <GstFormSection 
               form={form}
-              fields={gstTypeFields}
+              fields={gstTypeFields as GstFormSectionProps['fields']}
             />
             
             <GstFormSection 
               form={form}
-              fields={checkboxFields}
+              fields={checkboxFields as GstFormSectionProps['fields']}
             />
           </div>
 

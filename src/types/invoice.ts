@@ -22,6 +22,8 @@ export interface Invoice {
     phone?: string;
   };
   invoice_items?: InvoiceItem[];
+  // For preview mode where we might not have all fields
+  [key: string]: any;
 }
 
 export interface InvoiceItem {
