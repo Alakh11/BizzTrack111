@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   FormField,
   FormItem,
@@ -26,6 +26,10 @@ interface ShippingAddressSectionProps {
   addressSource?: {
     name?: string;
     address?: string;
+    city?: string;
+    state?: string;
+    postal?: string;
+    country?: string;
   };
   useSourceAddress: boolean;
   setUseSourceAddress: (checked: boolean) => void;
@@ -46,6 +50,19 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({
   setShowExtra,
 }) => {
   const prefix = type === "from" ? "shippedFrom" : "shippedTo";
+  
+  // Update fields when useSourceAddress changes
+  useEffect(() => {
+    if (useSourceAddress && addressSource) {
+      // Apply source address to the form fields
+      form.setValue(`${prefix}Name`, addressSource.name || '');
+      form.setValue(`${prefix}Address`, addressSource.address || '');
+      form.setValue(`${prefix}City`, addressSource.city || '');
+      form.setValue(`${prefix}State`, addressSource.state || '');
+      form.setValue(`${prefix}Postal`, addressSource.postal || '');
+      form.setValue(`${prefix}Country`, addressSource.country || 'india');
+    }
+  }, [useSourceAddress, addressSource, form, prefix]);
   
   const handleSaveToClientDetails = (checked: boolean) => {
     // This would update the client record with the shipping details
@@ -110,7 +127,7 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({
         render={({ field }) => (
           <FormItem>
             <FormLabel>Select Country</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <Select onValueChange={field.onChange} defaultValue={field.value || "india"}>
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select country" />
@@ -151,7 +168,7 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({
                 <FormItem>
                   <FormLabel>City (optional)</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} disabled={useSourceAddress} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -165,7 +182,7 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({
                 <FormItem>
                   <FormLabel>Postal Code / ZIP Code</FormLabel>
                   <FormControl>
-                    <Input {...field} />
+                    <Input {...field} disabled={useSourceAddress} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -180,7 +197,7 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({
               <FormItem>
                 <FormLabel>State (optional)</FormLabel>
                 <FormControl>
-                  <Input {...field} />
+                  <Input {...field} disabled={useSourceAddress} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

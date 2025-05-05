@@ -151,8 +151,8 @@ class InvoicePrintRenderer {
         </head>
         <body>
           <div class="invoice">
-            ${design.template === 'classic' || design.template === 'modern' ? 
-              `<div class="watermark">${design.watermarkText || 'PAID'}</div>` : ''}
+            <!-- Watermark -->
+            <div class="watermark">${design.watermarkText || 'INVOICE'}</div>
             
             ${design.template === 'modern' ? 
               `<div class="bg-accent" style="margin: -30px -30px 30px -30px; padding: 20px 30px;">
@@ -276,9 +276,10 @@ class InvoicePrintRenderer {
               </thead>
               <tbody>
                 ${
-                  invoice.invoice_items
-                    ?.map(
-                      (item) => `
+                  invoice.invoice_items && invoice.invoice_items.length > 0
+                    ? invoice.invoice_items
+                      .map(
+                        (item) => `
                 <tr>
                   <td>${item.description}</td>
                   <td>${item.quantity}</td>
@@ -286,8 +287,9 @@ class InvoicePrintRenderer {
                   <td>${item.amount.toLocaleString()}</td>
                 </tr>
                 `,
-                    )
-                    .join("") || ""
+                      )
+                      .join("")
+                    : `<tr><td colspan="4">No items</td></tr>`
                 }
               </tbody>
               <tfoot>
@@ -319,12 +321,11 @@ class InvoicePrintRenderer {
             </div>
             ` : ''}
             
-            ${design.signature ? `
+            <!-- Updated signature position to be properly aligned -->
             <div class="signature">
-              <img src="${design.signature}" alt="Digital Signature" />
+              ${design.signature ? `<img src="${design.signature}" alt="Digital Signature" /><br>` : ''}
               <p>Authorized Signature</p>
             </div>
-            ` : ''}
             
             <div class="footer">
               <p>Thank you for your business!</p>

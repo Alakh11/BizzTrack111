@@ -1,7 +1,7 @@
 
 import React from "react";
 
-// Sample invoice template images with more consistent URLs
+// Updated template images with valid URLs
 const templateImages = {
   standard: "https://i.imgur.com/CtbuDF6.png",
   professional: "https://i.imgur.com/l2O3M5j.png",
@@ -50,6 +50,12 @@ const InvoiceTemplates: React.FC<InvoiceTemplatesProps> = ({
               src={template.image}
               alt={template.name}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                // Fallback on error
+                const target = e.target as HTMLImageElement;
+                target.onerror = null;
+                target.src = "https://i.imgur.com/placeholder.png";
+              }}
             />
           </div>
           <div className="p-2 text-center text-sm font-medium">

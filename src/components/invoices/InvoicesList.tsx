@@ -23,12 +23,11 @@ import {
   MoreHorizontal,
   Eye,
   Download,
+  Printer,
   Send,
   Clock,
   ArrowDown,
   ArrowUp,
-  Check,
-  X,
   Search,
   Trash,
   FileEdit,
@@ -55,6 +54,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
+import InvoicePrintRenderer from "./InvoicePrintRenderer";
 
 const InvoicesList = () => {
   const navigate = useNavigate();
@@ -67,7 +67,7 @@ const InvoicesList = () => {
   const [isEditStatusModalOpen, setIsEditStatusModalOpen] = useState(false);
   const [newStatus, setNewStatus] = useState("");
 
-  const { invoices, isLoading, deleteInvoice, updateInvoice } = useInvoices();
+  const { invoices, isLoading, deleteInvoice, updateInvoice, getInvoice } = useInvoices();
 
   if (isLoading) {
     return (
@@ -145,6 +145,59 @@ const InvoicesList = () => {
   const handleDelete = (id: string) => {
     setSelectedInvoiceId(id);
     setDeleteConfirmOpen(true);
+  };
+
+  const handleViewInvoice = async (id: string) => {
+    try {
+      const invoice = await getInvoice(id);
+      if (invoice) {
+        InvoicePrintRenderer.previewInvoice(invoice);
+      }
+    } catch (error) {
+      console.error("Error viewing invoice:", error);
+      toast({
+        title: "Error",
+        description: "Could not load invoice preview",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDownloadInvoice = async (id: string) => {
+    try {
+      const invoice = await getInvoice(id);
+      if (invoice) {
+        InvoicePrintRenderer.downloadInvoice(invoice);
+        
+        toast({
+          title: "Success",
+          description: "Invoice downloaded successfully",
+        });
+      }
+    } catch (error) {
+      console.error("Error downloading invoice:", error);
+      toast({
+        title: "Error",
+        description: "Could not download invoice",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handlePrintInvoice = async (id: string) => {
+    try {
+      const invoice = await getInvoice(id);
+      if (invoice) {
+        InvoicePrintRenderer.printInvoice(invoice);
+      }
+    } catch (error) {
+      console.error("Error printing invoice:", error);
+      toast({
+        title: "Error",
+        description: "Could not print invoice",
+        variant: "destructive",
+      });
+    }
   };
 
   // Filtering and sorting
@@ -294,13 +347,17 @@ const InvoicesList = () => {
                           <Clock className="mr-2 h-4 w-4" />
                           Change Status
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleViewInvoice(invoice.id)}>
                           <Eye className="mr-2 h-4 w-4" />
                           View
                         </DropdownMenuItem>
-                        <DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDownloadInvoice(invoice.id)}>
                           <Download className="mr-2 h-4 w-4" />
                           Download
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handlePrintInvoice(invoice.id)}>
+                          <Printer className="mr-2 h-4 w-4" />
+                          Print
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <Send className="mr-2 h-4 w-4" />

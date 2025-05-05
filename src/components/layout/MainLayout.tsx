@@ -17,11 +17,12 @@ const MainLayout = ({ children, className }: MainLayoutProps) => {
       <Header toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
 
       <div className="flex flex-1 overflow-hidden">
-        <div className="sticky top-0 h-screen flex-shrink-0">
+        <div className="fixed top-16 bottom-0 left-0 h-[calc(100vh-4rem)] z-10">
           <Sidebar isCollapsed={!isSidebarOpen} setIsCollapsed={(collapsed) => setIsSidebarOpen(!collapsed)} />
         </div>
         <main
           className={`flex-1 overflow-y-auto p-4 md:p-6 transition-all duration-300 ${className}`}
+          style={{ marginLeft: isSidebarOpen ? '16rem' : '4rem' }}
         >
           <div className="mx-auto max-w-6xl">{children}</div>
         </main>

@@ -119,7 +119,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
         isCollapsed ? "w-16" : "w-64",
       )}
     >
-      {/* Logo Container - Removed watermark */}
       <div className="relative z-10 p-4 flex flex-col h-full">
         {/* User Profile */}
         {user && (
@@ -141,10 +140,10 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
               {!isCollapsed && (
                 <div className="ml-3 overflow-hidden">
                   <p className="font-medium truncate">
-                    {userProfile?.business_name || user.email}
+                    {userProfile?.business_name || user.email?.split('@')[0]}
                   </p>
                   <p className="text-sm text-muted-foreground truncate">
-                    {userProfile?.username || user.email?.split('@')[0]}
+                    {user.email}
                   </p>
                 </div>
               )}
@@ -170,11 +169,11 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
           ))}
         </nav>
 
-        {/* Logout Button */}
+        {/* Logout Button - Fixing margin */}
         <button
           onClick={signOut}
           className={cn(
-            "flex items-center py-3 px-3 rounded-md text-gray-700 hover:bg-muted/80 transition-colors mb-4",
+            "flex items-center py-3 px-3 rounded-md text-gray-700 hover:bg-muted/80 transition-colors mt-2",
             isCollapsed ? "justify-center" : "justify-start"
           )}
         >

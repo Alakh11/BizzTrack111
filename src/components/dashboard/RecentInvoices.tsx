@@ -1,3 +1,4 @@
+
 import { useMemo } from "react";
 import {
   Table,
@@ -10,71 +11,24 @@ import {
 import { Badge } from "@/components/ui/badge";
 import ChartCard from "./ChartCard";
 import { Link } from "react-router-dom";
-
-interface InvoiceStatus {
-  status: "paid" | "pending" | "overdue";
-  label: string;
-}
-
-interface Invoice {
-  id: string;
-  invoiceNumber: string;
-  client: string;
-  amount: number;
-  date: string;
-  status: InvoiceStatus;
-}
+import { useInvoices } from "@/hooks/useInvoices";
+import { formatCurrency } from "@/lib/utils";
+import { format } from "date-fns";
 
 const RecentInvoices = () => {
-  const invoices = useMemo(
-    () =>
-      [
-        {
-          id: "1",
-          invoiceNumber: "INV-2024-001",
-          client: "Acme Inc",
-          amount: 3200,
-          date: "Apr 15, 2024",
-          status: { status: "paid", label: "Paid" },
-        },
-        {
-          id: "2",
-          invoiceNumber: "INV-2024-002",
-          client: "TechGiant Co",
-          amount: 1800,
-          date: "Apr 12, 2024",
-          status: { status: "pending", label: "Pending" },
-        },
-        {
-          id: "3",
-          invoiceNumber: "INV-2024-003",
-          client: "Globe Media",
-          amount: 2100,
-          date: "Apr 10, 2024",
-          status: { status: "paid", label: "Paid" },
-        },
-        {
-          id: "4",
-          invoiceNumber: "INV-2024-004",
-          client: "Bright Solutions",
-          amount: 950,
-          date: "Apr 05, 2024",
-          status: { status: "overdue", label: "Overdue" },
-        },
-        {
-          id: "5",
-          invoiceNumber: "INV-2024-005",
-          client: "Nova Systems",
-          amount: 2700,
-          date: "Apr 01, 2024",
-          status: { status: "paid", label: "Paid" },
-        },
-      ] as Invoice[],
-    [],
-  );
+  const { invoices, isLoading } = useInvoices();
+  
+  // Get the 5 most recent invoices
+  const recentInvoices = useMemo(() => {
+    if (!invoices || invoices.length === 0) return [];
+    
+    return [...invoices]
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .slice(0, 5);
+  }, [invoices]);
 
-  const formatCurrency = (value: number) => {
-    return `₹${value.toLocaleString("en-IN")}`;
+  const formatCurrencyValue = (value: number) => {
+    return formatCurrency(value);
   };
 
   const getStatusColor = (status: string) => {
@@ -104,33 +58,43 @@ const RecentInvoices = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {invoices.map((invoice) => (
-              <TableRow key={invoice.id}>
-                <TableCell>
-                  <Link
-                    to={`/invoices/${invoice.id}`}
-                    className="font-medium text-primary hover:underline"
-                  >
-                    {invoice.invoiceNumber}
-                  </Link>
-                </TableCell>
-                <TableCell>{invoice.client}</TableCell>
-                <TableCell>{invoice.date}</TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={`${getStatusColor(
-                      invoice.status.status,
-                    )} border`}
-                  >
-                    {invoice.status.label}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  {formatCurrency(invoice.amount)}
-                </TableCell>
+            {isLoading ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-4">Loading...</TableCell>
               </TableRow>
-            ))}
+            ) : recentInvoices.length > 0 ? (
+              recentInvoices.map((invoice) => (
+                <TableRow key={invoice.id}>
+                  <TableCell>
+                    <Link
+                      to={`/invoices/edit/${invoice.id}`}
+                      className="font-medium text-primary hover:underline"
+                    >
+                      {invoice.invoice_number}
+                    </Link>
+                  </TableCell>
+                  <TableCell>{invoice.client?.name || "N/A"}</TableCell>
+                  <TableCell>
+                    {invoice.invoice_date && format(new Date(invoice.invoice_date), "MMM dd, yyyy")}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="outline"
+                      className={`${getStatusColor(invoice.status)}`}
+                    >
+                      {invoice.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    {formatCurrencyValue(Number(invoice.total_amount))}
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center py-4">No recent invoices found</TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>

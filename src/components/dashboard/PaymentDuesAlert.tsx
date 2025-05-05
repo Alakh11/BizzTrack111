@@ -6,28 +6,31 @@ import { ArrowRight, Bell } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { format, compareDesc } from "date-fns";
+import { format, compareDesc, isAfter, addDays } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 
 const PaymentDuesAlert = () => {
-  const { invoices = [] } = useInvoices();
+  const { invoices = [], isLoading } = useInvoices();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [sentReminders, setSentReminders] = useState<Set<string>>(new Set());
 
-  // Filter for overdue and upcoming invoices
+  const today = new Date();
+  const nextWeek = addDays(today, 7);
+
+  // Filter for overdue and upcoming invoices using real data
   const overdueInvoices = invoices.filter(
     (inv) => 
       inv.status === "pending" && 
-      new Date(inv.due_date) < new Date()
+      isAfter(today, new Date(inv.due_date))
   );
 
   const upcomingInvoices = invoices.filter(
     (inv) => 
       inv.status === "pending" && 
-      new Date(inv.due_date) >= new Date() &&
-      new Date(inv.due_date) <= new Date(new Date().setDate(new Date().getDate() + 7))
+      !isAfter(today, new Date(inv.due_date)) &&
+      isAfter(nextWeek, new Date(inv.due_date))
   );
 
   // Sort by due date (most urgent first)
@@ -45,6 +48,21 @@ const PaymentDuesAlert = () => {
     // Add to sent reminders list
     setSentReminders((prev) => new Set([...prev, invoiceId]));
   };
+
+  if (isLoading) {
+    return (
+      <Card className="mt-4">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-base">
+            <Bell className="w-4 h-4 inline-block mr-1" /> Payment Dues
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center py-4">Loading payment dues...</div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="mt-4">
@@ -73,7 +91,7 @@ const PaymentDuesAlert = () => {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <p className="font-medium">{invoice.client?.name || "Unknown client"}</p>
-                    {new Date(invoice.due_date) < new Date() ? (
+                    {isAfter(today, new Date(invoice.due_date)) ? (
                       <Badge variant="destructive">Overdue</Badge>
                     ) : (
                       <Badge variant="outline">Upcoming</Badge>
