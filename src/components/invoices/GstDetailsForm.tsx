@@ -34,11 +34,11 @@ const GstDetailsForm = ({ open, onOpenChange, form }: GstDetailsFormProps) => {
     nonGstClient: form.getValues("nonGstClient"),
   };
 
-  const basicGstFields = [
+  const basicGstFields: GstFormSectionProps['fields'] = [
     {
       name: "taxType",
       label: "Select Tax Type",
-      type: "select" as const,
+      type: "select",
       options: [
         { value: "gst", label: "GST" },
         { value: "igst", label: "IGST" },
@@ -48,7 +48,7 @@ const GstDetailsForm = ({ open, onOpenChange, form }: GstDetailsFormProps) => {
     {
       name: "placeOfSupply",
       label: "Place of Supply",
-      type: "select" as const,
+      type: "select",
       options: [
         { value: "01-jammu", label: "01-Jammu & Kashmir" },
         { value: "02-himachal", label: "02-Himachal Pradesh" },
@@ -88,11 +88,11 @@ const GstDetailsForm = ({ open, onOpenChange, form }: GstDetailsFormProps) => {
     },
   ];
 
-  const gstTypeFields = [
+  const gstTypeFields: GstFormSectionProps['fields'] = [
     {
       name: "gstType",
       label: "GST Type",
-      type: "select" as const,
+      type: "select",
       options: [
         { value: "unregistered", label: "Unregistered" },
         { value: "registered", label: "Registered" },
@@ -104,20 +104,20 @@ const GstDetailsForm = ({ open, onOpenChange, form }: GstDetailsFormProps) => {
     {
       name: "gstNumber",
       label: "GST Number",
-      type: "input" as const,
+      type: "input",
     },
   ];
 
-  const checkboxFields = [
+  const checkboxFields: GstFormSectionProps['fields'] = [
     {
       name: "gstReverseCharge",
       label: "Is Reverse Charge Applicable?",
-      type: "checkbox" as const,
+      type: "checkbox",
     },
     {
       name: "nonGstClient",
       label: "You are billing to a Non-GST Registered client",
-      type: "checkbox" as const,
+      type: "checkbox",
     },
   ];
 
@@ -131,17 +131,17 @@ const GstDetailsForm = ({ open, onOpenChange, form }: GstDetailsFormProps) => {
           <div className="space-y-4 py-4">
             <GstFormSection 
               form={form}
-              fields={basicGstFields as GstFormSectionProps['fields']}
+              fields={basicGstFields}
             />
             
             <GstFormSection 
               form={form}
-              fields={gstTypeFields as GstFormSectionProps['fields']}
+              fields={gstTypeFields}
             />
             
             <GstFormSection 
               form={form}
-              fields={checkboxFields as GstFormSectionProps['fields']}
+              fields={checkboxFields}
             />
           </div>
 
