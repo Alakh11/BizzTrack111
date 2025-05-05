@@ -1,245 +1,254 @@
 
 import React, { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Mail, Eye } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { Card } from "@/components/ui/card";
+import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Eye, Download, Mail, Printer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import InvoicePrintRenderer from "./InvoicePrintRenderer";
+import { useEmailSender } from "@/hooks/useEmailSender";
 
 interface EmailPreviewStepProps {
   form: UseFormReturn<any>;
 }
 
 const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
-  const [emailSubject, setEmailSubject] = useState("");
-  const [emailMessage, setEmailMessage] = useState("");
-  const [sendCopy, setSendCopy] = useState(true);
-  const [previewOpen, setPreviewOpen] = useState(false);
-  const [isSending, setIsSending] = useState(false);
+  const [activeTab, setActiveTab] = useState<string>("preview");
   const { toast } = useToast();
-  const formValues = form.getValues();
+  const { sendEmail } = useEmailSender();
+  const [isSending, setIsSending] = useState(false);
 
-  // Initialize email content when component mounts
-  React.useEffect(() => {
-    setEmailSubject(`Invoice #${formValues.invoiceNumber} from ${formValues.businessName}`);
-    setEmailMessage(
-      `Dear ${formValues.clientName},\n\nPlease find attached invoice #${formValues.invoiceNumber} for your recent purchase.\n\nIf you have any questions, please don't hesitate to contact us.\n\nThank you for your business.\n\nBest regards,\n${formValues.businessName}`
-    );
-  }, [formValues.invoiceNumber, formValues.businessName, formValues.clientName]);
-
-  const renderInvoicePreview = () => {
-    // Get design settings from form
-    const template = formValues.selectedTemplate || "standard";
-    const color = formValues.selectedColor || "blue";
-    const font = formValues.selectedFont || "inter";
-    const signature = formValues.signature || "";
-    const logo = formValues.businessLogo || "";
-    const customTitle = formValues.customInvoiceTitle || "INVOICE";
+  // Prepare invoice data from form
+  const getInvoiceData = () => {
+    const formData = form.getValues();
     
-    return (
-      <div className="border p-4 rounded-md my-6 bg-white">
-        <div className="flex justify-between items-start mb-6">
-          {logo && (
-            <img 
-              src={logo} 
-              alt="Business Logo" 
-              className="h-16 max-w-[150px] object-contain" 
-            />
-          )}
-          <div className={logo ? "text-right" : "w-full"}>
-            <h2 
-              className="text-xl font-bold" 
-              style={{ color: color }}
-            >
-              {customTitle}
-            </h2>
-            {formValues.customSubtitle && <p className="text-sm">{formValues.customSubtitle}</p>}
-            <p className="text-sm text-muted-foreground">#{formValues.invoiceNumber}</p>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-2 gap-4 mb-6">
-          <div>
-            <p className="font-medium">{formValues.businessName}</p>
-            <p className="text-sm">{formValues.businessAddress}</p>
-          </div>
-          
-          <div>
-            <p className="font-medium">Bill To:</p>
-            <p>{formValues.clientName}</p>
-            <p className="text-sm">{formValues.clientAddress}</p>
-          </div>
-        </div>
-        
-        <table className="w-full mb-6">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left py-2">Item</th>
-              <th className="text-right py-2">Qty</th>
-              <th className="text-right py-2">Price</th>
-              <th className="text-right py-2">Amount</th>
-            </tr>
-          </thead>
-          <tbody>
-            {form.getValues("items")?.map((item: any, index: number) => (
-              <tr key={index} className="border-b">
-                <td className="py-2">{item.description}</td>
-                <td className="text-right py-2">{item.quantity}</td>
-                <td className="text-right py-2">{item.rate}</td>
-                <td className="text-right py-2">{item.amount}</td>
-              </tr>
-            ))}
-          </tbody>
-          <tfoot>
-            <tr>
-              <td colSpan={3} className="text-right pt-4 font-medium">Total:</td>
-              <td className="text-right pt-4 font-medium">{formValues.total || form.getValues("totalAmount")}</td>
-            </tr>
-          </tfoot>
-        </table>
-        
-        <div className="border-t pt-4 mb-4">
-          <p><strong>Notes:</strong></p>
-          <p>{formValues.notes}</p>
-        </div>
-        
-        <div className="border-t pt-4">
-          <p><strong>Terms and Conditions:</strong></p>
-          <p>{formValues.terms}</p>
-        </div>
-        
-        {signature && (
-          <div className="mt-6 border-t pt-4">
-            <p className="text-xs text-muted-foreground mb-1">Signature:</p>
-            <img src={signature} alt="Signature" className="max-h-16" />
-          </div>
-        )}
-      </div>
-    );
+    // Calculate total amount
+    let totalAmount = 0;
+    if (formData.items && Array.isArray(formData.items)) {
+      totalAmount = formData.items.reduce((sum: number, item: any) => sum + (parseFloat(item.amount) || 0), 0);
+    }
+    
+    return {
+      invoice_number: formData.invoiceNumber,
+      invoice_date: formData.invoiceDate,
+      due_date: formData.dueDate,
+      total_amount: totalAmount,
+      client: {
+        name: formData.clientName,
+        address: formData.clientAddress,
+        email: formData.clientEmail,
+        phone: formData.clientPhone
+      },
+      invoice_items: formData.items || [],
+      notes: formData.notes,
+      terms: formData.terms,
+      metadata: JSON.stringify({
+        design: {
+          template: form.getValues("template") || "standard",
+          color: form.getValues("color") || "blue",
+          font: form.getValues("font") || "inter",
+          paperSize: form.getValues("paperSize") || "a4",
+          title: form.getValues("invoiceTitle") || "INVOICE",
+          logo: form.getValues("logo") || "",
+          signature: form.getValues("signature") || "",
+        },
+        payment: {
+          bank: {
+            name: formData.bankName,
+            accountNumber: formData.accountNumber,
+            ifscCode: formData.ifscCode,
+            accountHolderName: formData.accountHolderName,
+            branchName: formData.branchName,
+          },
+          upi: {
+            id: formData.upiId,
+            name: formData.upiName,
+          }
+        }
+      })
+    };
   };
 
-  const handleSendEmail = () => {
-    setIsSending(true);
-    // Simulate sending email
-    setTimeout(() => {
-      setIsSending(false);
+  // Handle preview actions
+  const handleViewInvoice = () => {
+    const invoiceData = getInvoiceData();
+    InvoicePrintRenderer.previewInvoice(invoiceData);
+  };
+
+  const handlePrintInvoice = () => {
+    const invoiceData = getInvoiceData();
+    InvoicePrintRenderer.printInvoice(invoiceData);
+  };
+
+  const handleDownloadInvoice = () => {
+    const invoiceData = getInvoiceData();
+    InvoicePrintRenderer.downloadInvoice(invoiceData);
+  };
+
+  const handleSendEmail = async () => {
+    const clientEmail = form.getValues("clientEmail");
+    const clientName = form.getValues("clientName");
+    const emailSubject = form.getValues("emailSubject");
+    const emailBody = form.getValues("emailBody");
+    const invoiceId = form.getValues("id"); // In case of edit mode
+    
+    if (!clientEmail) {
       toast({
-        title: "Email Sent",
-        description: `Invoice email has been sent to ${formValues.clientEmail}`,
+        title: "Missing Email Address",
+        description: "Client email address is required to send the invoice.",
+        variant: "destructive",
       });
-    }, 1500);
+      return;
+    }
+    
+    setIsSending(true);
+    
+    try {
+      await sendEmail({
+        to: clientEmail,
+        subject: emailSubject || `Invoice #${form.getValues("invoiceNumber")}`,
+        content: emailBody || "Please find attached your invoice.",
+        recipientName: clientName,
+        invoiceId: invoiceId,
+        // Attachments would be handled by the email service
+      });
+      
+      toast({
+        title: "Success",
+        description: `Invoice email sent to ${clientName || clientEmail}!`,
+      });
+    } catch (error) {
+      console.error("Error sending email:", error);
+      toast({
+        title: "Email Failed",
+        description: "There was a problem sending the email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
-    <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <Card>
-          <CardContent className="pt-6">
-            <h3 className="text-lg font-medium mb-4">Email Settings</h3>
-            
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Email Subject</label>
-                <input
-                  type="text"
-                  className="w-full p-2 border rounded"
-                  value={emailSubject}
-                  onChange={(e) => setEmailSubject(e.target.value)}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Email Message</label>
-                <textarea
-                  className="w-full p-2 border rounded min-h-[150px]"
-                  value={emailMessage}
-                  onChange={(e) => setEmailMessage(e.target.value)}
-                />
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <input 
-                  type="checkbox" 
-                  id="send-copy" 
-                  className="rounded" 
-                  checked={sendCopy}
-                  onChange={(e) => setSendCopy(e.target.checked)}
-                />
-                <label htmlFor="send-copy" className="text-sm">Send me a copy</label>
-              </div>
-              
-              <div className="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2">
-                <Button 
-                  className="w-full"
-                  variant="outline"
-                  onClick={() => setPreviewOpen(true)}
-                >
-                  <Eye className="mr-2 h-4 w-4" />
-                  Preview Email
-                </Button>
-                <Button 
-                  className="w-full"
-                  onClick={handleSendEmail}
-                  disabled={isSending || !formValues.clientEmail}
-                >
-                  <Mail className="mr-2 h-4 w-4" />
-                  {isSending ? "Sending..." : "Send Email"}
-                </Button>
-              </div>
-              
-              {!formValues.clientEmail && (
-                <p className="text-sm text-red-500">
-                  Client email address is required to send the invoice via email
-                </p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-        
-        <div>
-          <h3 className="text-lg font-medium mb-4">Invoice Preview</h3>
-          {renderInvoicePreview()}
-        </div>
-      </div>
-      
-      <Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
-        <DialogContent className="sm:max-w-[600px]">
-          <DialogHeader>
-            <DialogTitle>Email Preview</DialogTitle>
-          </DialogHeader>
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="p-6 space-y-4">
+          <h3 className="text-lg font-medium">Email Details</h3>
+
+          <FormField
+            control={form.control}
+            name="emailTo"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>To</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    defaultValue={form.getValues("clientEmail")} 
+                    placeholder="Client email address" 
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="emailSubject"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Subject</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    defaultValue={`Invoice #${form.getValues("invoiceNumber")}`} 
+                    placeholder="Email subject" 
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="emailBody"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Message</FormLabel>
+                <FormControl>
+                  <textarea
+                    className="flex min-h-24 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none"
+                    rows={5}
+                    {...field}
+                    defaultValue={`Dear ${form.getValues("clientName") || "Client"},\n\nPlease find attached your invoice #${form.getValues("invoiceNumber")} due on ${new Date(form.getValues("dueDate")).toLocaleDateString()}.\n\nThank you for your business.\n\nRegards,\n${form.getValues("businessName") || "Alakh Corporation"}`}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
           
-          <div className="space-y-4 py-4">
-            <div className="border rounded-md p-4">
-              <p><strong>To:</strong> {formValues.clientEmail || "(Client email not provided)"}</p>
-              {sendCopy && <p><strong>CC:</strong> {formValues.businessEmail}</p>}
-              <p><strong>Subject:</strong> {emailSubject}</p>
-              <div className="mt-4 pt-4 border-t">
-                <pre className="whitespace-pre-wrap font-sans text-sm">{emailMessage}</pre>
-              </div>
-              <div className="mt-4 pt-4 border-t">
-                <p className="text-sm text-muted-foreground">
-                  Invoice will be attached as a PDF file.
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setPreviewOpen(false)}>Close</Button>
-            <Button onClick={handleSendEmail} disabled={isSending || !formValues.clientEmail}>
+          <div className="flex justify-end space-x-2">
+            <Button 
+              type="button" 
+              onClick={handleSendEmail} 
+              disabled={isSending}
+            >
               <Mail className="mr-2 h-4 w-4" />
               {isSending ? "Sending..." : "Send Email"}
             </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </div>
+        </Card>
+
+        <Card className="p-6">
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid w-full grid-cols-2 mb-6">
+              <TabsTrigger value="preview">Invoice Preview</TabsTrigger>
+              <TabsTrigger value="actions">Invoice Actions</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="preview" className="space-y-4">
+              <div className="border rounded-md p-4 h-96 overflow-auto bg-gray-50">
+                <div className="flex justify-center items-center h-full flex-col">
+                  <p className="text-center text-muted-foreground mb-4">
+                    Click the button below to preview your invoice in a new tab
+                  </p>
+                  <Button onClick={handleViewInvoice}>
+                    <Eye className="mr-2 h-4 w-4" />
+                    View Full Invoice
+                  </Button>
+                </div>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="actions" className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Card className="p-6 flex flex-col items-center justify-center text-center">
+                  <Button onClick={handlePrintInvoice} variant="outline" className="w-full">
+                    <Printer className="mr-2 h-4 w-4" />
+                    Print Invoice
+                  </Button>
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    Send the invoice directly to your printer
+                  </p>
+                </Card>
+                
+                <Card className="p-6 flex flex-col items-center justify-center text-center">
+                  <Button onClick={handleDownloadInvoice} variant="outline" className="w-full">
+                    <Download className="mr-2 h-4 w-4" />
+                    Download Invoice
+                  </Button>
+                  <p className="mt-3 text-sm text-muted-foreground">
+                    Save the invoice as an HTML file
+                  </p>
+                </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </Card>
+      </div>
     </div>
   );
 };

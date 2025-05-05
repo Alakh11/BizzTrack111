@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { FormProvider } from "react-hook-form";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import BankingDetailsStep from "@/components/invoices/BankingDetailsStep";
 import EmailPreviewStep from "@/components/invoices/EmailPreviewStep";
 import { useInvoiceForm } from "@/hooks/useInvoiceForm";
 import { useToast } from "@/hooks/use-toast";
-import { AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogAction } from "@/components/ui/alert-dialog";
 
 const steps = [
   {
@@ -37,7 +37,8 @@ const steps = [
 
 const InvoiceGeneration = () => {
   const { toast } = useToast();
-  const [showEditAlert, setShowEditAlert] = React.useState(false);
+  const [showEditAlert, setShowEditAlert] = useState(false);
+  const [alertShown, setAlertShown] = useState(false);
   
   const {
     form,
@@ -97,15 +98,12 @@ const InvoiceGeneration = () => {
   };
 
   // Show editing alert only once when in edit mode
-  React.useEffect(() => {
-    if (isEditMode && !showEditAlert) {
+  useEffect(() => {
+    if (isEditMode && !alertShown) {
       setShowEditAlert(true);
-      const timer = setTimeout(() => {
-        setShowEditAlert(false);
-      }, 5000);
-      return () => clearTimeout(timer);
+      setAlertShown(true);
     }
-  }, [isEditMode]);
+  }, [isEditMode, alertShown]);
 
   const renderStep = () => {
     switch (currentStep) {
@@ -201,6 +199,7 @@ const InvoiceGeneration = () => {
           <AlertDialogDescription>
             You are now editing invoice #{form.getValues("invoiceNumber")}. Changes will only be saved when you click "Update Invoice" on the final step.
           </AlertDialogDescription>
+          <AlertDialogAction autoFocus>Got it</AlertDialogAction>
         </AlertDialogContent>
       </AlertDialog>
     </MainLayout>

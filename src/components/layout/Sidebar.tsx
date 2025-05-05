@@ -11,10 +11,13 @@ import {
   Settings,
   Briefcase,
   LogOut,
+  User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -22,14 +25,32 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
-  const { signOut } = useAuth();
+  const { signOut, user } = useAuth();
   const isMobile = useIsMobile();
   const location = useLocation();
   const [mounted, setMounted] = useState(false);
+  const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    
+    // Fetch user profile when user is available
+    const fetchUserProfile = async () => {
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+          
+        if (data) {
+          setUserProfile(data);
+        }
+      }
+    };
+    
+    fetchUserProfile();
+  }, [user]);
 
   // Close sidebar on mobile when route changes
   useEffect(() => {
@@ -118,10 +139,41 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
               <Receipt size={18} className="text-white" />
             </span>
             {!isCollapsed && (
-              <span className="ml-2 font-semibold text-lg">InvoiceApp</span>
+              <span className="ml-2 font-semibold text-lg">BizzTrack</span>
             )}
           </div>
         </div>
+        
+        {/* User Profile */}
+        {user && (
+          <div className={cn(
+            "mb-6 border-b pb-4",
+            isCollapsed ? "flex justify-center" : ""
+          )}>
+            <div className={cn(
+              "flex items-center",
+              isCollapsed ? "flex-col" : "flex-row"
+            )}>
+              <Avatar className="h-10 w-10">
+                <AvatarImage src={userProfile?.avatar_url} alt="User" />
+                <AvatarFallback>
+                  <User size={20} />
+                </AvatarFallback>
+              </Avatar>
+              
+              {!isCollapsed && (
+                <div className="ml-3 overflow-hidden">
+                  <p className="font-medium truncate">
+                    {userProfile?.business_name || user.email}
+                  </p>
+                  <p className="text-sm text-muted-foreground truncate">
+                    {userProfile?.username || user.email?.split('@')[0]}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Nav Items */}
         <nav className="flex-1 space-y-1">
