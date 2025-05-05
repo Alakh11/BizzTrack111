@@ -10,6 +10,7 @@ import {
 import { Button } from "@/components/ui/button";
 import GstDetailsPreview from "./GstDetailsPreview";
 import GstFormSection from "../gst/GstFormSection";
+import { GstFormSectionProps } from "../gst/GstFormSectionProps";
 
 interface GstDetailsFormProps {
   open: boolean;
@@ -80,7 +81,10 @@ const GstDetailsForm = ({ open, onOpenChange, form }: GstDetailsFormProps) => {
         { value: "33-tn", label: "33-Tamil Nadu" },
         { value: "37-andhra", label: "37-Andhra Pradesh" },
         { value: "36-telangana", label: "36-Telangana" },
-      ]
+      ].sort((a, b) => {
+        // Sort by state name alphabetically
+        return a.label.localeCompare(b.label);
+      })
     },
   ];
 

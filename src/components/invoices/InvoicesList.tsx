@@ -55,6 +55,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import InvoicePrintRenderer from "./InvoicePrintRenderer";
+import { Invoice } from "@/types/invoice";
 
 const InvoicesList = () => {
   const navigate = useNavigate();
@@ -149,7 +150,7 @@ const InvoicesList = () => {
 
   const handleViewInvoice = async (id: string) => {
     try {
-      const invoice = await getInvoice(id);
+      const invoice = await getInvoice(id) as unknown as Invoice;
       if (invoice) {
         InvoicePrintRenderer.previewInvoice(invoice);
       }
@@ -165,7 +166,7 @@ const InvoicesList = () => {
 
   const handleDownloadInvoice = async (id: string) => {
     try {
-      const invoice = await getInvoice(id);
+      const invoice = await getInvoice(id) as unknown as Invoice;
       if (invoice) {
         InvoicePrintRenderer.downloadInvoice(invoice);
         
@@ -186,7 +187,7 @@ const InvoicesList = () => {
 
   const handlePrintInvoice = async (id: string) => {
     try {
-      const invoice = await getInvoice(id);
+      const invoice = await getInvoice(id) as unknown as Invoice;
       if (invoice) {
         InvoicePrintRenderer.printInvoice(invoice);
       }
