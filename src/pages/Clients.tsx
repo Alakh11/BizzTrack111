@@ -176,11 +176,7 @@ const Clients = () => {
                                 <p className="font-medium text-sm">
                                   {client.name}
                                 </p>
-                                {client.company && (
-                                  <p className="text-xs text-muted-foreground">
-                                    {client.company}
-                                  </p>
-                                )}
+                                {/* Remove company field references as it doesn't exist in Client type */}
                               </div>
                             </div>
                           </TableCell>

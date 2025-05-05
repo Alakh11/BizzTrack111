@@ -13,7 +13,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useMobile } from "@/hooks/use-mobile";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/hooks/useAuth";
 
 interface SidebarProps {
@@ -23,7 +23,7 @@ interface SidebarProps {
 
 const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
   const { signOut } = useAuth();
-  const isMobile = useMobile();
+  const isMobile = useIsMobile();
   const location = useLocation();
   const [mounted, setMounted] = useState(false);
 

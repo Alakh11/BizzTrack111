@@ -17,7 +17,7 @@ const MainLayout = ({ children, className }: MainLayoutProps) => {
       <Header toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} isSidebarOpen={isSidebarOpen} />
 
       <div className="flex flex-1 overflow-hidden">
-        <Sidebar isOpen={isSidebarOpen} setIsOpen={setIsSidebarOpen} />
+        <Sidebar isCollapsed={!isSidebarOpen} setIsCollapsed={(collapsed) => setIsSidebarOpen(!collapsed)} />
         <main
           className={`flex-1 overflow-y-auto p-4 md:p-6 transition-all duration-300 ${
             isSidebarOpen ? "md:ml-64" : "md:ml-[70px]"
