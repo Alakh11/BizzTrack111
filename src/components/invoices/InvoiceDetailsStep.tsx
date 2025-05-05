@@ -10,7 +10,7 @@ import TransportDetailsForm from "./TransportDetailsForm";
 import GstDetailsForm from "./GstDetailsForm";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 
 interface InvoiceDetailsStepProps {
   form: any;

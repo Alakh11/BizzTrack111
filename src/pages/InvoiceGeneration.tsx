@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { useForm, FormProvider } from "react-hook-form";
+import { FormProvider } from "react-hook-form";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card } from "@/components/ui/card";
 import InvoiceGenerationStepper from "@/components/invoices/InvoiceGenerationStepper";
@@ -79,19 +79,10 @@ const InvoiceGeneration = () => {
     handleFormSubmit,
   } = useInvoiceForm();
 
-  // Add state to track if the user has submitted the form
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   // Wrapper for form submission
   const onSubmit = () => {
-    setIsSubmitting(true);
-    // Instead of directly calling form.handleSubmit, trigger it manually
-    form.handleSubmit((data) => {
-      handleFormSubmit(data);
-    })();
+    form.handleSubmit(handleFormSubmit)();
   };
-
-  const methods = form;
 
   const renderStep = () => {
     switch (currentStep) {
@@ -166,20 +157,17 @@ const InvoiceGeneration = () => {
         </div>
 
         <Card className="p-6">
-          <FormProvider {...methods}>
-            {/* Changed to a regular div since we're handling submission manually */}
-            <div>
-              <InvoiceGenerationStepper
-                steps={steps}
-                currentStep={currentStep}
-                setCurrentStep={setCurrentStep}
-                isEditMode={isEditMode}
-                handleSubmit={onSubmit}
-                showFinalSubmitButton={true}
-              >
-                {renderStep()}
-              </InvoiceGenerationStepper>
-            </div>
+          <FormProvider {...form}>
+            <InvoiceGenerationStepper
+              steps={steps}
+              currentStep={currentStep}
+              setCurrentStep={setCurrentStep}
+              isEditMode={isEditMode}
+              handleSubmit={onSubmit}
+              showFinalSubmitButton={true}
+            >
+              {renderStep()}
+            </InvoiceGenerationStepper>
           </FormProvider>
         </Card>
       </div>
