@@ -199,6 +199,11 @@ export const useInvoiceForm = () => {
                   setSelectedFont(metadata.design.font || "inter");
                   setCustomInvoiceTitle(metadata.design.title || "INVOICE");
                   setBusinessLogo(metadata.design.logo || "");
+                  
+                  // Added the missing properties
+                  if (metadata.design.paperSize) {
+                    setSelectedPaperSize(metadata.design.paperSize);
+                  }
                 }
                 if (metadata.additional) {
                   setPurchaseOrderNumber(metadata.additional.poNumber || "");
@@ -228,7 +233,9 @@ export const useInvoiceForm = () => {
     };
 
     fetchInvoice();
-  }, [params.id, form, navigate, toast, getInvoice, location.state, setItems, setSelectedTemplate, setSelectedColor, setSelectedFont, setCustomInvoiceTitle, setBusinessLogo, setPurchaseOrderNumber, setReferenceNumber]);
+  }, [params.id, form, navigate, toast, getInvoice, location.state, setItems, 
+      setSelectedTemplate, setSelectedColor, setSelectedFont, setSelectedPaperSize,
+      setCustomInvoiceTitle, setBusinessLogo, setPurchaseOrderNumber, setReferenceNumber]);
 
   // Fetch business profile data
   useEffect(() => {
@@ -443,6 +450,11 @@ export const useInvoiceForm = () => {
     selectedFont,
     selectedPaperSize,
     businessLogo,
+    setSelectedTemplate,
+    setSelectedColor,
+    setSelectedFont,
+    setSelectedPaperSize,
+    setBusinessLogo,
     isEditMode,
     invoiceId,
     clients,
