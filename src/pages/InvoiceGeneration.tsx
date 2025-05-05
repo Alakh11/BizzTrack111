@@ -83,9 +83,12 @@ const InvoiceGeneration = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Wrapper for form submission
-  const onSubmit = (data: any) => {
+  const onSubmit = () => {
     setIsSubmitting(true);
-    handleFormSubmit(data);
+    // Instead of directly calling form.handleSubmit, trigger it manually
+    form.handleSubmit((data) => {
+      handleFormSubmit(data);
+    })();
   };
 
   const methods = form;
@@ -164,18 +167,19 @@ const InvoiceGeneration = () => {
 
         <Card className="p-6">
           <FormProvider {...methods}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            {/* Changed to a regular div since we're handling submission manually */}
+            <div>
               <InvoiceGenerationStepper
                 steps={steps}
                 currentStep={currentStep}
                 setCurrentStep={setCurrentStep}
                 isEditMode={isEditMode}
-                handleSubmit={form.handleSubmit(onSubmit)}
+                handleSubmit={onSubmit}
                 showFinalSubmitButton={true}
               >
                 {renderStep()}
               </InvoiceGenerationStepper>
-            </form>
+            </div>
           </FormProvider>
         </Card>
       </div>

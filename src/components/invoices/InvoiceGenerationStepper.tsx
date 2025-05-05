@@ -77,7 +77,8 @@ const InvoiceGenerationStepper = ({
           </Button>
 
           {isLastStep && showFinalSubmitButton ? (
-            <Button type="submit" onClick={handleSubmit}>
+            // Fix: Don't use both type="submit" and onClick for the same action
+            <Button type="button" onClick={handleSubmit}>
               {isEditMode ? "Update Invoice" : "Save Invoice"}
             </Button>
           ) : (
