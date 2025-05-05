@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { 
   Dialog, 
@@ -18,9 +18,9 @@ import { Client } from "@/hooks/useClients";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useInvoices } from "@/hooks/useInvoices";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { IndianRupee } from "lucide-react";
 import { formatDate } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface ClientDetailsModalProps {
   open: boolean;
@@ -33,11 +33,11 @@ const ClientDetailsModal = ({ open, onOpenChange, client }: ClientDetailsModalPr
   const { updateClient } = useClients();
   const { invoices = [] } = useInvoices();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: {
       name: client?.name || "",
-      company: client?.company || "",
       email: client?.email || "",
       phone: client?.phone || "",
       address: client?.address || ""
@@ -45,17 +45,16 @@ const ClientDetailsModal = ({ open, onOpenChange, client }: ClientDetailsModalPr
   });
 
   // Reset form when client changes
-  useState(() => {
+  useEffect(() => {
     if (client) {
       reset({
         name: client.name || "",
-        company: client.company || "",
         email: client.email || "",
         phone: client.phone || "",
         address: client.address || ""
       });
     }
-  });
+  }, [client, reset]);
 
   const onSubmit = async (data: any) => {
     if (!client?.id) return;
@@ -66,9 +65,18 @@ const ClientDetailsModal = ({ open, onOpenChange, client }: ClientDetailsModalPr
         id: client.id,
         ...data
       });
+      toast({
+        title: "Success",
+        description: "Client updated successfully",
+      });
       onOpenChange(false);
     } catch (error) {
       console.error("Error updating client:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update client. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -105,15 +113,6 @@ const ClientDetailsModal = ({ open, onOpenChange, client }: ClientDetailsModalPr
                   placeholder="Enter client name"
                 />
                 {errors.name && <p className="text-sm text-red-500">{errors.name.message as string}</p>}
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="company">Company</Label>
-                <Input
-                  id="company"
-                  {...register("company")}
-                  placeholder="Enter company name"
-                />
               </div>
 
               <div className="space-y-2">

@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useClients } from "@/hooks/useClients";
+import { useToast } from "@/hooks/use-toast";
 
 interface AddClientModalProps {
   open: boolean;
@@ -22,10 +23,11 @@ interface AddClientModalProps {
 const AddClientModal = ({ open, onOpenChange }: AddClientModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { createClient } = useClients();
+  const { toast } = useToast();
+  
   const { register, handleSubmit, reset, formState: { errors } } = useForm({
     defaultValues: {
       name: "",
-      company: "",
       email: "",
       phone: "",
       address: ""
@@ -36,10 +38,19 @@ const AddClientModal = ({ open, onOpenChange }: AddClientModalProps) => {
     setIsSubmitting(true);
     try {
       await createClient.mutateAsync(data);
+      toast({
+        title: "Success",
+        description: "Client added successfully",
+      });
       reset();
       onOpenChange(false);
     } catch (error) {
       console.error("Error creating client:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add client. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsSubmitting(false);
     }
@@ -60,15 +71,6 @@ const AddClientModal = ({ open, onOpenChange }: AddClientModalProps) => {
               placeholder="Enter client name"
             />
             {errors.name && <p className="text-sm text-red-500">{errors.name.message as string}</p>}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="company">Company</Label>
-            <Input
-              id="company"
-              {...register("company")}
-              placeholder="Enter company name"
-            />
           </div>
 
           <div className="space-y-2">

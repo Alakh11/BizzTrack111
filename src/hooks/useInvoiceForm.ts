@@ -293,6 +293,7 @@ export const useInvoiceForm = () => {
       form.setValue("clientAddress", selectedClient.address || "");
       form.setValue("clientEmail", selectedClient.email || "");
       form.setValue("clientPhone", selectedClient.phone || "");
+      // The company field is not in the schema, so we won't set it
     }
   };
 
@@ -306,8 +307,8 @@ export const useInvoiceForm = () => {
     }
     
     try {
-      // Update form with latest total
-      form.setValue("total", calculateTotal());
+      // Calculate total instead of setting it directly
+      const totalAmount = calculateTotal();
       
       // Prepare metadata for design settings
       const metadata = {
@@ -384,7 +385,7 @@ export const useInvoiceForm = () => {
         invoice_number: data.invoiceNumber,
         invoice_date: data.invoiceDate,
         due_date: data.dueDate,
-        total_amount: calculateTotal(),
+        total_amount: totalAmount,
         client_id: data.clientId || null,
         notes: data.notes,
         terms: data.terms,

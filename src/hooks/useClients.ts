@@ -6,7 +6,6 @@ import { useToast } from "./use-toast";
 export interface Client {
   id?: string;
   name: string;
-  company?: string;
   email?: string;
   phone?: string;
   address?: string;
@@ -90,7 +89,6 @@ export const useClients = () => {
         .from("clients")
         .update({
           name: client.name,
-          company: client.company,
           email: client.email,
           phone: client.phone,
           address: client.address,
@@ -119,10 +117,37 @@ export const useClients = () => {
     },
   });
 
+  const deleteClient = useMutation({
+    mutationFn: async (clientId: string) => {
+      const { error } = await supabase
+        .from("clients")
+        .delete()
+        .eq("id", clientId);
+
+      if (error) throw error;
+      return clientId;
+    },
+    onSuccess: (clientId) => {
+      queryClient.invalidateQueries({ queryKey: ["clients"] });
+      toast({
+        title: "Success",
+        description: "Client deleted successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     clients,
     isLoading,
     createClient,
     updateClient,
+    deleteClient,
   };
 };

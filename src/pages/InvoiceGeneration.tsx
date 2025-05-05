@@ -9,6 +9,8 @@ import DesignStep from "@/components/invoices/DesignStep";
 import BankingDetailsStep from "@/components/invoices/BankingDetailsStep";
 import EmailPreviewStep from "@/components/invoices/EmailPreviewStep";
 import { useInvoiceForm } from "@/hooks/useInvoiceForm";
+import { useToast } from "@/hooks/use-toast";
+import { AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription } from "@/components/ui/alert-dialog";
 
 const steps = [
   {
@@ -34,6 +36,9 @@ const steps = [
 ];
 
 const InvoiceGeneration = () => {
+  const { toast } = useToast();
+  const [showEditAlert, setShowEditAlert] = React.useState(false);
+  
   const {
     form,
     currentStep,
@@ -85,9 +90,22 @@ const InvoiceGeneration = () => {
     // Only set finalSubmission to true if we're on the last step
     if (currentStep === steps.length - 1) {
       setFinalSubmission(true);
+      form.handleSubmit(handleFormSubmit)();
+    } else {
+      form.handleSubmit(handleFormSubmit)();
     }
-    form.handleSubmit(handleFormSubmit)();
   };
+
+  // Show editing alert only once when in edit mode
+  React.useEffect(() => {
+    if (isEditMode && !showEditAlert) {
+      setShowEditAlert(true);
+      const timer = setTimeout(() => {
+        setShowEditAlert(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [isEditMode]);
 
   const renderStep = () => {
     switch (currentStep) {
@@ -176,6 +194,15 @@ const InvoiceGeneration = () => {
           </FormProvider>
         </Card>
       </div>
+
+      <AlertDialog open={showEditAlert} onOpenChange={setShowEditAlert}>
+        <AlertDialogContent>
+          <AlertDialogTitle>Editing Invoice</AlertDialogTitle>
+          <AlertDialogDescription>
+            You are now editing invoice #{form.getValues("invoiceNumber")}. Changes will only be saved when you click "Update Invoice" on the final step.
+          </AlertDialogDescription>
+        </AlertDialogContent>
+      </AlertDialog>
     </MainLayout>
   );
 };
