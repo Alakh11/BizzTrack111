@@ -87,7 +87,7 @@ class InvoicePrintRenderer {
             .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
             .logo { font-size: 24px; font-weight: bold; }
             .logo img { max-height: 80px; max-width: 200px; }
-            .title { text-align: ${design.template === 'modern' ? 'left' : 'center'}; margin: 20px 0; }
+            .title { text-align: ${design.template === 'modern' ? 'left' : 'right'}; margin: 0; }
             .title h1 { 
               color: ${design.color === 'blue' ? '#4A90E2' : 
                       design.color === 'green' ? '#4CAF50' : 
@@ -120,7 +120,7 @@ class InvoicePrintRenderer {
             .footer { margin-top: 30px; text-align: center; color: #666; font-size: 12px; }
             .payment { margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px; }
             .signature { margin-top: 50px; text-align: right; }
-            .signature img { max-width: 200px; max-height: 50px; margin-left: auto; margin-right: 0; display: block; }
+            .signature img { max-width: 200px; max-height: 80px; display: inline-block; }
             .signature p { margin-top: 10px; border-top: 1px solid #ccc; display: inline-block; padding-top: 5px; }
             .watermark {
               position: absolute;
@@ -140,6 +140,7 @@ class InvoicePrintRenderer {
             .additional-fields { margin-top: 10px; font-size: 0.9em; color: #666; }
             .additional-fields span { margin-right: 20px; }
             .shipping-details, .transport-details { margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }
+            .amount-in-words { margin: 15px 0; font-style: italic; }
             
             @media print {
               body { padding: 0; }
@@ -151,13 +152,13 @@ class InvoicePrintRenderer {
         <body>
           <div class="invoice">
             ${design.template === 'classic' || design.template === 'modern' ? 
-              `<div class="watermark">${design.watermarkText || 'PREMIUM'}</div>` : ''}
+              `<div class="watermark">${design.watermarkText || 'PAID'}</div>` : ''}
             
             ${design.template === 'modern' ? 
               `<div class="bg-accent" style="margin: -30px -30px 30px -30px; padding: 20px 30px;">
                 <div class="header">
-                  <div class="logo">${design.logo ? `<img src="${design.logo}" alt="Business Logo">` : 'Invoice App'}</div>
-                  <div>
+                  <div class="logo">${design.logo ? `<img src="${design.logo}" alt="Business Logo">` : 'BizzTrack'}</div>
+                  <div class="title">
                     <h1 style="color: white; font-size: 28px;">${design.title || 'INVOICE'}</h1>
                     <p style="color: white; opacity: 0.8;">#${invoice.invoice_number}</p>
                   </div>
@@ -165,7 +166,7 @@ class InvoicePrintRenderer {
               </div>` 
             : 
               `<div class="header">
-                <div class="logo">${design.logo ? `<img src="${design.logo}" alt="Business Logo">` : 'Invoice App'}</div>
+                <div class="logo">${design.logo ? `<img src="${design.logo}" alt="Business Logo">` : 'BizzTrack'}</div>
                 <div class="title">
                   <h1>${design.title || 'INVOICE'}</h1>
                   ${design.subtitle ? `<h2>${design.subtitle}</h2>` : ''}
@@ -281,8 +282,8 @@ class InvoicePrintRenderer {
                 <tr>
                   <td>${item.description}</td>
                   <td>${item.quantity}</td>
-                  <td>${item.unit_price}</td>
-                  <td>${item.amount}</td>
+                  <td>${item.unit_price.toLocaleString()}</td>
+                  <td>${item.amount.toLocaleString()}</td>
                 </tr>
                 `,
                     )

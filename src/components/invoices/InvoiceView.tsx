@@ -30,14 +30,17 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
     navigate(`/invoices/edit/${invoice.id}`, { state: { invoice } });
   };
 
+  const handlePrint = () => {
+    InvoicePrintRenderer.printInvoice(invoice);
+  };
+
   const handleDownload = () => {
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
-    printWindow.document.write(InvoicePrintRenderer.getHtml(invoice));
-    printWindow.document.close();
-    setTimeout(() => {
-      printWindow.print();
-    }, 500);
+    InvoicePrintRenderer.downloadInvoice(invoice);
+  };
+  
+  const handleShare = () => {
+    // Preview in a new tab
+    InvoicePrintRenderer.previewInvoice(invoice);
   };
 
   const getStatusColor = (status: string) => {
@@ -50,6 +53,23 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
         return "bg-warning/10 text-warning border-warning";
     }
   };
+
+  // Parse metadata for additional info
+  let metadata: any = {};
+  try {
+    if (invoice.metadata) {
+      metadata = JSON.parse(invoice.metadata);
+    }
+  } catch (e) {
+    console.error("Error parsing invoice metadata", e);
+  }
+
+  // Get design settings and other metadata
+  const design = metadata.design || {};
+  const gst = metadata.gst || {};
+  const shipping = metadata.shipping || {};
+  const transport = metadata.transport || {};
+  const payment = metadata.payment || {};
 
   return (
     <DialogContent className="max-w-4xl h-[85vh] overflow-y-auto">
@@ -73,13 +93,19 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
         {/* Invoice Header with Logo */}
         <div className="flex justify-between items-start">
           <div>
-            <div className="text-2xl font-bold font-playfair">INVOICE</div>
+            <div className="text-2xl font-bold font-playfair">
+              {design.title || "INVOICE"}
+            </div>
             <div className="text-muted-foreground text-sm">
               {invoice.invoice_number}
             </div>
           </div>
           <div className="h-16 w-16 bg-gray-100 flex items-center justify-center rounded border">
-            <span className="text-xl font-bold">Logo</span>
+            {design.logo ? (
+              <img src={design.logo} alt="Logo" className="max-h-full max-w-full object-contain" />
+            ) : (
+              <span className="text-xl font-bold">Logo</span>
+            )}
           </div>
         </div>
 
@@ -116,6 +142,81 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
             </div>
           </div>
         </div>
+
+        {/* GST Details if available */}
+        {gst && gst.gstNumber && (
+          <div className="bg-muted/10 p-4 rounded-md space-y-2">
+            <h3 className="font-medium">GST Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <span className="text-sm text-muted-foreground">GST Number:</span>
+                <p>{gst.gstNumber}</p>
+              </div>
+              {gst.gstType && (
+                <div>
+                  <span className="text-sm text-muted-foreground">GST Type:</span>
+                  <p>{gst.gstType}</p>
+                </div>
+              )}
+              {gst.placeOfSupply && (
+                <div>
+                  <span className="text-sm text-muted-foreground">Place of Supply:</span>
+                  <p>{gst.placeOfSupply}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Shipping Details if available */}
+        {shipping && (shipping.from || shipping.to) && (
+          <div className="bg-muted/10 p-4 rounded-md space-y-2">
+            <h3 className="font-medium">Shipping Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {shipping.from && (
+                <div>
+                  <span className="text-sm text-muted-foreground">From:</span>
+                  <p>{shipping.from.name}</p>
+                  <p>{shipping.from.address}</p>
+                  <p>{shipping.from.city} {shipping.from.state} {shipping.from.postal}</p>
+                </div>
+              )}
+              {shipping.to && (
+                <div>
+                  <span className="text-sm text-muted-foreground">To:</span>
+                  <p>{shipping.to.name}</p>
+                  <p>{shipping.to.address}</p>
+                  <p>{shipping.to.city} {shipping.to.state} {shipping.to.postal}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Transport Details if available */}
+        {transport && transport.transporter && (
+          <div className="bg-muted/10 p-4 rounded-md space-y-2">
+            <h3 className="font-medium">Transport Details</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <span className="text-sm text-muted-foreground">Transporter:</span>
+                <p>{transport.transporter}</p>
+              </div>
+              {transport.mode && (
+                <div>
+                  <span className="text-sm text-muted-foreground">Mode:</span>
+                  <p>{transport.mode}</p>
+                </div>
+              )}
+              {transport.vehicleNumber && (
+                <div>
+                  <span className="text-sm text-muted-foreground">Vehicle Number:</span>
+                  <p>{transport.vehicleNumber}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Invoice Details */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -216,6 +317,29 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
           </table>
         </div>
 
+        {/* Payment Details */}
+        {payment && (payment.bank?.accountNumber || payment.upi?.id) && (
+          <div className="border rounded-md p-4">
+            <h3 className="font-medium mb-2">Payment Details</h3>
+            {payment.bank?.accountNumber && (
+              <div className="space-y-1 mb-2">
+                <h4 className="text-sm font-medium">Bank Details:</h4>
+                <p className="text-sm">Bank: {payment.bank.name || 'N/A'}</p>
+                <p className="text-sm">Account Number: {payment.bank.accountNumber}</p>
+                {payment.bank.ifscCode && <p className="text-sm">IFSC: {payment.bank.ifscCode}</p>}
+                {payment.bank.accountHolderName && <p className="text-sm">Account Holder: {payment.bank.accountHolderName}</p>}
+              </div>
+            )}
+            {payment.upi?.id && (
+              <div className="space-y-1">
+                <h4 className="text-sm font-medium">UPI Details:</h4>
+                <p className="text-sm">UPI ID: {payment.upi.id}</p>
+                {payment.upi.name && <p className="text-sm">UPI Name: {payment.upi.name}</p>}
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Notes & Terms */}
         {(invoice.notes || invoice.terms) && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -237,6 +361,22 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
             )}
           </div>
         )}
+
+        {/* Signature */}
+        {design.signature && (
+          <div className="mt-6 border-t pt-4">
+            <div className="text-right">
+              <img 
+                src={design.signature} 
+                alt="Signature" 
+                className="max-h-16 inline-block" 
+              />
+              <p className="text-xs mt-1 border-t border-gray-300 inline-block pt-1">
+                Authorized Signature
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       <DialogFooter className="flex justify-between items-center mt-8">
@@ -250,10 +390,10 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
           <Button variant="outline" onClick={handleDownload}>
             <Download className="h-4 w-4 mr-2" /> Download
           </Button>
-          <Button variant="outline" onClick={handleDownload}>
+          <Button variant="outline" onClick={handlePrint}>
             <Printer className="h-4 w-4 mr-2" /> Print
           </Button>
-          <Button>
+          <Button onClick={handleShare}>
             <Share2 className="h-4 w-4 mr-2" /> Share
           </Button>
         </div>

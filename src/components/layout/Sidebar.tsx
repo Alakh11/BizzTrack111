@@ -119,29 +119,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
         isCollapsed ? "w-16" : "w-64",
       )}
     >
-      {/* Watermark Background */}
-      <div className="absolute inset-0 flex items-center justify-center opacity-[0.03] pointer-events-none overflow-hidden z-0">
-        <div className="rotate-[-15deg] text-[200px] text-gray-900 font-bold">
-          $$$
-        </div>
-      </div>
-      
-      {/* Logo Container */}
+      {/* Logo Container - Removed watermark */}
       <div className="relative z-10 p-4 flex flex-col h-full">
-        <div className="flex items-center h-14 mb-8">
-          {/* Logo only, removed the BizzTrack text */}
-          <div
-            className={cn(
-              "flex items-center transition-all duration-300",
-              isCollapsed ? "justify-center w-full" : "justify-start"
-            )}
-          >
-            <span className="h-8 w-8 rounded-md bg-primary flex items-center justify-center">
-              <Receipt size={18} className="text-white" />
-            </span>
-          </div>
-        </div>
-        
         {/* User Profile */}
         {user && (
           <div className={cn(

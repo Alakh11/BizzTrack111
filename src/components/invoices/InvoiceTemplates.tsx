@@ -1,10 +1,9 @@
 
 import React from "react";
 
-// Sample invoice template images
+// Sample invoice template images with more consistent URLs
 const templateImages = {
-  standard:
-    "https://square-mailstrom-production.s3.amazonaws.com/invoices/templates/img/en-us-invoice-template-576474.jpg?v=2",
+  standard: "https://i.imgur.com/CtbuDF6.png",
   professional: "https://i.imgur.com/l2O3M5j.png",
   modern: "https://i.imgur.com/DFg6QiK.png",
   classic: "https://i.imgur.com/CtbuDF6.png",
@@ -39,7 +38,7 @@ const InvoiceTemplates: React.FC<InvoiceTemplatesProps> = ({
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
       {templates.map((template) => (
         <div
           key={template.id}

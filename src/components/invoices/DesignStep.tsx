@@ -60,17 +60,41 @@ const DesignStep: React.FC<DesignStepProps> = ({
   useEffect(() => {
     const formValues = form.getValues();
     if (formValues) {
+      // Calculate currency symbol
+      const currencySymbol = formValues.selectedCurrency === 'usd' ? '$' : 
+                            formValues.selectedCurrency === 'eur' ? '€' : 
+                            formValues.selectedCurrency === 'gbp' ? '£' : '₹';
+      
+      // Calculate total
+      const total = formValues.items?.reduce((sum: number, item: any) => 
+        sum + (parseFloat(item.amount) || 0), 0) || 0;
+      
       const newPreviewData = {
         clientName: formValues.clientName || "Client Name",
+        clientAddress: formValues.clientAddress || "Client Address",
+        clientEmail: formValues.clientEmail || "client@example.com",
         invoiceNumber: formValues.invoiceNumber || "INV-2023-001",
         invoiceDate: formValues.invoiceDate ? new Date(formValues.invoiceDate).toLocaleDateString() : "May 5, 2025",
         dueDate: formValues.dueDate ? new Date(formValues.dueDate).toLocaleDateString() : "May 19, 2025",
-        total: "$" + (form.getValues("items")?.reduce((sum: number, item: any) => sum + (parseFloat(item.amount) || 0), 0) || 0).toFixed(2),
-        items: form.getValues("items") || [{ description: "Product Name", quantity: 2, rate: "$100.00", amount: "$200.00" }]
+        total: `${currencySymbol}${total.toFixed(2)}`,
+        items: formValues.items || [{ description: "Product Name", quantity: 2, rate: "$100.00", amount: "$200.00" }],
+        gstNumber: formValues.gstNumber || "",
+        shippingDetails: {
+          from: {
+            name: formValues.shippedFromName || "",
+            address: formValues.shippedFromAddress || "",
+          },
+          to: {
+            name: formValues.shippedToName || "",
+            address: formValues.shippedToAddress || "",
+          }
+        },
+        notes: formValues.notes || "",
+        terms: formValues.terms || ""
       };
       setPreviewData(newPreviewData);
     }
-  }, [form, form.watch]);
+  }, [form, form.watch()]);
   
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -299,17 +323,23 @@ const DesignStep: React.FC<DesignStepProps> = ({
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div>
                     <p className="text-xs text-muted-foreground">From:</p>
-                    <p className="font-medium">Alakh Corporation</p>
-                    <p className="text-sm">Mirzapur, UP, India - 231312</p>
-                    <p className="text-sm">+91 9580813770</p>
+                    <p className="font-medium">{form.getValues("businessName") || "Your Business"}</p>
+                    <p className="text-sm">{form.getValues("businessAddress") || "Business Address"}</p>
+                    <p className="text-sm">{form.getValues("businessPhone") || ""}</p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">To:</p>
                     <p className="font-medium">{previewData.clientName}</p>
-                    <p className="text-sm">{form.getValues("clientAddress") || "Client Address"}</p>
-                    <p className="text-sm">{form.getValues("clientEmail") || "client@example.com"}</p>
+                    <p className="text-sm">{previewData.clientAddress || "Client Address"}</p>
+                    <p className="text-sm">{previewData.clientEmail || "client@example.com"}</p>
                   </div>
                 </div>
+                
+                {previewData.gstNumber && (
+                  <div className="border-t border-b py-2 mb-4">
+                    <p className="text-xs text-muted-foreground">GST Number: {previewData.gstNumber}</p>
+                  </div>
+                )}
                 
                 <div className="border-t border-b py-2 mb-4 grid grid-cols-4">
                   <div>
@@ -337,12 +367,12 @@ const DesignStep: React.FC<DesignStepProps> = ({
                     <div className="col-span-2 text-right">Rate</div>
                     <div className="col-span-2 text-right">Amount</div>
                   </div>
-                  {previewData.items && previewData.items.slice(0, 2).map((item: any, index: number) => (
+                  {previewData.items && previewData.items.slice(0, 3).map((item: any, index: number) => (
                     <div className="grid grid-cols-12 mb-1" key={index}>
-                      <div className="col-span-6">{item.description || "Product"}</div>
+                      <div className="col-span-6 truncate">{item.description || "Product"}</div>
                       <div className="col-span-2 text-right">{item.quantity || 1}</div>
-                      <div className="col-span-2 text-right">${item.rate || 0}</div>
-                      <div className="col-span-2 text-right">${item.amount || 0}</div>
+                      <div className="col-span-2 text-right">{item.rate || 0}</div>
+                      <div className="col-span-2 text-right">{item.amount || 0}</div>
                     </div>
                   ))}
                 </div>
@@ -354,12 +384,32 @@ const DesignStep: React.FC<DesignStepProps> = ({
                   </div>
                 </div>
                 
+                {/* Show shipping details if available */}
+                {(previewData.shippingDetails?.from?.name || previewData.shippingDetails?.to?.name) && (
+                  <div className="text-xs border-t pt-2 mt-3">
+                    <p className="font-medium">Shipping Details:</p>
+                    {previewData.shippingDetails.from.name && (
+                      <p>From: {previewData.shippingDetails.from.name}, {previewData.shippingDetails.from.address}</p>
+                    )}
+                    {previewData.shippingDetails.to.name && (
+                      <p>To: {previewData.shippingDetails.to.name}, {previewData.shippingDetails.to.address}</p>
+                    )}
+                  </div>
+                )}
+                
                 {signature && (
                   <div className="mt-6 border-t pt-4">
                     <div className="text-right">
-                      <img src={signature} alt="Signature" className="max-h-16 ml-auto" />
+                      <img src={signature} alt="Signature" className="max-h-16 inline-block" />
                       <p className="text-xs mt-1 border-t border-gray-300 inline-block pt-1">Authorized Signature</p>
                     </div>
+                  </div>
+                )}
+                
+                {(previewData.notes || previewData.terms) && (
+                  <div className="text-xs text-muted-foreground mt-4 border-t pt-2">
+                    {previewData.notes && <p className="mb-1"><strong>Notes:</strong> {previewData.notes}</p>}
+                    {previewData.terms && <p><strong>Terms:</strong> {previewData.terms}</p>}
                   </div>
                 )}
                 
