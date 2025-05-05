@@ -1,7 +1,7 @@
 
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, ArrowLeft } from "lucide-react";
+import { ArrowRight, ArrowLeft, Save } from "lucide-react";
 import InvoiceSteps from "@/components/invoices/InvoiceSteps";
 
 interface InvoiceGenerationStepperProps {
@@ -34,8 +34,12 @@ const InvoiceGenerationStepper = ({
   };
 
   const handleNext = () => {
-    const nextStep = Math.min(currentStep + 1, steps.length - 1);
-    setCurrentStep(nextStep);
+    if (currentStep === steps.length - 1) {
+      handleSubmit();
+    } else {
+      const nextStep = Math.min(currentStep + 1, steps.length - 1);
+      setCurrentStep(nextStep);
+    }
   };
 
   const handlePrevious = () => {
@@ -76,6 +80,7 @@ const InvoiceGenerationStepper = ({
 
           {isLastStep && showFinalSubmitButton ? (
             <Button type="button" onClick={handleSubmit}>
+              <Save className="mr-2 h-4 w-4" />
               {isEditMode ? "Update Invoice" : "Save Invoice"}
             </Button>
           ) : (

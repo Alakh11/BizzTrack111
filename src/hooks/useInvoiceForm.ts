@@ -16,6 +16,7 @@ export const useInvoiceForm = () => {
   const [isGstDialogOpen, setIsGstDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [invoiceId, setInvoiceId] = useState<string | null>(null);
+  const [finalSubmission, setFinalSubmission] = useState(false);
 
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -135,8 +136,19 @@ export const useInvoiceForm = () => {
       watermarkText: "",
       margins: "normal",
       textScale: "100",
+      
+      // Digital signature
+      signature: "",
+      
+      // Items array for easier access
+      items: items
     },
   });
+
+  // Keep form's items in sync with the items state
+  useEffect(() => {
+    form.setValue("items", items);
+  }, [items, form]);
 
   // Check if we're in edit mode
   useEffect(() => {
@@ -203,6 +215,10 @@ export const useInvoiceForm = () => {
                   // Added the missing properties
                   if (metadata.design.paperSize) {
                     setSelectedPaperSize(metadata.design.paperSize);
+                  }
+                  
+                  if (metadata.design.signature) {
+                    form.setValue("signature", metadata.design.signature);
                   }
                 }
                 if (metadata.additional) {
@@ -282,7 +298,17 @@ export const useInvoiceForm = () => {
 
   // Modified handleFormSubmit to ensure shipping and transport details are saved
   const handleFormSubmit = async (data: any) => {
+    // Only proceed if finalSubmission is true
+    if (!finalSubmission && currentStep !== 3) {
+      // If we're not on the final step and not in final submission, just go to next step
+      setCurrentStep(currentStep + 1);
+      return;
+    }
+    
     try {
+      // Update form with latest total
+      form.setValue("total", calculateTotal());
+      
       // Prepare metadata for design settings
       const metadata = {
         design: {
@@ -293,6 +319,7 @@ export const useInvoiceForm = () => {
           title: customInvoiceTitle,
           subtitle: customSubtitle,
           logo: businessLogo,
+          signature: data.signature || "",
         },
         additional: {
           poNumber: purchaseOrderNumber,
@@ -388,7 +415,10 @@ export const useInvoiceForm = () => {
           title: "Invoice updated",
           description: "Your invoice has been updated successfully.",
         });
-      } else {
+        
+        navigate("/invoices");
+      } else if (finalSubmission) {
+        // Only create the invoice if this is the final submission
         // Create new invoice
         const result = await createInvoice.mutateAsync(invoiceData);
 
@@ -406,10 +436,10 @@ export const useInvoiceForm = () => {
             title: "Invoice created",
             description: "Your invoice has been created successfully.",
           });
+          
+          navigate("/invoices");
         }
       }
-
-      navigate("/invoices");
     } catch (error: any) {
       console.error("Error with invoice:", error);
       toast({
@@ -465,5 +495,7 @@ export const useInvoiceForm = () => {
     handleRemoveItem,
     calculateTotal,
     handleFormSubmit,
+    setFinalSubmission,
+    finalSubmission,
   };
 };

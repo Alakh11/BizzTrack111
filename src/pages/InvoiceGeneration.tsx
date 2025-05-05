@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { FormProvider } from "react-hook-form";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card } from "@/components/ui/card";
@@ -77,10 +77,15 @@ const InvoiceGeneration = () => {
     handleRemoveItem,
     calculateTotal,
     handleFormSubmit,
+    setFinalSubmission,
   } = useInvoiceForm();
 
   // Wrapper for form submission
   const onSubmit = () => {
+    // Only set finalSubmission to true if we're on the last step
+    if (currentStep === steps.length - 1) {
+      setFinalSubmission(true);
+    }
     form.handleSubmit(handleFormSubmit)();
   };
 

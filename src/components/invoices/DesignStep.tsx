@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useRef, useState } from "react";
 import { FileText } from "lucide-react";
 import InvoiceTemplates from "./InvoiceTemplates";
 import { UseFormReturn } from "react-hook-form";
@@ -44,6 +44,10 @@ const DesignStep: React.FC<DesignStepProps> = ({
   setSelectedPaperSize,
   setBusinessLogo
 }) => {
+  const [signature, setSignature] = useState<string>("");
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isDrawing, setIsDrawing] = useState(false);
+  
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
@@ -55,6 +59,63 @@ const DesignStep: React.FC<DesignStepProps> = ({
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    setIsDrawing(true);
+    ctx.beginPath();
+    ctx.moveTo(
+      e.nativeEvent.offsetX, 
+      e.nativeEvent.offsetY
+    );
+  };
+  
+  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isDrawing) return;
+    
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    ctx.lineWidth = 2;
+    ctx.lineCap = 'round';
+    ctx.strokeStyle = 'black';
+    
+    ctx.lineTo(
+      e.nativeEvent.offsetX, 
+      e.nativeEvent.offsetY
+    );
+    ctx.stroke();
+  };
+  
+  const stopDrawing = () => {
+    setIsDrawing(false);
+    
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    setSignature(canvas.toDataURL('image/png'));
+    form.setValue("signature", canvas.toDataURL('image/png'));
+  };
+  
+  const clearSignature = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    setSignature("");
+    form.setValue("signature", "");
   };
 
   return (
@@ -69,6 +130,7 @@ const DesignStep: React.FC<DesignStepProps> = ({
                   <TabsTrigger value="templates" className="flex-1">Templates</TabsTrigger>
                   <TabsTrigger value="colors" className="flex-1">Colors</TabsTrigger>
                   <TabsTrigger value="fonts" className="flex-1">Fonts</TabsTrigger>
+                  <TabsTrigger value="signature" className="flex-1">Signature</TabsTrigger>
                 </TabsList>
                 <TabsContent value="templates" className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
@@ -148,6 +210,35 @@ const DesignStep: React.FC<DesignStepProps> = ({
                       <Label htmlFor="font-montserrat" className="font-['Montserrat']">Montserrat</Label>
                     </div>
                   </RadioGroup>
+                </TabsContent>
+                
+                <TabsContent value="signature" className="space-y-4">
+                  <Label>Digital Signature</Label>
+                  <div className="border rounded-md p-2">
+                    <canvas
+                      ref={canvasRef}
+                      width={400}
+                      height={150}
+                      className="border rounded-md w-full bg-white"
+                      onMouseDown={startDrawing}
+                      onMouseMove={draw}
+                      onMouseUp={stopDrawing}
+                      onMouseLeave={stopDrawing}
+                    />
+                    <div className="flex justify-end mt-2">
+                      <Button 
+                        variant="outline" 
+                        type="button" 
+                        onClick={clearSignature}
+                        className="text-sm"
+                      >
+                        Clear Signature
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Draw your signature above. It will be included in the final invoice.
+                  </div>
                 </TabsContent>
               </Tabs>
             </CardContent>
@@ -273,6 +364,13 @@ const DesignStep: React.FC<DesignStepProps> = ({
                     <span className="font-bold">$200.00</span>
                   </div>
                 </div>
+                
+                {signature && (
+                  <div className="mt-6 border-t pt-4">
+                    <p className="text-xs text-muted-foreground mb-1">Signature:</p>
+                    <img src={signature} alt="Signature" className="max-h-16" />
+                  </div>
+                )}
                 
                 <div className="text-xs text-muted-foreground text-center mt-6 border-t pt-2">
                   Thank you for your business

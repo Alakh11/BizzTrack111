@@ -49,36 +49,32 @@ const TransportFormSection: React.FC<TransportFormSectionProps> = ({
             render={({ field: formField }) => (
               <FormItem>
                 <FormLabel>{field.label}</FormLabel>
-                <div className={field.buttonText ? "flex gap-2" : ""}>
-                  <FormControl>
-                    {field.type === 'select' && field.options && (
-                      <Select 
-                        onValueChange={formField.onChange} 
-                        value={formField.value}
-                      >
-                        <SelectTrigger>
-                          <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {field.options.map(option => (
-                            <SelectItem 
-                              key={option.value} 
-                              value={option.value}
-                            >
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                    {field.type === 'input' && (
-                      <Input {...formField} />
-                    )}
-                    {field.type === 'date' && (
-                      <Input type="date" {...formField} />
-                    )}
-                  </FormControl>
-                </div>
+                <FormControl>
+                  {field.type === 'select' && field.options ? (
+                    <Select 
+                      onValueChange={formField.onChange} 
+                      value={formField.value || ""}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {field.options.map(option => (
+                          <SelectItem 
+                            key={option.value} 
+                            value={option.value}
+                          >
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : field.type === 'input' ? (
+                    <Input {...formField} />
+                  ) : (
+                    <Input type="date" {...formField} />
+                  )}
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}
