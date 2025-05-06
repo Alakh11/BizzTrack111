@@ -1,9 +1,14 @@
 
 import { useEffect } from "react";
 import { useInvoiceFormCore } from "./useInvoiceFormCore";
+import { useInvoiceFormUpdater } from "./useInvoiceFormUpdater";
 
+// This hook now only handles form setup and data preparation,
+// while delegating the actual update operations to useInvoiceFormUpdater
 export const useInvoiceForm = () => {
   const core = useInvoiceFormCore();
+  const formUpdater = useInvoiceFormUpdater();
+  
   const {
     form,
     setItems,
@@ -82,7 +87,10 @@ export const useInvoiceForm = () => {
             // Parse and apply metadata with timeout to prevent UI freeze
             if (invoiceData.metadata) {
               try {
-                const metadata = JSON.parse(invoiceData.metadata);
+                const metadata = typeof invoiceData.metadata === 'string' 
+                  ? JSON.parse(invoiceData.metadata)
+                  : invoiceData.metadata;
+                  
                 setTimeout(() => {
                   applyMetadataToForm(metadata);
                 }, 0);
@@ -315,7 +323,7 @@ export const useInvoiceForm = () => {
     };
   };
 
-  // Optimized handleFormSubmit with improved performance
+  // Optimized handleFormSubmit with improved performance - using the updater hook
   const handleFormSubmit = async (data: any) => {
     // Only proceed if finalSubmission is true or we're on the last step
     if (!core.finalSubmission && core.currentStep !== 3) {
@@ -353,86 +361,30 @@ export const useInvoiceForm = () => {
         service_id: item.serviceId || null,
       }));
 
+      // Use the updater hook to handle the database operations
       if (core.isEditMode && core.invoiceId) {
-        // Update existing invoice - use setTimeout to prevent UI freeze
-        setTimeout(async () => {
-          try {
-            await core.updateInvoice.mutateAsync({
-              id: core.invoiceId!,
-              invoiceData: {
-                ...invoiceData,
-                invoice_items: invoiceItems,
-              },
-            });
-  
-            core.toast({
-              title: "Invoice updated",
-              description: "Your invoice has been updated successfully.",
-            });
-            
-            core.navigate("/invoices");
-          } catch (error: any) {
-            console.error("Error updating invoice:", error);
-            core.toast({
-              title: "Error updating invoice",
-              description: error.message || "An error occurred while updating the invoice",
-              variant: "destructive",
-            });
-          }
-        }, 0);
+        const result = await formUpdater.updateInvoice(
+          core.invoiceId,
+          invoiceData,
+          invoiceItems
+        );
+        
+        if (result) {
+          formUpdater.navigate("/invoices");
+        }
       } else if (core.finalSubmission) {
-        // Only create the invoice if this is the final submission
-        // Check for unique invoice number first
-        setTimeout(async () => {
-          try {
-            const { data: existingInvoices } = await supabase
-              .from("invoices")
-              .select("id")
-              .eq("invoice_number", data.invoiceNumber)
-              .limit(1);
-              
-            if (existingInvoices && existingInvoices.length > 0) {
-              core.toast({
-                title: "Duplicate Invoice Number",
-                description: "This invoice number already exists. Please use a unique number.",
-                variant: "destructive",
-              });
-              return;
-            }
-            
-            // Create new invoice
-            const result = await core.createInvoice.mutateAsync(invoiceData);
-  
-            // If invoice was created successfully, add invoice items
-            if (result && result.id) {
-              // Insert invoice items
-              await supabase.from("invoice_items").insert(
-                invoiceItems.map((item) => ({
-                  ...item,
-                  invoice_id: result.id,
-                })),
-              );
-  
-              core.toast({
-                title: "Invoice created",
-                description: "Your invoice has been created successfully.",
-              });
-              
-              core.navigate("/invoices");
-            }
-          } catch (error: any) {
-            console.error("Error creating invoice:", error);
-            core.toast({
-              title: "Error creating invoice",
-              description: error.message || "An error occurred while creating the invoice",
-              variant: "destructive",
-            });
-          }
-        }, 0);
+        const result = await formUpdater.createInvoice(
+          { ...invoiceData, user_id: (await supabase.auth.getUser()).data.user?.id },
+          invoiceItems
+        );
+        
+        if (result) {
+          formUpdater.navigate("/invoices");
+        }
       }
     } catch (error: any) {
       console.error("Error with invoice:", error);
-      core.toast({
+      toast({
         title: core.isEditMode ? "Error updating invoice" : "Error creating invoice",
         description:
           error.message ||

@@ -1,12 +1,12 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { FormProvider } from "react-hook-form";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card } from "@/components/ui/card";
 import InvoiceGenerationStepper from "@/components/invoices/InvoiceGenerationStepper";
 import InvoiceDetailsStep from "@/components/invoices/InvoiceDetailsStep";
-import DesignStep from "@/components/invoices/DesignStep";
 import BankingDetailsStep from "@/components/invoices/BankingDetailsStep";
+import DesignStep from "@/components/invoices/DesignStep";
 import EmailPreviewStep from "@/components/invoices/EmailPreviewStep";
 import { useInvoiceForm } from "@/hooks/useInvoiceForm";
 
@@ -34,6 +34,7 @@ const steps = [
 ];
 
 const InvoiceGeneration = () => {
+  const [formSubmitAttempted, setFormSubmitAttempted] = useState(false);
   const {
     form,
     currentStep,
@@ -50,6 +51,7 @@ const InvoiceGeneration = () => {
 
   // Wrapper for form submission
   const onSubmit = () => {
+    setFormSubmitAttempted(true);
     // Only set finalSubmission to true if we're on the last step
     if (currentStep === steps.length - 1) {
       setFinalSubmission(true);

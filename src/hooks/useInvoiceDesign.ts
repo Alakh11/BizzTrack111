@@ -25,6 +25,17 @@ const dummyTemplates = [
   { id: "simple", name: "Simple", preview: templateImages.simple }
 ];
 
+// Font families available for selection
+const fontFamilies = [
+  { id: "inter", name: "Inter", class: "font-sans" },
+  { id: "playfair", name: "Playfair Display", class: "font-playfair" },
+  { id: "montserrat", name: "Montserrat", class: "font-montserrat" },
+  { id: "poppins", name: "Poppins", class: "font-poppins" },
+  { id: "timesNewRoman", name: "Times New Roman", class: 'font-["Times_New_Roman"]' },
+  { id: "calibri", name: "Calibri", class: 'font-["Calibri"]' },
+  { id: "algerian", name: "Algerian", class: 'font-["Algerian"]' },
+];
+
 export const useInvoiceDesign = () => {
   const [selectedTemplate, setSelectedTemplate] = useState("standard");
   const [selectedColor, setSelectedColor] = useState("blue");
@@ -55,6 +66,7 @@ export const useInvoiceDesign = () => {
     businessLogo,
     setBusinessLogo,
     templates,
-    templateImages
+    templateImages,
+    fontFamilies
   };
 };
