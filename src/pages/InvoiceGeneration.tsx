@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { FormProvider } from "react-hook-form";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card } from "@/components/ui/card";
@@ -9,8 +9,6 @@ import DesignStep from "@/components/invoices/DesignStep";
 import BankingDetailsStep from "@/components/invoices/BankingDetailsStep";
 import EmailPreviewStep from "@/components/invoices/EmailPreviewStep";
 import { useInvoiceForm } from "@/hooks/useInvoiceForm";
-import { useToast } from "@/hooks/use-toast";
-import { AlertDialog, AlertDialogContent, AlertDialogTitle, AlertDialogDescription, AlertDialogAction } from "@/components/ui/alert-dialog";
 
 const steps = [
   {
@@ -19,14 +17,14 @@ const steps = [
     description: "Basic information about the invoice",
   },
   {
-    id: "design",
-    name: "Design & Share",
-    description: "Customize the look and feel",
-  },
-  {
     id: "banking",
     name: "Banking Details",
     description: "Add payment information",
+  },
+  {
+    id: "design",
+    name: "Design & Share",
+    description: "Customize the look and feel",
   },
   {
     id: "preview",
@@ -36,10 +34,6 @@ const steps = [
 ];
 
 const InvoiceGeneration = () => {
-  const { toast } = useToast();
-  const [showEditAlert, setShowEditAlert] = useState(false);
-  const [alertShown, setAlertShown] = useState(false);
-  
   const {
     form,
     currentStep,
@@ -97,14 +91,6 @@ const InvoiceGeneration = () => {
     }
   };
 
-  // Show editing alert only once when in edit mode
-  useEffect(() => {
-    if (isEditMode && !alertShown) {
-      setShowEditAlert(true);
-      setAlertShown(true);
-    }
-  }, [isEditMode, alertShown]);
-
   const renderStep = () => {
     switch (currentStep) {
       case 0:
@@ -139,6 +125,8 @@ const InvoiceGeneration = () => {
           />
         );
       case 1:
+        return <BankingDetailsStep form={form} />;
+      case 2:
         return (
           <DesignStep
             form={form}
@@ -154,8 +142,6 @@ const InvoiceGeneration = () => {
             setBusinessLogo={setBusinessLogo}
           />
         );
-      case 2:
-        return <BankingDetailsStep form={form} />;
       case 3:
         return <EmailPreviewStep form={form} />;
       default:
@@ -192,16 +178,6 @@ const InvoiceGeneration = () => {
           </FormProvider>
         </Card>
       </div>
-
-      <AlertDialog open={showEditAlert} onOpenChange={setShowEditAlert}>
-        <AlertDialogContent>
-          <AlertDialogTitle>Editing Invoice</AlertDialogTitle>
-          <AlertDialogDescription>
-            You are now editing invoice #{form.getValues("invoiceNumber")}. Changes will only be saved when you click "Update Invoice" on the final step.
-          </AlertDialogDescription>
-          <AlertDialogAction autoFocus>Got it</AlertDialogAction>
-        </AlertDialogContent>
-      </AlertDialog>
     </MainLayout>
   );
 };

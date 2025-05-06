@@ -7,7 +7,7 @@ const Footer = ({ isSidebarOpen }: { isSidebarOpen?: boolean }) => {
 
   return (
     <footer className="bg-primary/5 border-t mt-8">
-      <div className={`mx-auto px-4 py-8 transition-all ${isSidebarOpen ? 'ml-64' : 'container'}`}>
+      <div className={`px-4 py-8 transition-all ${isSidebarOpen ? 'ml-64' : 'ml-16'}`}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="font-bold text-lg mb-4">Alakh Corporation</h3>
