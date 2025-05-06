@@ -99,8 +99,8 @@ const DesignStep = ({
             </CardHeader>
             <CardContent>
               <LogoUpload 
-                businessLogo={businessLogo}
-                setBusinessLogo={setBusinessLogo}
+                onUpload={setBusinessLogo}
+                currentLogo={businessLogo}
               />
             </CardContent>
           </Card>
