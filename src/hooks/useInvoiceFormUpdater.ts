@@ -37,16 +37,20 @@ export const useInvoiceFormUpdater = () => {
 
       // If invoice was created successfully, add invoice items
       if (result && result.id) {
-        // Map item IDs to be sequential numbers for clarity
-        const itemsWithFixedIds = invoiceItems.map((item, index) => ({
-          ...item,
-          invoice_id: result.id,
+        // Prepare invoice items with proper IDs
+        const itemsToInsert = invoiceItems.map((item) => ({
+          description: item.description || "",
+          quantity: item.quantity || 0,
+          unit_price: item.rate || 0,
+          amount: item.amount || 0,
+          service_id: item.serviceId || null,
+          invoice_id: result.id
         }));
 
         // Insert invoice items
         const { error: itemsError } = await supabase
           .from("invoice_items")
-          .insert(itemsWithFixedIds);
+          .insert(itemsToInsert);
 
         if (itemsError) throw itemsError;
 
@@ -90,19 +94,19 @@ export const useInvoiceFormUpdater = () => {
 
       // Then insert new invoice items with proper mapping
       if (invoiceItems && invoiceItems.length > 0) {
-        // Map items with sequential IDs for clarity and ensure invoice_id is properly set
-        const itemsWithFixedIds = invoiceItems.map((item, index) => ({
-          description: item.description,
-          quantity: item.quantity,
-          unit_price: item.rate,
-          amount: item.amount,
+        // Map items with proper structure for insertion
+        const itemsToInsert = invoiceItems.map((item) => ({
+          description: item.description || "",
+          quantity: item.quantity || 0,
+          unit_price: item.rate || 0,
+          amount: item.amount || 0,
           service_id: item.serviceId || null,
           invoice_id: invoiceId
         }));
 
         const { error: itemsError } = await supabase
           .from("invoice_items")
-          .insert(itemsWithFixedIds);
+          .insert(itemsToInsert);
 
         if (itemsError) throw itemsError;
       }
@@ -112,7 +116,12 @@ export const useInvoiceFormUpdater = () => {
         description: "Your invoice has been updated successfully.",
       });
       
-      return invoiceId;
+      // Add a short delay before navigation to prevent UI freezing
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          resolve(invoiceId);
+        }, 300);
+      });
     } catch (error: any) {
       console.error("Error updating invoice:", error);
       toast({

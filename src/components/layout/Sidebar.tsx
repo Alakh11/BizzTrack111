@@ -131,6 +131,13 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
     return "U";
   };
 
+  const getDisplayName = () => {
+    if (userProfile?.full_name) {
+      return userProfile.full_name;
+    }
+    return user?.email ? user.email.split('@')[0] : "User";
+  };
+
   return (
     <div
       className={cn(
@@ -155,7 +162,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
               {!isCollapsed && (
                 <div className="ml-3 overflow-hidden">
                   <p className="font-semibold dark:text-white text-slate-800 truncate">
-                    {userProfile?.full_name || user.email}
+                    {getDisplayName()}
                   </p>
                   <p className="text-xs dark:text-gray-300 text-gray-600 truncate">
                     {user.email}

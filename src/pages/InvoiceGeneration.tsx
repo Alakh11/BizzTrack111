@@ -33,6 +33,20 @@ const steps = [
   },
 ];
 
+// Add global styles for dark mode inputs
+const darkModeStyles = document.createElement('style');
+darkModeStyles.textContent = `
+  .dark input, .dark textarea, .dark select {
+    background-color: rgb(17, 24, 39) !important;
+    color: white !important;
+    border-color: rgb(55, 65, 81) !important;
+  }
+  .dark input::placeholder, .dark textarea::placeholder, .dark select::placeholder {
+    color: rgb(156, 163, 175) !important;
+  }
+`;
+document.head.appendChild(darkModeStyles);
+
 const InvoiceGeneration = () => {
   const [formSubmitAttempted, setFormSubmitAttempted] = useState(false);
   const {

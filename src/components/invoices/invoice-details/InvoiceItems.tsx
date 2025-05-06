@@ -51,7 +51,7 @@ const InvoiceItems = ({
           <div className="col-span-1 md:col-span-2">
             <Label className="dark:text-gray-200">Description</Label>
             <Input
-              className="dark:bg-gray-900 dark:text-white dark:border-gray-700"
+              className="dark:bg-gray-900 dark:text-white dark:border-gray-700 dark:placeholder-gray-400"
               value={item.description}
               onChange={(e) => handleItemChange(item.id, "description", e.target.value)}
               placeholder="Item description"
@@ -60,7 +60,7 @@ const InvoiceItems = ({
           <div>
             <Label className="dark:text-gray-200">Quantity</Label>
             <Input
-              className="dark:bg-gray-900 dark:text-white dark:border-gray-700"
+              className="dark:bg-gray-900 dark:text-white dark:border-gray-700 dark:placeholder-gray-400"
               type="number"
               value={item.quantity}
               onChange={(e) => handleQuantityChange(item.id, Number(e.target.value))}
@@ -70,7 +70,7 @@ const InvoiceItems = ({
           <div>
             <Label className="dark:text-gray-200">Rate</Label>
             <Input
-              className="dark:bg-gray-900 dark:text-white dark:border-gray-700"
+              className="dark:bg-gray-900 dark:text-white dark:border-gray-700 dark:placeholder-gray-400"
               type="number"
               value={item.rate}
               onChange={(e) => handleRateChange(item.id, Number(e.target.value))}
