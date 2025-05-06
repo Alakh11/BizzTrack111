@@ -28,7 +28,7 @@ const MainLayout = ({ children, className }: MainLayoutProps) => {
         </main>
       </div>
 
-      <Footer />
+      <Footer isSidebarOpen={isSidebarOpen} />
     </div>
   );
 };

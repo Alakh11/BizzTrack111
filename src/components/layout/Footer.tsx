@@ -1,15 +1,13 @@
 
 import { Copyright, Phone, Mail, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useSidebar } from "@/components/ui/sidebar";
 
-const Footer = () => {
-  const { open } = useSidebar();
+const Footer = ({ isSidebarOpen }: { isSidebarOpen?: boolean }) => {
   const currentYear = new Date().getFullYear();
 
   return (
     <footer className="bg-primary/5 border-t mt-8">
-      <div className={`mx-auto px-4 py-8 transition-all ${open ? 'ml-64' : 'container'}`}>
+      <div className={`mx-auto px-4 py-8 transition-all ${isSidebarOpen ? 'ml-64' : 'container'}`}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div>
             <h3 className="font-bold text-lg mb-4">Alakh Corporation</h3>
