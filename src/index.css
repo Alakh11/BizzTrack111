@@ -125,7 +125,7 @@
   }
   
   .dark-gradient {
-    @apply bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#334155] text-white;
+    @apply dark:bg-gradient-to-b dark:from-[#0f172a] dark:via-[#1e293b] dark:to-[#334155] dark:text-white;
   }
 }
 
@@ -140,4 +140,16 @@
 
 .font-montserrat {
   font-family: "Montserrat", sans-serif;
+}
+
+.font-\[\"Times_New_Roman\"\] {
+  font-family: "Times New Roman", Times, serif;
+}
+
+.font-\[\"Calibri\"\] {
+  font-family: Calibri, "Segoe UI", sans-serif;
+}
+
+.font-\[\"Algerian\"\] {
+  font-family: Algerian, fantasy;
 }

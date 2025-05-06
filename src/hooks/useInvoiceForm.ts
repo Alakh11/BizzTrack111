@@ -1,162 +1,33 @@
 
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
-import { useClients } from "@/hooks/useClients";
-import { useInvoices } from "@/hooks/useInvoices";
-import { useInvoiceItems } from "@/hooks/useInvoiceItems";
-import { useInvoiceDesign } from "@/hooks/useInvoiceDesign";
-import { useInvoiceAdditionalDetails } from "@/hooks/useInvoiceAdditionalDetails";
-import { supabase } from "@/integrations/supabase/client";
+import { useEffect } from "react";
+import { useInvoiceFormCore } from "./useInvoiceFormCore";
 
 export const useInvoiceForm = () => {
-  // Core state
-  const [currentStep, setCurrentStep] = useState(0);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [invoiceId, setInvoiceId] = useState<string | null>(null);
-  const [finalSubmission, setFinalSubmission] = useState(false);
-  
-  // Feature toggles
-  const [showShippingDetails, setShowShippingDetails] = useState(false);
-  const [showTransportDetails, setShowTransportDetails] = useState(false);
-  const [isGstDialogOpen, setIsGstDialogOpen] = useState(false);
-  
-  // Hooks
-  const { toast } = useToast();
-  const navigate = useNavigate();
-  const params = useParams();
-  const location = useLocation();
-  const { clients = [], isLoading: clientsLoading } = useClients();
-  const { createInvoice, updateInvoice, getInvoice } = useInvoices();
-  
-  // Feature-specific hooks
-  const { 
-    items, 
-    setItems, 
-    handleItemChange, 
-    handleAddItem, 
-    handleRemoveItem, 
-    calculateTotal 
-  } = useInvoiceItems();
-
+  const core = useInvoiceFormCore();
   const {
-    selectedTemplate,
+    form,
+    setItems,
+    setIsEditMode,
+    setInvoiceId,
+    params,
+    location,
+    getInvoice,
+    toast,
+    navigate,
     setSelectedTemplate,
-    selectedColor,
     setSelectedColor,
-    selectedFont,
     setSelectedFont,
-    selectedPaperSize,
     setSelectedPaperSize,
-    businessLogo,
     setBusinessLogo,
-    templates
-  } = useInvoiceDesign();
-
-  const {
-    showAdditionalFields, 
+    setShowShippingDetails,
+    setShowTransportDetails,
     setShowAdditionalFields,
-    customInvoiceTitle, 
     setCustomInvoiceTitle,
-    customSubtitle, 
-    setCustomSubtitle,
-    selectedCurrency, 
-    setSelectedCurrency,
-    purchaseOrderNumber, 
     setPurchaseOrderNumber,
-    referenceNumber, 
-    setReferenceNumber
-  } = useInvoiceAdditionalDetails();
-
-  // Form definition
-  const form = useForm({
-    defaultValues: {
-      invoiceNumber: `INV-${new Date().getFullYear()}-${String(
-        Math.floor(Math.random() * 1000),
-      ).padStart(3, "0")}`,
-      invoiceDate: new Date().toISOString().split("T")[0],
-      dueDate: new Date(new Date().setDate(new Date().getDate() + 14))
-        .toISOString()
-        .split("T")[0],
-      clientId: "",
-      clientName: "",
-      clientAddress: "",
-      clientEmail: "",
-      clientPhone: "",
-      
-      // Business details
-      businessName: "Alakh Corporation",
-      businessAddress: "Mirzapur, UP, India - 231312",
-      businessPhone: "+91 9580813770",
-      businessEmail: "alakh1304@gmail.com",
-      
-      // Shipping details
-      shippedFromName: "",
-      shippedFromAddress: "",
-      shippedFromCity: "",
-      shippedFromState: "",
-      shippedFromPostal: "",
-      shippedFromCountry: "india",
-      shippedFromWarehouse: "",
-      
-      shippedToName: "",
-      shippedToAddress: "",
-      shippedToCity: "",
-      shippedToState: "",
-      shippedToPostal: "",
-      shippedToCountry: "india",
-      
-      // Transport details
-      transporterName: "",
-      distance: "",
-      transportMode: "",
-      transportDocNo: "",
-      transportDocDate: "",
-      vehicleType: "",
-      vehicleNumber: "",
-      transactionType: "",
-      supplyType: "",
-      
-      // GST details
-      taxType: "gst",
-      placeOfSupply: "",
-      gstType: "",
-      gstNumber: "",
-      gstReverseCharge: false,
-      nonGstClient: false,
-      
-      // Payment details - Bank
-      bankName: "",
-      accountNumber: "",
-      ifscCode: "",
-      accountHolderName: "",
-      branchName: "",
-      
-      // Payment details - UPI
-      upiId: "",
-      upiName: "",
-      
-      notes: "",
-      terms: "Payment is due within 14 days of issue.",
-      
-      // Design details
-      watermarkText: "",
-      margins: "normal",
-      textScale: "100",
-      
-      // Digital signature
-      signature: "",
-      
-      // Items array for easier access
-      items: items
-    },
-  });
-
-  // Keep form's items in sync with the items state
-  useEffect(() => {
-    form.setValue("items", items);
-  }, [items, form]);
+    setReferenceNumber,
+    setSelectedCurrency,
+    supabase
+  } = core;
 
   // Check if we're in edit mode
   useEffect(() => {
@@ -192,28 +63,29 @@ export const useInvoiceForm = () => {
               form.setValue("clientPhone", invoiceData.client.phone || "");
             }
 
-            // Set invoice items
-            if (
-              invoiceData.invoice_items &&
-              invoiceData.invoice_items.length > 0
-            ) {
-              setItems(
-                invoiceData.invoice_items.map((item: any, index: number) => ({
-                  id: index + 1,
-                  description: item.description,
-                  quantity: item.quantity,
-                  rate: item.unit_price,
-                  amount: item.amount,
-                  serviceId: item.service_id || "",
-                })),
-              );
+            // Set invoice items with timeout to prevent UI freeze
+            if (invoiceData.invoice_items && invoiceData.invoice_items.length > 0) {
+              setTimeout(() => {
+                setItems(
+                  invoiceData.invoice_items.map((item: any, index: number) => ({
+                    id: index + 1,
+                    description: item.description,
+                    quantity: item.quantity,
+                    rate: item.unit_price,
+                    amount: item.amount,
+                    serviceId: item.service_id || "",
+                  }))
+                );
+              }, 0);
             }
 
-            // Parse and apply metadata
+            // Parse and apply metadata with timeout to prevent UI freeze
             if (invoiceData.metadata) {
               try {
                 const metadata = JSON.parse(invoiceData.metadata);
-                applyMetadataToForm(metadata);
+                setTimeout(() => {
+                  applyMetadataToForm(metadata);
+                }, 0);
               } catch (e) {
                 console.error("Error parsing invoice metadata", e);
               }
@@ -326,7 +198,7 @@ export const useInvoiceForm = () => {
         form.setValue("upiName", metadata.payment.upi.name || "");
       }
     }
-  }
+  };
 
   // Fetch business profile data
   useEffect(() => {
@@ -358,10 +230,10 @@ export const useInvoiceForm = () => {
     };
 
     fetchBusinessProfile();
-  }, [form]);
+  }, [form, supabase]);
 
   const handleClientChange = (clientId: string) => {
-    const selectedClient = clients.find((c) => c.id === clientId);
+    const selectedClient = core.clients.find((c) => c.id === clientId);
     if (selectedClient) {
       form.setValue("clientId", clientId);
       form.setValue("clientName", selectedClient.name);
@@ -375,21 +247,21 @@ export const useInvoiceForm = () => {
   const createMetadata = (data: any) => {
     return {
       design: {
-        template: selectedTemplate,
-        color: selectedColor,
-        font: selectedFont,
-        paperSize: selectedPaperSize,
-        title: customInvoiceTitle,
-        subtitle: customSubtitle,
-        logo: businessLogo,
+        template: core.selectedTemplate,
+        color: core.selectedColor,
+        font: core.selectedFont,
+        paperSize: core.selectedPaperSize,
+        title: core.customInvoiceTitle,
+        subtitle: core.customSubtitle,
+        logo: core.businessLogo,
         signature: data.signature || "",
       },
       additional: {
-        poNumber: purchaseOrderNumber,
-        refNumber: referenceNumber,
-        currency: selectedCurrency,
+        poNumber: core.purchaseOrderNumber,
+        refNumber: core.referenceNumber,
+        currency: core.selectedCurrency,
       },
-      shipping: showShippingDetails ? {
+      shipping: core.showShippingDetails ? {
         from: {
           name: data.shippedFromName,
           address: data.shippedFromAddress,
@@ -408,7 +280,7 @@ export const useInvoiceForm = () => {
           country: data.shippedToCountry,
         }
       } : null,
-      transport: showTransportDetails ? {
+      transport: core.showTransportDetails ? {
         transporter: data.transporterName,
         distance: data.distance,
         mode: data.transportMode,
@@ -443,18 +315,18 @@ export const useInvoiceForm = () => {
     };
   };
 
-  // Modified handleFormSubmit to ensure shipping and transport details are saved
+  // Optimized handleFormSubmit with improved performance
   const handleFormSubmit = async (data: any) => {
     // Only proceed if finalSubmission is true or we're on the last step
-    if (!finalSubmission && currentStep !== 3) {
+    if (!core.finalSubmission && core.currentStep !== 3) {
       // If we're not on the final step and not in final submission, just go to next step
-      setCurrentStep(currentStep + 1);
+      core.setCurrentStep(core.currentStep + 1);
       return;
     }
     
     try {
       // Calculate total
-      const totalAmount = calculateTotal();
+      const totalAmount = core.calculateTotal();
       
       // Create metadata
       const metadata = createMetadata(data);
@@ -473,7 +345,7 @@ export const useInvoiceForm = () => {
       };
 
       // Prepare invoice items
-      const invoiceItems = items.map((item) => ({
+      const invoiceItems = core.items.map((item) => ({
         description: item.description,
         quantity: item.quantity,
         unit_price: item.rate,
@@ -481,68 +353,90 @@ export const useInvoiceForm = () => {
         service_id: item.serviceId || null,
       }));
 
-      if (isEditMode && invoiceId) {
-        // Update existing invoice
-        await updateInvoice.mutateAsync({
-          id: invoiceId,
-          invoiceData: {
-            ...invoiceData,
-            invoice_items: invoiceItems,
-          },
-        });
-
-        toast({
-          title: "Invoice updated",
-          description: "Your invoice has been updated successfully.",
-        });
-        
-        navigate("/invoices");
-      } else if (finalSubmission) {
+      if (core.isEditMode && core.invoiceId) {
+        // Update existing invoice - use setTimeout to prevent UI freeze
+        setTimeout(async () => {
+          try {
+            await core.updateInvoice.mutateAsync({
+              id: core.invoiceId!,
+              invoiceData: {
+                ...invoiceData,
+                invoice_items: invoiceItems,
+              },
+            });
+  
+            core.toast({
+              title: "Invoice updated",
+              description: "Your invoice has been updated successfully.",
+            });
+            
+            core.navigate("/invoices");
+          } catch (error: any) {
+            console.error("Error updating invoice:", error);
+            core.toast({
+              title: "Error updating invoice",
+              description: error.message || "An error occurred while updating the invoice",
+              variant: "destructive",
+            });
+          }
+        }, 0);
+      } else if (core.finalSubmission) {
         // Only create the invoice if this is the final submission
         // Check for unique invoice number first
-        const { data: existingInvoices } = await supabase
-          .from("invoices")
-          .select("id")
-          .eq("invoice_number", data.invoiceNumber)
-          .limit(1);
-          
-        if (existingInvoices && existingInvoices.length > 0) {
-          toast({
-            title: "Duplicate Invoice Number",
-            description: "This invoice number already exists. Please use a unique number.",
-            variant: "destructive",
-          });
-          return;
-        }
-        
-        // Create new invoice
-        const result = await createInvoice.mutateAsync(invoiceData);
-
-        // If invoice was created successfully, add invoice items
-        if (result && result.id) {
-          // Insert invoice items
-          await supabase.from("invoice_items").insert(
-            invoiceItems.map((item) => ({
-              ...item,
-              invoice_id: result.id,
-            })),
-          );
-
-          toast({
-            title: "Invoice created",
-            description: "Your invoice has been created successfully.",
-          });
-          
-          navigate("/invoices");
-        }
+        setTimeout(async () => {
+          try {
+            const { data: existingInvoices } = await supabase
+              .from("invoices")
+              .select("id")
+              .eq("invoice_number", data.invoiceNumber)
+              .limit(1);
+              
+            if (existingInvoices && existingInvoices.length > 0) {
+              core.toast({
+                title: "Duplicate Invoice Number",
+                description: "This invoice number already exists. Please use a unique number.",
+                variant: "destructive",
+              });
+              return;
+            }
+            
+            // Create new invoice
+            const result = await core.createInvoice.mutateAsync(invoiceData);
+  
+            // If invoice was created successfully, add invoice items
+            if (result && result.id) {
+              // Insert invoice items
+              await supabase.from("invoice_items").insert(
+                invoiceItems.map((item) => ({
+                  ...item,
+                  invoice_id: result.id,
+                })),
+              );
+  
+              core.toast({
+                title: "Invoice created",
+                description: "Your invoice has been created successfully.",
+              });
+              
+              core.navigate("/invoices");
+            }
+          } catch (error: any) {
+            console.error("Error creating invoice:", error);
+            core.toast({
+              title: "Error creating invoice",
+              description: error.message || "An error occurred while creating the invoice",
+              variant: "destructive",
+            });
+          }
+        }, 0);
       }
     } catch (error: any) {
       console.error("Error with invoice:", error);
-      toast({
-        title: isEditMode ? "Error updating invoice" : "Error creating invoice",
+      core.toast({
+        title: core.isEditMode ? "Error updating invoice" : "Error creating invoice",
         description:
           error.message ||
-          `An error occurred while ${isEditMode ? "updating" : "creating"} the invoice`,
+          `An error occurred while ${core.isEditMode ? "updating" : "creating"} the invoice`,
         variant: "destructive",
       });
     }
@@ -551,107 +445,107 @@ export const useInvoiceForm = () => {
   // Organize props by feature for easier component consumption
   const invoiceDetailsProps = {
     form,
-    clients: clients || [],
-    items,
-    showShippingDetails,
-    setShowShippingDetails,
-    showTransportDetails,
-    setShowTransportDetails,
-    isGstDialogOpen,
-    setIsGstDialogOpen,
-    showAdditionalFields,
-    setShowAdditionalFields,
-    customInvoiceTitle,
-    setCustomInvoiceTitle,
-    customSubtitle,
-    setCustomSubtitle,
-    selectedCurrency,
-    setSelectedCurrency,
-    purchaseOrderNumber,
-    setPurchaseOrderNumber,
-    referenceNumber,
-    setReferenceNumber,
+    clients: core.clients || [],
+    items: core.items,
+    showShippingDetails: core.showShippingDetails,
+    setShowShippingDetails: core.setShowShippingDetails,
+    showTransportDetails: core.showTransportDetails,
+    setShowTransportDetails: core.setShowTransportDetails,
+    isGstDialogOpen: core.isGstDialogOpen,
+    setIsGstDialogOpen: core.setIsGstDialogOpen,
+    showAdditionalFields: core.showAdditionalFields,
+    setShowAdditionalFields: core.setShowAdditionalFields,
+    customInvoiceTitle: core.customInvoiceTitle,
+    setCustomInvoiceTitle: core.setCustomInvoiceTitle,
+    customSubtitle: core.customSubtitle,
+    setCustomSubtitle: core.setCustomSubtitle,
+    selectedCurrency: core.selectedCurrency,
+    setSelectedCurrency: core.setSelectedCurrency,
+    purchaseOrderNumber: core.purchaseOrderNumber,
+    setPurchaseOrderNumber: core.setPurchaseOrderNumber,
+    referenceNumber: core.referenceNumber,
+    setReferenceNumber: core.setReferenceNumber,
     handleClientChange,
-    handleItemChange,
-    handleAddItem,
-    handleRemoveItem,
-    calculateTotal,
+    handleItemChange: core.handleItemChange,
+    handleAddItem: core.handleAddItem,
+    handleRemoveItem: core.handleRemoveItem,
+    calculateTotal: core.calculateTotal,
   };
 
   const designProps = {
-    selectedTemplate,
-    selectedColor,
-    selectedFont,
-    selectedPaperSize,
-    businessLogo,
-    setSelectedTemplate,
-    setSelectedColor,
-    setSelectedFont,
-    setSelectedPaperSize,
-    setBusinessLogo,
-    templates,
+    selectedTemplate: core.selectedTemplate,
+    selectedColor: core.selectedColor,
+    selectedFont: core.selectedFont,
+    selectedPaperSize: core.selectedPaperSize,
+    businessLogo: core.businessLogo,
+    setSelectedTemplate: core.setSelectedTemplate,
+    setSelectedColor: core.setSelectedColor,
+    setSelectedFont: core.setSelectedFont,
+    setSelectedPaperSize: core.setSelectedPaperSize,
+    setBusinessLogo: core.setBusinessLogo,
+    templates: core.templates,
   };
 
   const renderingProps = {
-    isEditMode,
-    invoiceId,
+    isEditMode: core.isEditMode,
+    invoiceId: core.invoiceId,
   };
 
   return {
     // Core form functionality
     form,
-    currentStep,
-    setCurrentStep,
-    isEditMode,
-    invoiceId,
-    finalSubmission,
-    setFinalSubmission,
+    currentStep: core.currentStep,
+    setCurrentStep: core.setCurrentStep,
+    isEditMode: core.isEditMode,
+    invoiceId: core.invoiceId,
+    finalSubmission: core.finalSubmission,
+    setFinalSubmission: core.setFinalSubmission,
     handleFormSubmit,
     
     // Data
-    items,
-    clients,
-    clientsLoading,
+    items: core.items,
+    clients: core.clients,
+    clientsLoading: core.clientsLoading,
     
     // Feature flags
-    showShippingDetails,
-    setShowShippingDetails,
-    showTransportDetails,
-    setShowTransportDetails,
-    isGstDialogOpen,
-    setIsGstDialogOpen,
-    showAdditionalFields,
-    setShowAdditionalFields,
+    showShippingDetails: core.showShippingDetails,
+    setShowShippingDetails: core.setShowShippingDetails,
+    showTransportDetails: core.showTransportDetails,
+    setShowTransportDetails: core.setShowTransportDetails,
+    isGstDialogOpen: core.isGstDialogOpen,
+    setIsGstDialogOpen: core.setIsGstDialogOpen,
+    showAdditionalFields: core.showAdditionalFields,
+    setShowAdditionalFields: core.setShowAdditionalFields,
     
     // Design settings
-    customInvoiceTitle,
-    setCustomInvoiceTitle,
-    customSubtitle,
-    setCustomSubtitle,
-    selectedCurrency,
-    setSelectedCurrency,
-    purchaseOrderNumber,
-    setPurchaseOrderNumber,
-    referenceNumber,
-    setReferenceNumber,
-    selectedTemplate,
-    selectedColor,
-    selectedFont,
-    selectedPaperSize,
-    businessLogo,
-    setSelectedTemplate,
-    setSelectedColor,
-    setSelectedFont,
-    setSelectedPaperSize,
-    setBusinessLogo,
-    templates,
+    customInvoiceTitle: core.customInvoiceTitle,
+    setCustomInvoiceTitle: core.setCustomInvoiceTitle,
+    customSubtitle: core.customSubtitle,
+    setCustomSubtitle: core.setCustomSubtitle,
+    selectedCurrency: core.selectedCurrency,
+    setSelectedCurrency: core.setSelectedCurrency,
+    purchaseOrderNumber: core.purchaseOrderNumber,
+    setPurchaseOrderNumber: core.setPurchaseOrderNumber,
+    referenceNumber: core.referenceNumber,
+    setReferenceNumber: core.setReferenceNumber,
+    selectedTemplate: core.selectedTemplate,
+    selectedColor: core.selectedColor,
+    selectedFont: core.selectedFont,
+    selectedPaperSize: core.selectedPaperSize,
+    businessLogo: core.businessLogo,
+    setSelectedTemplate: core.setSelectedTemplate,
+    setSelectedColor: core.setSelectedColor,
+    setSelectedFont: core.setSelectedFont,
+    setSelectedPaperSize: core.setSelectedPaperSize,
+    setBusinessLogo: core.setBusinessLogo,
+    templates: core.templates,
     
     // Handler functions
     handleClientChange,
-    handleItemChange,
-    handleAddItem,
-    handleRemoveItem,
-    calculateTotal,
+    handleItemChange: core.handleItemChange,
+    handleAddItem: core.handleAddItem,
+    handleRemoveItem: core.handleRemoveItem,
+    calculateTotal: core.calculateTotal,
     
     // Grouped props for components
     invoiceDetailsProps,

@@ -23,6 +23,9 @@ export default {
         playfair: ["Playfair Display", "serif"],
         poppins: ["Poppins", "sans-serif"],
         montserrat: ["Montserrat", "sans-serif"],
+        "times-new-roman": ['"Times New Roman"', "Times", "serif"],
+        calibri: ["Calibri", '"Segoe UI"', "sans-serif"],
+        algerian: ["Algerian", "fantasy"],
       },
       colors: {
         border: "hsl(var(--border))",

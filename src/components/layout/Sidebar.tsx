@@ -111,32 +111,53 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
   ];
 
   if (!mounted) return null;
+  
+  // Get user initials for the avatar
+  const getInitials = () => {
+    if (userProfile?.full_name) {
+      const names = userProfile.full_name.split(' ');
+      if (names.length >= 2) {
+        return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+      } else if (names.length === 1) {
+        return names[0][0].toUpperCase();
+      }
+    }
+    
+    // Fallback to email
+    if (user?.email) {
+      return user.email[0].toUpperCase();
+    }
+    
+    return "U";
+  };
 
   return (
     <div
       className={cn(
-        "relative h-full border-r bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#334155] text-white transition-all duration-300 ease-in-out shadow-lg",
-        isCollapsed ? "w-16" : "w-64"
+        "relative h-full border-r transition-all duration-300 ease-in-out shadow-lg",
+        isCollapsed ? "w-16" : "w-64",
+        "dark:bg-gradient-to-b dark:from-[#0f172a] dark:via-[#1e293b] dark:to-[#334155] dark:text-white",
+        "bg-white text-slate-800"
       )}
     >
       <div className="p-4 flex flex-col h-full">
         {/* User Info */}
         {user && (
-          <div className={cn("mb-6 border-b pb-4 border-gray-600", isCollapsed ? "flex justify-center" : "")}>
+          <div className={cn("mb-6 border-b pb-4 dark:border-gray-600 border-gray-200", isCollapsed ? "flex justify-center" : "")}>
             <div className={cn("flex items-center", isCollapsed ? "flex-col" : "flex-row")}>
-              <Avatar className="h-10 w-10 border border-white shadow-md">
+              <Avatar className="h-10 w-10 border shadow-md dark:border-white border-slate-300">
                 <AvatarImage src="" alt="User" />
-                <AvatarFallback>
-                  <User size={20} />
+                <AvatarFallback className="bg-primary text-primary-foreground">
+                  {getInitials()}
                 </AvatarFallback>
               </Avatar>
               
               {!isCollapsed && (
                 <div className="ml-3 overflow-hidden">
-                  <p className="font-semibold text-white truncate">
-                    {userProfile?.username || user.email?.split('@')[0]}
+                  <p className="font-semibold dark:text-white text-slate-800 truncate">
+                    {userProfile?.full_name || user.email?.split('@')[0]}
                   </p>
-                  <p className="text-xs text-gray-300 truncate">
+                  <p className="text-xs dark:text-gray-300 text-gray-600 truncate">
                     {user.email}
                   </p>
                 </div>
@@ -154,8 +175,8 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
               className={cn(
                 "flex items-center py-3 px-3 rounded-md transition-colors font-medium",
                 item.active
-                  ? "bg-white text-[#0f172a]"
-                  : "text-gray-300 hover:bg-gray-700/40 hover:text-white",
+                  ? "bg-primary text-primary-foreground"
+                  : "dark:text-gray-300 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700/40 dark:hover:text-white hover:text-black",
                 isCollapsed ? "justify-center" : "justify-start"
               )}
             >
@@ -169,7 +190,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
         <button
           onClick={signOut}
           className={cn(
-            "flex items-center py-3 px-3 mt-4 rounded-md text-gray-300 hover:bg-red-600 hover:text-white transition-colors",
+            "flex items-center py-3 px-3 mt-4 rounded-md dark:text-gray-300 text-gray-600 hover:bg-red-100 dark:hover:bg-red-600 hover:text-red-600 dark:hover:text-white transition-colors",
             isCollapsed ? "justify-center" : "justify-start"
           )}
         >
@@ -179,7 +200,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
 
         {/* Decorative Bottom Design */}
         {!isCollapsed && (
-          <div className="mt-auto pt-4 text-center text-sm text-gray-400 border-t border-gray-600">
+          <div className="mt-auto pt-4 text-center text-sm dark:text-gray-400 text-gray-500 border-t dark:border-gray-600 border-gray-200">
             <p>BizzTrack © {new Date().getFullYear()}</p>
             <p className="text-xs">Crafted with ❤️ by Alakh</p>
           </div>

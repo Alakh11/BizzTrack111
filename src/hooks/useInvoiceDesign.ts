@@ -1,12 +1,12 @@
 
 import { useState } from "react";
 
-// Template images with valid URLs
+// Template images with valid URLs for different invoice templates
 const templateImages = {
   standard: "https://i.imgur.com/CtbuDF6.png",
   professional: "https://i.imgur.com/l2O3M5j.png",
   modern: "https://i.imgur.com/DFg6QiK.png",
-  classic: "https://i.imgur.com/CtbuDF6.png",
+  classic: "https://i.imgur.com/Z5a2g7R.png",
   minimal: "https://i.imgur.com/yH8vXNk.png",
   elegant: "https://i.imgur.com/BpjcRZK.png",
   corporate: "https://i.imgur.com/ZdT8nkL.png",
@@ -32,8 +32,16 @@ export const useInvoiceDesign = () => {
   const [selectedPaperSize, setSelectedPaperSize] = useState("a4");
   const [businessLogo, setBusinessLogo] = useState("");
   
-  // Add templates for local use
+  // Add templates for local use with better preloading
   const templates = dummyTemplates;
+
+  // Preload template images to avoid loading issues
+  if (typeof window !== 'undefined') {
+    templates.forEach(template => {
+      const img = new Image();
+      img.src = template.preview;
+    });
+  }
 
   return {
     selectedTemplate,

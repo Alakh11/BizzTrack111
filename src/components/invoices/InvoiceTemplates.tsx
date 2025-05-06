@@ -18,7 +18,11 @@ const InvoiceTemplates: React.FC<InvoiceTemplatesProps> = ({
       {templates.map((template) => (
         <div
           key={template.id}
-          className={`border rounded-md cursor-pointer overflow-hidden transition-all hover:shadow-md ${selectedTemplate === template.id ? "ring-2 ring-primary border-primary" : ""}`}
+          className={`border rounded-md cursor-pointer overflow-hidden transition-all hover:shadow-md ${
+            selectedTemplate === template.id 
+              ? "ring-2 ring-primary border-primary" 
+              : "border-gray-200 dark:border-gray-700"
+          }`}
           onClick={() => setSelectedTemplate(template.id)}
         >
           <div className="aspect-[3/4]">
@@ -26,6 +30,7 @@ const InvoiceTemplates: React.FC<InvoiceTemplatesProps> = ({
               src={template.preview}
               alt={template.name}
               className="w-full h-full object-cover"
+              loading="lazy"
               onError={(e) => {
                 // Fallback on error
                 const target = e.target as HTMLImageElement;
@@ -34,7 +39,7 @@ const InvoiceTemplates: React.FC<InvoiceTemplatesProps> = ({
               }}
             />
           </div>
-          <div className="p-2 text-center text-sm font-medium">
+          <div className="p-2 text-center text-sm font-medium dark:text-white">
             {template.name}
           </div>
         </div>

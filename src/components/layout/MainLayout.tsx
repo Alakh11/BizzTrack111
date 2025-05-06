@@ -39,7 +39,7 @@ const MainLayout = ({ children, className }: MainLayoutProps) => {
   };
 
   return (
-    <div className={`flex min-h-screen flex-col bg-gray-50 dark:bg-[#0f172a] dark:text-white transition-colors duration-300`}>
+    <div className="flex min-h-screen flex-col bg-gray-50 dark:bg-[#0f172a] dark:text-white transition-colors duration-300">
       <Header 
         toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)} 
         isSidebarOpen={isSidebarOpen}

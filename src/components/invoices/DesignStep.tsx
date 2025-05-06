@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from "react";
 import { FileText } from "lucide-react";
 import InvoiceTemplates from "./InvoiceTemplates";
@@ -182,7 +183,58 @@ const DesignStep: React.FC<DesignStepProps> = ({
     }
   };
 
+  // Get font style based on selected font
+  const getFontStyle = (font: string) => {
+    switch(font) {
+      case 'inter': return 'font-["Inter"]';
+      case 'roboto': return 'font-["Roboto"]';
+      case 'poppins': return 'font-["Poppins"]';
+      case 'montserrat': return 'font-["Montserrat"]';
+      case 'times': return 'font-["Times_New_Roman"]';
+      case 'calibri': return 'font-["Calibri"]';
+      case 'algerian': return 'font-["Algerian"]';
+      default: return 'font-["Inter"]';
+    }
+  };
+
   const colorStyles = getColorStyles(selectedColor);
+  const fontClass = getFontStyle(selectedFont);
+
+  // Add font preload links to document head
+  useEffect(() => {
+    // For standard web fonts like Times New Roman and Calibri,
+    // we don't need to load them as they are system fonts
+    const fontLinks = {
+      inter: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      roboto: "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap",
+      poppins: "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap",
+      montserrat: "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap",
+    };
+    
+    // Only add link for web fonts
+    if (fontLinks[selectedFont as keyof typeof fontLinks]) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = fontLinks[selectedFont as keyof typeof fontLinks];
+      link.id = `font-${selectedFont}`;
+      
+      // Check if link already exists
+      if (!document.getElementById(link.id)) {
+        document.head.appendChild(link);
+      }
+    }
+    
+    return () => {
+      // Clean up any font links we added
+      Object.keys(fontLinks).forEach(font => {
+        const linkId = `font-${font}`;
+        const existingLink = document.getElementById(linkId);
+        if (existingLink) {
+          existingLink.remove();
+        }
+      });
+    };
+  }, [selectedFont]);
 
   return (
     <div className="space-y-8">
@@ -212,7 +264,7 @@ const DesignStep: React.FC<DesignStepProps> = ({
                       <div 
                         key={color}
                         className={`w-10 h-10 rounded-full cursor-pointer border-2 ${selectedColor === color ? 'ring-2 ring-offset-2' : ''}`}
-                        style={{ backgroundColor: color }}
+                        style={{ backgroundColor: getColorStyles(color).textColor }}
                         onClick={() => setSelectedColor(color)}
                       />
                     ))}
@@ -234,9 +286,21 @@ const DesignStep: React.FC<DesignStepProps> = ({
                       <RadioGroupItem value="poppins" id="font-poppins" />
                       <Label htmlFor="font-poppins" className="font-['Poppins']">Poppins</Label>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2 mb-2">
                       <RadioGroupItem value="montserrat" id="font-montserrat" />
                       <Label htmlFor="font-montserrat" className="font-['Montserrat']">Montserrat</Label>
+                    </div>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <RadioGroupItem value="times" id="font-times" />
+                      <Label htmlFor="font-times" className="font-['Times_New_Roman']">Times New Roman</Label>
+                    </div>
+                    <div className="flex items-center space-x-2 mb-2">
+                      <RadioGroupItem value="calibri" id="font-calibri" />
+                      <Label htmlFor="font-calibri" className="font-['Calibri']">Calibri</Label>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <RadioGroupItem value="algerian" id="font-algerian" />
+                      <Label htmlFor="font-algerian" className="font-['Algerian']">Algerian</Label>
                     </div>
                   </RadioGroup>
                 </TabsContent>
@@ -323,7 +387,7 @@ const DesignStep: React.FC<DesignStepProps> = ({
           <div className="h-full flex flex-col">
             <h3 className="text-lg font-medium mb-4">Preview</h3>
             <div className="flex-grow bg-muted/10 border rounded-md p-4 flex items-center justify-center">
-              <div className={`w-full max-w-md p-6 border rounded-md bg-white shadow-sm font-${selectedFont}`}>
+              <div className={`w-full max-w-md p-6 border rounded-md bg-white shadow-sm ${fontClass}`}>
                 <div className="flex justify-between items-start mb-6">
                   {businessLogo ? (
                     <img src={businessLogo} alt="Logo" className="h-12 max-w-[120px] object-contain" />
@@ -416,7 +480,7 @@ const DesignStep: React.FC<DesignStepProps> = ({
                 )}
                 
                 {signature && (
-                  <div className="mt-6 pt-4 text-right">
+                  <div className="mt-4 pt-2 text-right">
                     <img src={signature} alt="Signature" className="max-h-16 inline-block" />
                     <p className="text-xs mt-1 border-t border-gray-300 inline-block pt-1">Authorized Signature</p>
                   </div>
