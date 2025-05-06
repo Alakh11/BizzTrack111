@@ -361,26 +361,37 @@ export const useInvoiceForm = () => {
         service_id: item.serviceId || null,
       }));
 
-      // Use the updater hook to handle the database operations
-      if (core.isEditMode && core.invoiceId) {
-        const result = await formUpdater.updateInvoice(
-          core.invoiceId,
-          invoiceData,
-          invoiceItems
-        );
-        
-        if (result) {
-          formUpdater.navigate("/invoices");
+      // Use a Promise to handle the database operations
+      const updatePromise = async () => {
+        if (core.isEditMode && core.invoiceId) {
+          return await formUpdater.updateInvoice(
+            core.invoiceId,
+            invoiceData,
+            invoiceItems
+          );
+        } else if (core.finalSubmission) {
+          const userData = (await supabase.auth.getUser()).data.user;
+          return await formUpdater.createInvoice(
+            { ...invoiceData, user_id: userData?.id },
+            invoiceItems
+          );
         }
-      } else if (core.finalSubmission) {
-        const result = await formUpdater.createInvoice(
-          { ...invoiceData, user_id: (await supabase.auth.getUser()).data.user?.id },
-          invoiceItems
-        );
-        
-        if (result) {
+        return null;
+      };
+
+      // Show loading toast
+      toast({
+        title: core.isEditMode ? "Updating invoice..." : "Creating invoice...",
+        description: "Please wait while we process your request.",
+      });
+
+      // Execute the promise
+      const result = await updatePromise();
+      
+      if (result) {
+        setTimeout(() => {
           formUpdater.navigate("/invoices");
-        }
+        }, 500); // Add small delay for toast visibility
       }
     } catch (error: any) {
       console.error("Error with invoice:", error);

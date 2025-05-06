@@ -44,21 +44,23 @@ const InvoiceItems = ({
   };
 
   return (
-    <div>
+    <div className="dark:text-gray-100">
       <h3 className="text-lg font-semibold mb-2">Invoice Items</h3>
       {items.map((item) => (
-        <div key={item.id} className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 p-4 border rounded-md bg-muted/10">
+        <div key={item.id} className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 p-4 border rounded-md dark:bg-gray-800/50 bg-muted/10">
           <div className="col-span-1 md:col-span-2">
-            <Label>Description</Label>
+            <Label className="dark:text-gray-200">Description</Label>
             <Input
+              className="dark:bg-gray-900 dark:text-white dark:border-gray-700"
               value={item.description}
               onChange={(e) => handleItemChange(item.id, "description", e.target.value)}
               placeholder="Item description"
             />
           </div>
           <div>
-            <Label>Quantity</Label>
+            <Label className="dark:text-gray-200">Quantity</Label>
             <Input
+              className="dark:bg-gray-900 dark:text-white dark:border-gray-700"
               type="number"
               value={item.quantity}
               onChange={(e) => handleQuantityChange(item.id, Number(e.target.value))}
@@ -66,8 +68,9 @@ const InvoiceItems = ({
             />
           </div>
           <div>
-            <Label>Rate</Label>
+            <Label className="dark:text-gray-200">Rate</Label>
             <Input
+              className="dark:bg-gray-900 dark:text-white dark:border-gray-700"
               type="number"
               value={item.rate}
               onChange={(e) => handleRateChange(item.id, Number(e.target.value))}
@@ -76,12 +79,12 @@ const InvoiceItems = ({
           </div>
           <div className="flex flex-col justify-between">
             <div>
-              <Label>Amount</Label>
+              <Label className="dark:text-gray-200">Amount</Label>
               <Input
+                className="dark:bg-gray-900 dark:text-gray-300 dark:border-gray-700 bg-muted cursor-not-allowed"
                 type="number"
                 value={item.amount}
                 readOnly
-                className="bg-muted cursor-not-allowed"
                 placeholder="Amount"
               />
             </div>

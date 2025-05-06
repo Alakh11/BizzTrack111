@@ -37,15 +37,16 @@ export const useInvoiceFormUpdater = () => {
 
       // If invoice was created successfully, add invoice items
       if (result && result.id) {
+        // Map item IDs to be sequential numbers for clarity
+        const itemsWithFixedIds = invoiceItems.map((item, index) => ({
+          ...item,
+          invoice_id: result.id,
+        }));
+
         // Insert invoice items
         const { error: itemsError } = await supabase
           .from("invoice_items")
-          .insert(
-            invoiceItems.map((item) => ({
-              ...item,
-              invoice_id: result.id,
-            }))
-          );
+          .insert(itemsWithFixedIds);
 
         if (itemsError) throw itemsError;
 
@@ -87,16 +88,21 @@ export const useInvoiceFormUpdater = () => {
 
       if (deleteError) throw deleteError;
 
-      // Then insert new invoice items
-      if (invoiceItems.length > 0) {
+      // Then insert new invoice items with proper mapping
+      if (invoiceItems && invoiceItems.length > 0) {
+        // Map items with sequential IDs for clarity and ensure invoice_id is properly set
+        const itemsWithFixedIds = invoiceItems.map((item, index) => ({
+          description: item.description,
+          quantity: item.quantity,
+          unit_price: item.rate,
+          amount: item.amount,
+          service_id: item.serviceId || null,
+          invoice_id: invoiceId
+        }));
+
         const { error: itemsError } = await supabase
           .from("invoice_items")
-          .insert(
-            invoiceItems.map((item) => ({
-              ...item,
-              invoice_id: invoiceId,
-            }))
-          );
+          .insert(itemsWithFixedIds);
 
         if (itemsError) throw itemsError;
       }

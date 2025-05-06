@@ -155,7 +155,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
               {!isCollapsed && (
                 <div className="ml-3 overflow-hidden">
                   <p className="font-semibold dark:text-white text-slate-800 truncate">
-                    {userProfile?.full_name || (user.email?.split('@')[0])}
+                    {userProfile?.full_name || user.email}
                   </p>
                   <p className="text-xs dark:text-gray-300 text-gray-600 truncate">
                     {user.email}
@@ -175,7 +175,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
               className={cn(
                 "flex items-center py-3 px-3 rounded-md transition-colors font-medium",
                 item.active
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-primary-foreground dark:bg-white dark:text-black"
                   : "dark:text-gray-300 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700/40 dark:hover:text-white hover:text-black",
                 isCollapsed ? "justify-center" : "justify-start"
               )}

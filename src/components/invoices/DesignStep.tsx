@@ -7,6 +7,8 @@ import InvoiceTemplates from "@/components/invoices/InvoiceTemplates";
 import LogoUpload from "./LogoUpload";
 import FontSelector from "./design/FontSelector";
 import ColorSelector from "./design/ColorSelector";
+import PaperSizeSelector from "./design/PaperSizeSelector";
+import DigitalSignature from "./design/DigitalSignature";
 
 interface DesignStepProps {
   form: UseFormReturn<any>;
@@ -41,22 +43,14 @@ const DesignStep = ({
   setBusinessLogo,
   templates,
 }: DesignStepProps) => {
-  // Paper sizes with dimensions
-  const paperSizes = [
-    { id: "a4", name: "A4", dimensions: "210 × 297 mm" },
-    { id: "letter", name: "US Letter", dimensions: "215.9 × 279.4 mm" },
-    { id: "legal", name: "US Legal", dimensions: "215.9 × 355.6 mm" },
-    { id: "a3", name: "A3", dimensions: "297 × 420 mm" }
-  ];
-
   return (
     <div className="space-y-6">
       <Tabs defaultValue="templates" className="w-full">
         <TabsList className="w-full grid grid-cols-4 mb-4">
-          <TabsTrigger value="templates">Templates</TabsTrigger>
-          <TabsTrigger value="colors">Colors & Fonts</TabsTrigger>
-          <TabsTrigger value="branding">Branding</TabsTrigger>
-          <TabsTrigger value="advanced">Advanced</TabsTrigger>
+          <TabsTrigger value="templates" className="dark:data-[state=active]:bg-white dark:data-[state=active]:text-black">Templates</TabsTrigger>
+          <TabsTrigger value="colors" className="dark:data-[state=active]:bg-white dark:data-[state=active]:text-black">Colors & Fonts</TabsTrigger>
+          <TabsTrigger value="branding" className="dark:data-[state=active]:bg-white dark:data-[state=active]:text-black">Branding</TabsTrigger>
+          <TabsTrigger value="advanced" className="dark:data-[state=active]:bg-white dark:data-[state=active]:text-black">Advanced</TabsTrigger>
         </TabsList>
 
         <TabsContent value="templates" className="space-y-4">
@@ -112,48 +106,17 @@ const DesignStep = ({
               <CardTitle>Paper Settings</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Paper Size</label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {paperSizes.map((size) => (
-                    <div
-                      key={size.id}
-                      className={`border rounded-md p-3 text-center cursor-pointer hover:bg-muted transition-colors ${
-                        selectedPaperSize === size.id
-                          ? "border-primary bg-primary/10"
-                          : ""
-                      }`}
-                      onClick={() => setSelectedPaperSize(size.id)}
-                    >
-                      <p className="font-medium">{size.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {size.dimensions}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <PaperSizeSelector 
+                selectedPaperSize={selectedPaperSize}
+                setSelectedPaperSize={setSelectedPaperSize}
+              />
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
 
       <div className="flex flex-col md:flex-row justify-between gap-4">
-        <Card className="w-full">
-          <CardHeader className="py-3">
-            <CardTitle className="text-sm">Digital Signature</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Signature</label>
-              <textarea
-                className="w-full rounded-md border p-2 h-20 dark:bg-gray-800 bg-white"
-                placeholder="Type your name to create a digital signature"
-                {...form.register("signature")}
-              />
-            </div>
-          </CardContent>
-        </Card>
+        <DigitalSignature form={form} />
       </div>
     </div>
   );

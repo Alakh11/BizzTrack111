@@ -16,7 +16,7 @@ const FontSelector: React.FC<FontSelectorProps> = ({ value, onChange }) => {
     <div className="space-y-2">
       <Label htmlFor="font-select">Font Family</Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger id="font-select" className="w-full">
+        <SelectTrigger id="font-select" className="w-full dark:bg-gray-800 dark:text-white">
           <SelectValue placeholder="Select Font" />
         </SelectTrigger>
         <SelectContent>
@@ -32,7 +32,7 @@ const FontSelector: React.FC<FontSelectorProps> = ({ value, onChange }) => {
         </SelectContent>
       </Select>
       
-      <div className="mt-2 p-3 border rounded-md dark:bg-gray-800 bg-gray-50">
+      <div className="mt-2 p-3 border rounded-md dark:bg-gray-800 dark:text-white bg-gray-50">
         <p className={`text-sm ${fontFamilies.find(f => f.id === value)?.class || ''}`}>
           Sample text in {fontFamilies.find(f => f.id === value)?.name || 'selected font'}
         </p>
