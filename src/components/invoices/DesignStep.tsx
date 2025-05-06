@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from "react";
 import { FileText } from "lucide-react";
 import InvoiceTemplates from "./InvoiceTemplates";
@@ -166,6 +165,25 @@ const DesignStep: React.FC<DesignStepProps> = ({
     form.setValue("signature", "");
   };
 
+  const getColorStyles = (color: string) => {
+    // Convert simple color names to proper hex or tailwind-like colors
+    switch(color) {
+      case 'blue': return { textColor: '#3B82F6', accentColor: '#60A5FA' };
+      case 'green': return { textColor: '#10B981', accentColor: '#34D399' };
+      case 'red': return { textColor: '#EF4444', accentColor: '#F87171' };
+      case 'purple': return { textColor: '#8B5CF6', accentColor: '#A78BFA' };
+      case 'orange': return { textColor: '#F97316', accentColor: '#FB923C' };
+      case 'teal': return { textColor: '#14B8A6', accentColor: '#2DD4BF' };
+      case 'pink': return { textColor: '#EC4899', accentColor: '#F472B6' };
+      case 'gray': return { textColor: '#4B5563', accentColor: '#9CA3AF' };
+      case 'black': return { textColor: '#1F2937', accentColor: '#4B5563' };
+      case 'indigo': return { textColor: '#6366F1', accentColor: '#818CF8' };
+      default: return { textColor: '#3B82F6', accentColor: '#60A5FA' };
+    }
+  };
+
+  const colorStyles = getColorStyles(selectedColor);
+
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -315,7 +333,7 @@ const DesignStep: React.FC<DesignStepProps> = ({
                     </div>
                   )}
                   <div className="text-right">
-                    <h2 className="text-xl font-bold" style={{ color: selectedColor }}>INVOICE</h2>
+                    <h2 className="text-xl font-bold" style={{ color: colorStyles.textColor }}>INVOICE</h2>
                     <p className="text-sm text-muted-foreground">#{previewData.invoiceNumber}</p>
                   </div>
                 </div>
@@ -356,7 +374,7 @@ const DesignStep: React.FC<DesignStepProps> = ({
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Amount Due</p>
-                    <p className="text-sm font-semibold">{previewData.total}</p>
+                    <p className="text-sm font-semibold" style={{ color: colorStyles.textColor }}>{previewData.total}</p>
                   </div>
                 </div>
                 
@@ -380,7 +398,7 @@ const DesignStep: React.FC<DesignStepProps> = ({
                 <div className="text-right text-sm mt-4 mb-2">
                   <div className="flex justify-between">
                     <span>Total:</span>
-                    <span className="font-bold">{previewData.total}</span>
+                    <span className="font-bold" style={{ color: colorStyles.textColor }}>{previewData.total}</span>
                   </div>
                 </div>
                 
@@ -398,11 +416,9 @@ const DesignStep: React.FC<DesignStepProps> = ({
                 )}
                 
                 {signature && (
-                  <div className="mt-6 border-t pt-4">
-                    <div className="text-right">
-                      <img src={signature} alt="Signature" className="max-h-16 inline-block" />
-                      <p className="text-xs mt-1 border-t border-gray-300 inline-block pt-1">Authorized Signature</p>
-                    </div>
+                  <div className="mt-6 pt-4 text-right">
+                    <img src={signature} alt="Signature" className="max-h-16 inline-block" />
+                    <p className="text-xs mt-1 border-t border-gray-300 inline-block pt-1">Authorized Signature</p>
                   </div>
                 )}
                 

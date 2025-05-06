@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React from "react";
 import { FormProvider } from "react-hook-form";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card } from "@/components/ui/card";
@@ -38,46 +38,14 @@ const InvoiceGeneration = () => {
     form,
     currentStep,
     setCurrentStep,
-    items,
-    showShippingDetails,
-    setShowShippingDetails,
-    showTransportDetails,
-    setShowTransportDetails,
-    isGstDialogOpen,
-    setIsGstDialogOpen,
-    showAdditionalFields,
-    setShowAdditionalFields,
-    customInvoiceTitle,
-    setCustomInvoiceTitle,
-    customSubtitle,
-    setCustomSubtitle,
-    selectedCurrency,
-    setSelectedCurrency,
-    purchaseOrderNumber,
-    setPurchaseOrderNumber,
-    referenceNumber,
-    setReferenceNumber,
-    selectedTemplate,
-    selectedColor,
-    selectedFont,
-    selectedPaperSize,
-    businessLogo,
-    setSelectedTemplate,
-    setSelectedColor,
-    setSelectedFont,
-    setSelectedPaperSize,
-    setBusinessLogo,
     isEditMode,
     invoiceId,
-    clients,
-    clientsLoading,
-    handleClientChange,
-    handleItemChange,
-    handleAddItem,
-    handleRemoveItem,
-    calculateTotal,
     handleFormSubmit,
     setFinalSubmission,
+    // Group related props together
+    invoiceDetailsProps,
+    designProps,
+    renderingProps,
   } = useInvoiceForm();
 
   // Wrapper for form submission
@@ -94,54 +62,11 @@ const InvoiceGeneration = () => {
   const renderStep = () => {
     switch (currentStep) {
       case 0:
-        return (
-          <InvoiceDetailsStep
-            form={form}
-            clients={clients || []}
-            items={items}
-            showShippingDetails={showShippingDetails}
-            setShowShippingDetails={setShowShippingDetails}
-            showTransportDetails={showTransportDetails}
-            setShowTransportDetails={setShowTransportDetails}
-            isGstDialogOpen={isGstDialogOpen}
-            setIsGstDialogOpen={setIsGstDialogOpen}
-            showAdditionalFields={showAdditionalFields}
-            setShowAdditionalFields={setShowAdditionalFields}
-            customInvoiceTitle={customInvoiceTitle}
-            setCustomInvoiceTitle={setCustomInvoiceTitle}
-            customSubtitle={customSubtitle}
-            setCustomSubtitle={setCustomSubtitle}
-            selectedCurrency={selectedCurrency}
-            setSelectedCurrency={setSelectedCurrency}
-            purchaseOrderNumber={purchaseOrderNumber}
-            setPurchaseOrderNumber={setPurchaseOrderNumber}
-            referenceNumber={referenceNumber}
-            setReferenceNumber={setReferenceNumber}
-            handleClientChange={handleClientChange}
-            handleItemChange={handleItemChange}
-            handleAddItem={handleAddItem}
-            handleRemoveItem={handleRemoveItem}
-            calculateTotal={calculateTotal}
-          />
-        );
+        return <InvoiceDetailsStep {...invoiceDetailsProps} />;
       case 1:
         return <BankingDetailsStep form={form} />;
       case 2:
-        return (
-          <DesignStep
-            form={form}
-            selectedTemplate={selectedTemplate}
-            selectedColor={selectedColor}
-            selectedFont={selectedFont}
-            selectedPaperSize={selectedPaperSize}
-            businessLogo={businessLogo}
-            setSelectedTemplate={setSelectedTemplate}
-            setSelectedColor={setSelectedColor}
-            setSelectedFont={setSelectedFont}
-            setSelectedPaperSize={setSelectedPaperSize}
-            setBusinessLogo={setBusinessLogo}
-          />
-        );
+        return <DesignStep form={form} {...designProps} />;
       case 3:
         return <EmailPreviewStep form={form} />;
       default:
@@ -163,7 +88,7 @@ const InvoiceGeneration = () => {
           </p>
         </div>
 
-        <Card className="p-6">
+        <Card className="p-6 dark:bg-gray-900/50">
           <FormProvider {...form}>
             <InvoiceGenerationStepper
               steps={steps}

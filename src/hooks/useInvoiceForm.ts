@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
@@ -10,15 +11,18 @@ import { useInvoiceAdditionalDetails } from "@/hooks/useInvoiceAdditionalDetails
 import { supabase } from "@/integrations/supabase/client";
 
 export const useInvoiceForm = () => {
+  // Core state
   const [currentStep, setCurrentStep] = useState(0);
-  const [showShippingDetails, setShowShippingDetails] = useState(false);
-  const [showTransportDetails, setShowTransportDetails] = useState(false);
-  const [isGstDialogOpen, setIsGstDialogOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [invoiceId, setInvoiceId] = useState<string | null>(null);
   const [finalSubmission, setFinalSubmission] = useState(false);
-  const [alertShown, setAlertShown] = useState(true); // Set to true to prevent showing alert
-
+  
+  // Feature toggles
+  const [showShippingDetails, setShowShippingDetails] = useState(false);
+  const [showTransportDetails, setShowTransportDetails] = useState(false);
+  const [isGstDialogOpen, setIsGstDialogOpen] = useState(false);
+  
+  // Hooks
   const { toast } = useToast();
   const navigate = useNavigate();
   const params = useParams();
@@ -26,6 +30,7 @@ export const useInvoiceForm = () => {
   const { clients = [], isLoading: clientsLoading } = useClients();
   const { createInvoice, updateInvoice, getInvoice } = useInvoices();
   
+  // Feature-specific hooks
   const { 
     items, 
     setItems, 
@@ -64,6 +69,7 @@ export const useInvoiceForm = () => {
     setReferenceNumber
   } = useInvoiceAdditionalDetails();
 
+  // Form definition
   const form = useForm({
     defaultValues: {
       invoiceNumber: `INV-${new Date().getFullYear()}-${String(
@@ -85,7 +91,7 @@ export const useInvoiceForm = () => {
       businessPhone: "+91 9580813770",
       businessEmail: "alakh1304@gmail.com",
       
-      // Shipping details - moved to useInvoiceForm to keep core details
+      // Shipping details
       shippedFromName: "",
       shippedFromAddress: "",
       shippedFromCity: "",
@@ -101,7 +107,7 @@ export const useInvoiceForm = () => {
       shippedToPostal: "",
       shippedToCountry: "india",
       
-      // Transport details - moved to useInvoiceForm to keep core details
+      // Transport details
       transporterName: "",
       distance: "",
       transportMode: "",
@@ -203,105 +209,15 @@ export const useInvoiceForm = () => {
               );
             }
 
-            // If there are design settings stored in metadata
+            // Parse and apply metadata
             if (invoiceData.metadata) {
               try {
                 const metadata = JSON.parse(invoiceData.metadata);
-                if (metadata.design) {
-                  setSelectedTemplate(metadata.design.template || "standard");
-                  setSelectedColor(metadata.design.color || "blue");
-                  setSelectedFont(metadata.design.font || "inter");
-                  setCustomInvoiceTitle(metadata.design.title || "INVOICE");
-                  setBusinessLogo(metadata.design.logo || "");
-                  
-                  // Added the missing properties
-                  if (metadata.design.paperSize) {
-                    setSelectedPaperSize(metadata.design.paperSize);
-                  }
-                  
-                  if (metadata.design.signature) {
-                    form.setValue("signature", metadata.design.signature);
-                  }
-                }
-                
-                // Set shipping details flag if shipping data exists
-                if (metadata.shipping) {
-                  setShowShippingDetails(true);
-                  // Set shipping form values
-                  if (metadata.shipping.from) {
-                    form.setValue("shippedFromName", metadata.shipping.from.name || "");
-                    form.setValue("shippedFromAddress", metadata.shipping.from.address || "");
-                    form.setValue("shippedFromCity", metadata.shipping.from.city || "");
-                    form.setValue("shippedFromState", metadata.shipping.from.state || "");
-                    form.setValue("shippedFromPostal", metadata.shipping.from.postal || "");
-                    form.setValue("shippedFromCountry", metadata.shipping.from.country || "india");
-                    form.setValue("shippedFromWarehouse", metadata.shipping.from.warehouse || "");
-                  }
-                  
-                  if (metadata.shipping.to) {
-                    form.setValue("shippedToName", metadata.shipping.to.name || "");
-                    form.setValue("shippedToAddress", metadata.shipping.to.address || "");
-                    form.setValue("shippedToCity", metadata.shipping.to.city || "");
-                    form.setValue("shippedToState", metadata.shipping.to.state || "");
-                    form.setValue("shippedToPostal", metadata.shipping.to.postal || "");
-                    form.setValue("shippedToCountry", metadata.shipping.to.country || "india");
-                  }
-                }
-                
-                // Set transport details flag if transport data exists
-                if (metadata.transport) {
-                  setShowTransportDetails(true);
-                  form.setValue("transporterName", metadata.transport.transporter || "");
-                  form.setValue("distance", metadata.transport.distance || "");
-                  form.setValue("transportMode", metadata.transport.mode || "");
-                  form.setValue("transportDocNo", metadata.transport.docNo || "");
-                  form.setValue("transportDocDate", metadata.transport.docDate || "");
-                  form.setValue("vehicleType", metadata.transport.vehicleType || "");
-                  form.setValue("vehicleNumber", metadata.transport.vehicleNumber || "");
-                  form.setValue("transactionType", metadata.transport.transactionType || "");
-                  form.setValue("supplyType", metadata.transport.supplyType || "");
-                }
-                
-                if (metadata.additional) {
-                  setPurchaseOrderNumber(metadata.additional.poNumber || "");
-                  setReferenceNumber(metadata.additional.refNumber || "");
-                  setSelectedCurrency(metadata.additional.currency || "inr");
-                  if (metadata.additional.poNumber || metadata.additional.refNumber) {
-                    setShowAdditionalFields(true);
-                  }
-                }
-                
-                // Set GST details
-                if (metadata.gst) {
-                  form.setValue("taxType", metadata.gst.type || "gst");
-                  form.setValue("placeOfSupply", metadata.gst.placeOfSupply || "");
-                  form.setValue("gstType", metadata.gst.gstType || "");
-                  form.setValue("gstNumber", metadata.gst.gstNumber || "");
-                  form.setValue("gstReverseCharge", metadata.gst.reverseCharge || false);
-                  form.setValue("nonGstClient", metadata.gst.nonGstClient || false);
-                }
-                
-                // Set payment/banking details
-                if (metadata.payment) {
-                  if (metadata.payment.bank) {
-                    form.setValue("bankName", metadata.payment.bank.name || "");
-                    form.setValue("accountNumber", metadata.payment.bank.accountNumber || "");
-                    form.setValue("ifscCode", metadata.payment.bank.ifscCode || "");
-                    form.setValue("accountHolderName", metadata.payment.bank.accountHolderName || "");
-                    form.setValue("branchName", metadata.payment.bank.branchName || "");
-                  }
-                  
-                  if (metadata.payment.upi) {
-                    form.setValue("upiId", metadata.payment.upi.id || "");
-                    form.setValue("upiName", metadata.payment.upi.name || "");
-                  }
-                }
+                applyMetadataToForm(metadata);
               } catch (e) {
                 console.error("Error parsing invoice metadata", e);
               }
             }
-
-            // No toast notification to remove blinking alerts
           }
         } catch (error) {
           console.error("Error fetching invoice:", error);
@@ -316,10 +232,101 @@ export const useInvoiceForm = () => {
     };
 
     fetchInvoice();
-  }, [params.id, form, navigate, toast, getInvoice, location.state, setItems, 
-      setSelectedTemplate, setSelectedColor, setSelectedFont, setSelectedPaperSize,
-      setCustomInvoiceTitle, setBusinessLogo, setPurchaseOrderNumber, setReferenceNumber,
-      setSelectedCurrency, setShowShippingDetails, setShowTransportDetails, setShowAdditionalFields]);
+  }, [params.id, form, navigate, toast, getInvoice, location.state, setItems]);
+
+  // Apply metadata to form
+  const applyMetadataToForm = (metadata: any) => {
+    // Design settings
+    if (metadata.design) {
+      setSelectedTemplate(metadata.design.template || "standard");
+      setSelectedColor(metadata.design.color || "blue");
+      setSelectedFont(metadata.design.font || "inter");
+      setCustomInvoiceTitle(metadata.design.title || "INVOICE");
+      setBusinessLogo(metadata.design.logo || "");
+      
+      if (metadata.design.paperSize) {
+        setSelectedPaperSize(metadata.design.paperSize);
+      }
+      
+      if (metadata.design.signature) {
+        form.setValue("signature", metadata.design.signature);
+      }
+    }
+    
+    // Shipping details
+    if (metadata.shipping) {
+      setShowShippingDetails(true);
+      
+      if (metadata.shipping.from) {
+        form.setValue("shippedFromName", metadata.shipping.from.name || "");
+        form.setValue("shippedFromAddress", metadata.shipping.from.address || "");
+        form.setValue("shippedFromCity", metadata.shipping.from.city || "");
+        form.setValue("shippedFromState", metadata.shipping.from.state || "");
+        form.setValue("shippedFromPostal", metadata.shipping.from.postal || "");
+        form.setValue("shippedFromCountry", metadata.shipping.from.country || "india");
+        form.setValue("shippedFromWarehouse", metadata.shipping.from.warehouse || "");
+      }
+      
+      if (metadata.shipping.to) {
+        form.setValue("shippedToName", metadata.shipping.to.name || "");
+        form.setValue("shippedToAddress", metadata.shipping.to.address || "");
+        form.setValue("shippedToCity", metadata.shipping.to.city || "");
+        form.setValue("shippedToState", metadata.shipping.to.state || "");
+        form.setValue("shippedToPostal", metadata.shipping.to.postal || "");
+        form.setValue("shippedToCountry", metadata.shipping.to.country || "india");
+      }
+    }
+    
+    // Transport details
+    if (metadata.transport) {
+      setShowTransportDetails(true);
+      form.setValue("transporterName", metadata.transport.transporter || "");
+      form.setValue("distance", metadata.transport.distance || "");
+      form.setValue("transportMode", metadata.transport.mode || "");
+      form.setValue("transportDocNo", metadata.transport.docNo || "");
+      form.setValue("transportDocDate", metadata.transport.docDate || "");
+      form.setValue("vehicleType", metadata.transport.vehicleType || "");
+      form.setValue("vehicleNumber", metadata.transport.vehicleNumber || "");
+      form.setValue("transactionType", metadata.transport.transactionType || "");
+      form.setValue("supplyType", metadata.transport.supplyType || "");
+    }
+    
+    // Additional details
+    if (metadata.additional) {
+      setPurchaseOrderNumber(metadata.additional.poNumber || "");
+      setReferenceNumber(metadata.additional.refNumber || "");
+      setSelectedCurrency(metadata.additional.currency || "inr");
+      if (metadata.additional.poNumber || metadata.additional.refNumber) {
+        setShowAdditionalFields(true);
+      }
+    }
+    
+    // GST details
+    if (metadata.gst) {
+      form.setValue("taxType", metadata.gst.type || "gst");
+      form.setValue("placeOfSupply", metadata.gst.placeOfSupply || "");
+      form.setValue("gstType", metadata.gst.gstType || "");
+      form.setValue("gstNumber", metadata.gst.gstNumber || "");
+      form.setValue("gstReverseCharge", metadata.gst.reverseCharge || false);
+      form.setValue("nonGstClient", metadata.gst.nonGstClient || false);
+    }
+    
+    // Payment/banking details
+    if (metadata.payment) {
+      if (metadata.payment.bank) {
+        form.setValue("bankName", metadata.payment.bank.name || "");
+        form.setValue("accountNumber", metadata.payment.bank.accountNumber || "");
+        form.setValue("ifscCode", metadata.payment.bank.ifscCode || "");
+        form.setValue("accountHolderName", metadata.payment.bank.accountHolderName || "");
+        form.setValue("branchName", metadata.payment.bank.branchName || "");
+      }
+      
+      if (metadata.payment.upi) {
+        form.setValue("upiId", metadata.payment.upi.id || "");
+        form.setValue("upiName", metadata.payment.upi.name || "");
+      }
+    }
+  }
 
   // Fetch business profile data
   useEffect(() => {
@@ -361,13 +368,84 @@ export const useInvoiceForm = () => {
       form.setValue("clientAddress", selectedClient.address || "");
       form.setValue("clientEmail", selectedClient.email || "");
       form.setValue("clientPhone", selectedClient.phone || "");
-      // The company field is not in the schema, so we won't set it
     }
+  };
+
+  // Create metadata object from form and state values
+  const createMetadata = (data: any) => {
+    return {
+      design: {
+        template: selectedTemplate,
+        color: selectedColor,
+        font: selectedFont,
+        paperSize: selectedPaperSize,
+        title: customInvoiceTitle,
+        subtitle: customSubtitle,
+        logo: businessLogo,
+        signature: data.signature || "",
+      },
+      additional: {
+        poNumber: purchaseOrderNumber,
+        refNumber: referenceNumber,
+        currency: selectedCurrency,
+      },
+      shipping: showShippingDetails ? {
+        from: {
+          name: data.shippedFromName,
+          address: data.shippedFromAddress,
+          city: data.shippedFromCity,
+          state: data.shippedFromState,
+          postal: data.shippedFromPostal,
+          country: data.shippedFromCountry,
+          warehouse: data.shippedFromWarehouse,
+        },
+        to: {
+          name: data.shippedToName,
+          address: data.shippedToAddress,
+          city: data.shippedToCity,
+          state: data.shippedToState,
+          postal: data.shippedToPostal,
+          country: data.shippedToCountry,
+        }
+      } : null,
+      transport: showTransportDetails ? {
+        transporter: data.transporterName,
+        distance: data.distance,
+        mode: data.transportMode,
+        docNo: data.transportDocNo,
+        docDate: data.transportDocDate,
+        vehicleType: data.vehicleType,
+        vehicleNumber: data.vehicleNumber,
+        transactionType: data.transactionType,
+        supplyType: data.supplyType,
+      } : null,
+      gst: {
+        type: data.taxType,
+        placeOfSupply: data.placeOfSupply,
+        gstType: data.gstType,
+        gstNumber: data.gstNumber,
+        reverseCharge: data.gstReverseCharge,
+        nonGstClient: data.nonGstClient,
+      },
+      payment: {
+        bank: {
+          name: data.bankName,
+          accountNumber: data.accountNumber,
+          ifscCode: data.ifscCode,
+          accountHolderName: data.accountHolderName,
+          branchName: data.branchName,
+        },
+        upi: {
+          id: data.upiId,
+          name: data.upiName,
+        }
+      }
+    };
   };
 
   // Modified handleFormSubmit to ensure shipping and transport details are saved
   const handleFormSubmit = async (data: any) => {
-    // Only proceed if finalSubmission is true
+    // Only proceed if finalSubmission is true or we're on the last step
     if (!finalSubmission && currentStep !== 3) {
       // If we're not on the final step and not in final submission, just go to next step
       setCurrentStep(currentStep + 1);
@@ -375,78 +453,11 @@ export const useInvoiceForm = () => {
     }
     
     try {
-      // Calculate total instead of setting it directly
+      // Calculate total
       const totalAmount = calculateTotal();
       
-      // Prepare metadata for design settings
-      const metadata = {
-        design: {
-          template: selectedTemplate,
-          color: selectedColor,
-          font: selectedFont,
-          paperSize: selectedPaperSize,
-          title: customInvoiceTitle,
-          subtitle: customSubtitle,
-          logo: businessLogo,
-          signature: data.signature || "",
-        },
-        additional: {
-          poNumber: purchaseOrderNumber,
-          refNumber: referenceNumber,
-          currency: selectedCurrency,
-        },
-        shipping: showShippingDetails ? {
-          from: {
-            name: data.shippedFromName,
-            address: data.shippedFromAddress,
-            city: data.shippedFromCity,
-            state: data.shippedFromState,
-            postal: data.shippedFromPostal,
-            country: data.shippedFromCountry,
-            warehouse: data.shippedFromWarehouse,
-          },
-          to: {
-            name: data.shippedToName,
-            address: data.shippedToAddress,
-            city: data.shippedToCity,
-            state: data.shippedToState,
-            postal: data.shippedToPostal,
-            country: data.shippedToCountry,
-          }
-        } : null,
-        transport: showTransportDetails ? {
-          transporter: data.transporterName,
-          distance: data.distance,
-          mode: data.transportMode,
-          docNo: data.transportDocNo,
-          docDate: data.transportDocDate,
-          vehicleType: data.vehicleType,
-          vehicleNumber: data.vehicleNumber,
-          transactionType: data.transactionType,
-          supplyType: data.supplyType,
-        } : null,
-        gst: {
-          type: data.taxType,
-          placeOfSupply: data.placeOfSupply,
-          gstType: data.gstType,
-          gstNumber: data.gstNumber,
-          reverseCharge: data.gstReverseCharge,
-          nonGstClient: data.nonGstClient,
-        },
-        payment: {
-          bank: {
-            name: data.bankName,
-            accountNumber: data.accountNumber,
-            ifscCode: data.ifscCode,
-            accountHolderName: data.accountHolderName,
-            branchName: data.branchName,
-          },
-          upi: {
-            id: data.upiId,
-            name: data.upiName,
-          }
-        }
-      };
+      // Create metadata
+      const metadata = createMetadata(data);
 
       // Prepare invoice data
       const invoiceData = {
@@ -488,6 +499,22 @@ export const useInvoiceForm = () => {
         navigate("/invoices");
       } else if (finalSubmission) {
         // Only create the invoice if this is the final submission
+        // Check for unique invoice number first
+        const { data: existingInvoices } = await supabase
+          .from("invoices")
+          .select("id")
+          .eq("invoice_number", data.invoiceNumber)
+          .limit(1);
+          
+        if (existingInvoices && existingInvoices.length > 0) {
+          toast({
+            title: "Duplicate Invoice Number",
+            description: "This invoice number already exists. Please use a unique number.",
+            variant: "destructive",
+          });
+          return;
+        }
+        
         // Create new invoice
         const result = await createInvoice.mutateAsync(invoiceData);
 
@@ -521,10 +548,10 @@ export const useInvoiceForm = () => {
     }
   };
 
-  return {
+  // Organize props by feature for easier component consumption
+  const invoiceDetailsProps = {
     form,
-    currentStep,
-    setCurrentStep,
+    clients: clients || [],
     items,
     showShippingDetails,
     setShowShippingDetails,
@@ -534,6 +561,69 @@ export const useInvoiceForm = () => {
     setIsGstDialogOpen,
     showAdditionalFields,
     setShowAdditionalFields,
+    customInvoiceTitle,
+    setCustomInvoiceTitle,
+    customSubtitle,
+    setCustomSubtitle,
+    selectedCurrency,
+    setSelectedCurrency,
+    purchaseOrderNumber,
+    setPurchaseOrderNumber,
+    referenceNumber,
+    setReferenceNumber,
+    handleClientChange,
+    handleItemChange,
+    handleAddItem,
+    handleRemoveItem,
+    calculateTotal,
+  };
+
+  const designProps = {
+    selectedTemplate,
+    selectedColor,
+    selectedFont,
+    selectedPaperSize,
+    businessLogo,
+    setSelectedTemplate,
+    setSelectedColor,
+    setSelectedFont,
+    setSelectedPaperSize,
+    setBusinessLogo,
+    templates,
+  };
+
+  const renderingProps = {
+    isEditMode,
+    invoiceId,
+  };
+
+  return {
+    // Core form functionality
+    form,
+    currentStep,
+    setCurrentStep,
+    isEditMode,
+    invoiceId,
+    finalSubmission,
+    setFinalSubmission,
+    handleFormSubmit,
+    
+    // Data
+    items,
+    clients,
+    clientsLoading,
+    
+    // Feature flags
+    showShippingDetails,
+    setShowShippingDetails,
+    showTransportDetails,
+    setShowTransportDetails,
+    isGstDialogOpen,
+    setIsGstDialogOpen,
+    showAdditionalFields,
+    setShowAdditionalFields,
+    
+    // Design settings
     customInvoiceTitle,
     setCustomInvoiceTitle,
     customSubtitle,
@@ -554,18 +644,18 @@ export const useInvoiceForm = () => {
     setSelectedFont,
     setSelectedPaperSize,
     setBusinessLogo,
-    isEditMode,
-    invoiceId,
-    clients,
-    clientsLoading,
+    templates,
+    
+    // Handler functions
     handleClientChange,
     handleItemChange,
     handleAddItem,
     handleRemoveItem,
     calculateTotal,
-    handleFormSubmit,
-    setFinalSubmission,
-    finalSubmission,
-    templates,
+    
+    // Grouped props for components
+    invoiceDetailsProps,
+    designProps,
+    renderingProps,
   };
 };

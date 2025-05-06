@@ -1,13 +1,28 @@
 
 import { useState } from "react";
 
-// Dummy template data since external data is no longer available
+// Template images with valid URLs
+const templateImages = {
+  standard: "https://i.imgur.com/CtbuDF6.png",
+  professional: "https://i.imgur.com/l2O3M5j.png",
+  modern: "https://i.imgur.com/DFg6QiK.png",
+  classic: "https://i.imgur.com/CtbuDF6.png",
+  minimal: "https://i.imgur.com/yH8vXNk.png",
+  elegant: "https://i.imgur.com/BpjcRZK.png",
+  corporate: "https://i.imgur.com/ZdT8nkL.png",
+  simple: "https://i.imgur.com/sO17jcA.png",
+};
+
+// Dummy template data with actual image URLs
 const dummyTemplates = [
-  { id: "standard", name: "Standard", preview: "/placeholder.svg" },
-  { id: "professional", name: "Professional", preview: "/placeholder.svg" },
-  { id: "modern", name: "Modern", preview: "/placeholder.svg" },
-  { id: "minimal", name: "Minimal", preview: "/placeholder.svg" },
-  { id: "classic", name: "Classic", preview: "/placeholder.svg" }
+  { id: "standard", name: "Standard", preview: templateImages.standard },
+  { id: "professional", name: "Professional", preview: templateImages.professional },
+  { id: "modern", name: "Modern", preview: templateImages.modern },
+  { id: "minimal", name: "Minimal", preview: templateImages.minimal },
+  { id: "classic", name: "Classic", preview: templateImages.classic },
+  { id: "elegant", name: "Elegant", preview: templateImages.elegant },
+  { id: "corporate", name: "Corporate", preview: templateImages.corporate },
+  { id: "simple", name: "Simple", preview: templateImages.simple }
 ];
 
 export const useInvoiceDesign = () => {
@@ -31,6 +46,7 @@ export const useInvoiceDesign = () => {
     setSelectedPaperSize,
     businessLogo,
     setBusinessLogo,
-    templates
+    templates,
+    templateImages
   };
 };

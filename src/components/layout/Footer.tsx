@@ -6,9 +6,9 @@ const Footer = ({ isSidebarOpen }: { isSidebarOpen?: boolean }) => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-primary/5 border-t mt-8">
-      <div className={`px-4 py-8 transition-all ${isSidebarOpen ? 'ml-64' : 'ml-16'}`}>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+    <footer className="bg-primary/5 border-t mt-8 dark:bg-gray-900/50 dark:border-gray-800">
+      <div className={`px-4 py-8 transition-all duration-300`} style={{ marginLeft: isSidebarOpen ? '16rem' : '4rem' }}>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 overflow-x-auto">
           <div>
             <h3 className="font-bold text-lg mb-4">Alakh Corporation</h3>
             <p className="text-muted-foreground mb-4">

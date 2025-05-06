@@ -18,12 +18,37 @@ const InvoiceItems = ({
   handleAddItem,
   handleRemoveItem,
 }: InvoiceItemsProps) => {
+  // Calculate amount when quantity or rate changes
+  const calculateAmount = (quantity: number, rate: number) => {
+    return (quantity * rate).toFixed(2);
+  };
+  
+  // Handle quantity change and recalculate amount
+  const handleQuantityChange = (id: number, value: number) => {
+    const item = items.find(item => item.id === id);
+    if (item) {
+      handleItemChange(id, "quantity", value);
+      const amount = calculateAmount(value, item.rate);
+      handleItemChange(id, "amount", parseFloat(amount));
+    }
+  };
+  
+  // Handle rate change and recalculate amount
+  const handleRateChange = (id: number, value: number) => {
+    const item = items.find(item => item.id === id);
+    if (item) {
+      handleItemChange(id, "rate", value);
+      const amount = calculateAmount(item.quantity, value);
+      handleItemChange(id, "amount", parseFloat(amount));
+    }
+  };
+
   return (
     <div>
       <h3 className="text-lg font-semibold mb-2">Invoice Items</h3>
       {items.map((item) => (
-        <div key={item.id} className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-          <div className="col-span-1">
+        <div key={item.id} className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 p-4 border rounded-md bg-muted/10">
+          <div className="col-span-1 md:col-span-2">
             <Label>Description</Label>
             <Input
               value={item.description}
@@ -36,7 +61,7 @@ const InvoiceItems = ({
             <Input
               type="number"
               value={item.quantity}
-              onChange={(e) => handleItemChange(item.id, "quantity", Number(e.target.value))}
+              onChange={(e) => handleQuantityChange(item.id, Number(e.target.value))}
               placeholder="Quantity"
             />
           </div>
@@ -45,16 +70,27 @@ const InvoiceItems = ({
             <Input
               type="number"
               value={item.rate}
-              onChange={(e) => handleItemChange(item.id, "rate", Number(e.target.value))}
+              onChange={(e) => handleRateChange(item.id, Number(e.target.value))}
               placeholder="Rate"
             />
           </div>
-          <div className="flex items-end">
+          <div className="flex flex-col justify-between">
+            <div>
+              <Label>Amount</Label>
+              <Input
+                type="number"
+                value={item.amount}
+                readOnly
+                className="bg-muted cursor-not-allowed"
+                placeholder="Amount"
+              />
+            </div>
             <Button
               type="button"
               variant="destructive"
               size="sm"
               onClick={() => handleRemoveItem(item.id)}
+              className="mt-2"
             >
               <Trash className="h-4 w-4 mr-2" />
               Remove

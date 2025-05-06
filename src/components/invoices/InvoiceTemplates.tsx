@@ -1,17 +1,6 @@
 
 import React from "react";
-
-// Updated template images with valid URLs
-const templateImages = {
-  standard: "https://i.imgur.com/CtbuDF6.png",
-  professional: "https://i.imgur.com/l2O3M5j.png",
-  modern: "https://i.imgur.com/DFg6QiK.png",
-  classic: "https://i.imgur.com/CtbuDF6.png",
-  simple: "https://i.imgur.com/sO17jcA.png",
-  minimal: "https://i.imgur.com/yH8vXNk.png",
-  elegant: "https://i.imgur.com/BpjcRZK.png",
-  corporate: "https://i.imgur.com/ZdT8nkL.png",
-};
+import { useInvoiceDesign } from "@/hooks/useInvoiceDesign";
 
 interface InvoiceTemplatesProps {
   selectedTemplate: string;
@@ -22,20 +11,7 @@ const InvoiceTemplates: React.FC<InvoiceTemplatesProps> = ({
   selectedTemplate,
   setSelectedTemplate,
 }) => {
-  const templates = [
-    { id: "standard", name: "Standard", image: templateImages.standard },
-    {
-      id: "professional",
-      name: "Professional",
-      image: templateImages.professional,
-    },
-    { id: "modern", name: "Modern", image: templateImages.modern },
-    { id: "classic", name: "Classic", image: templateImages.classic },
-    { id: "simple", name: "Simple", image: templateImages.simple },
-    { id: "minimal", name: "Minimal", image: templateImages.minimal },
-    { id: "elegant", name: "Elegant", image: templateImages.elegant },
-    { id: "corporate", name: "Corporate", image: templateImages.corporate },
-  ];
+  const { templates } = useInvoiceDesign();
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
@@ -47,7 +23,7 @@ const InvoiceTemplates: React.FC<InvoiceTemplatesProps> = ({
         >
           <div className="aspect-[3/4]">
             <img
-              src={template.image}
+              src={template.preview}
               alt={template.name}
               className="w-full h-full object-cover"
               onError={(e) => {
