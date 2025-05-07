@@ -23,17 +23,23 @@ const ExpensesByCategory = () => {
     const categories: Record<string, number> = {};
     
     expenses.forEach(expense => {
+      if (!expense.amount || !expense.category) return;
+      
       const category = expense.category;
+      const amount = parseFloat(expense.amount.toString());
+      
+      if (isNaN(amount)) return;
+      
       if (categories[category]) {
-        categories[category] += Number(expense.amount);
+        categories[category] += amount;
       } else {
-        categories[category] = Number(expense.amount);
+        categories[category] = amount;
       }
     });
 
     return Object.entries(categories).map(([name, value]) => ({
       name,
-      value,
+      value: Number(value.toFixed(2)),
     }));
   }, [expenses]);
 

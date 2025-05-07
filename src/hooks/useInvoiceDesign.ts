@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 // Template images with valid URLs for different invoice templates
 const templateImages = {
@@ -47,12 +47,20 @@ export const useInvoiceDesign = () => {
   const templates = dummyTemplates;
 
   // Preload template images to avoid loading issues
-  if (typeof window !== 'undefined') {
-    templates.forEach(template => {
-      const img = new Image();
-      img.src = template.preview;
-    });
-  }
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      templates.forEach(template => {
+        const img = new Image();
+        img.src = template.preview;
+        img.onload = () => {
+          console.log(`Preloaded template image: ${template.name}`);
+        };
+        img.onerror = () => {
+          console.error(`Failed to load template image: ${template.name}`);
+        };
+      });
+    }
+  }, []);
 
   return {
     selectedTemplate,

@@ -25,6 +25,24 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
 
   if (!invoice) return null;
 
+  // Parse metadata for additional info
+  let metadata: any = {};
+  try {
+    if (invoice.metadata) {
+      metadata = typeof invoice.metadata === 'string' ? 
+        JSON.parse(invoice.metadata) : invoice.metadata;
+    }
+  } catch (e) {
+    console.error("Error parsing invoice metadata", e);
+  }
+
+  // Get design settings and other metadata
+  const design = metadata.design || {};
+  const gst = metadata.gst || {};
+  const shipping = metadata.shipping || {};
+  const transport = metadata.transport || {};
+  const payment = metadata.payment || {};
+
   const handleEdit = () => {
     if (onOpenChange) onOpenChange(false);
     navigate(`/invoices/edit/${invoice.id}`, { state: { invoice } });
@@ -54,22 +72,26 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
     }
   };
 
-  // Parse metadata for additional info
-  let metadata: any = {};
-  try {
-    if (invoice.metadata) {
-      metadata = JSON.parse(invoice.metadata);
+  // Get color style for the invoice based on metadata
+  const getColorStyle = () => {
+    if (!design.color) return {};
+    
+    switch(design.color) {
+      case 'blue': return { color: '#3B82F6' };
+      case 'green': return { color: '#10B981' };
+      case 'red': return { color: '#EF4444' };
+      case 'purple': return { color: '#8B5CF6' };
+      case 'orange': return { color: '#F97316' };
+      case 'teal': return { color: '#14B8A6' };
+      case 'pink': return { color: '#EC4899' };
+      case 'gray': return { color: '#4B5563' };
+      case 'black': return { color: '#1F2937' };
+      case 'indigo': return { color: '#6366F1' };
+      default: return { color: '#3B82F6' };
     }
-  } catch (e) {
-    console.error("Error parsing invoice metadata", e);
-  }
+  };
 
-  // Get design settings and other metadata
-  const design = metadata.design || {};
-  const gst = metadata.gst || {};
-  const shipping = metadata.shipping || {};
-  const transport = metadata.transport || {};
-  const payment = metadata.payment || {};
+  const colorStyle = getColorStyle();
 
   return (
     <DialogContent className="max-w-4xl h-[85vh] overflow-y-auto">
@@ -93,7 +115,7 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
         {/* Invoice Header with Logo */}
         <div className="flex justify-between items-start">
           <div>
-            <div className="text-2xl font-bold font-playfair">
+            <div className="text-2xl font-bold font-playfair" style={colorStyle}>
               {design.title || "INVOICE"}
             </div>
             <div className="text-muted-foreground text-sm">
@@ -236,7 +258,7 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
             <h3 className="text-sm font-medium text-muted-foreground">
               Total Amount
             </h3>
-            <p className="flex items-center font-medium text-lg">
+            <p className="flex items-center font-medium text-lg" style={colorStyle}>
               <IndianRupee className="h-4 w-4 mr-1" />
               {invoice.total_amount.toLocaleString("en-IN")}
             </p>
@@ -274,7 +296,7 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-border">
+            <tbody className="bg-white divide-y divide-border dark:bg-gray-800">
               {invoice.invoice_items?.map((item: any) => (
                 <tr key={item.id}>
                   <td className="px-4 py-3 whitespace-nowrap text-sm">
@@ -298,8 +320,8 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
                 </tr>
               ))}
             </tbody>
-            <tfoot>
-              <tr className="bg-muted/10">
+            <tfoot className="bg-muted/10 dark:bg-gray-900">
+              <tr>
                 <th
                   colSpan={3}
                   className="px-4 py-3 text-right text-sm font-medium"
@@ -307,7 +329,7 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
                   Total:
                 </th>
                 <th className="px-4 py-3 text-right text-sm font-medium">
-                  <div className="flex items-center justify-end">
+                  <div className="flex items-center justify-end" style={colorStyle}>
                     <IndianRupee className="h-3 w-3 mr-1" />
                     {invoice.total_amount.toLocaleString("en-IN")}
                   </div>
