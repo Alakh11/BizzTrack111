@@ -47,6 +47,12 @@ darkModeStyles.textContent = `
   .dark .bg-muted {
     background-color: rgb(31, 41, 55) !important;
   }
+  .dark input[type=number] {
+    color: white !important;
+  }
+  .dark input[readonly] {
+    opacity: 0.7;
+  }
 `;
 document.head.appendChild(darkModeStyles);
 

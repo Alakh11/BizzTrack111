@@ -25,32 +25,14 @@ interface SidebarProps {
 }
 
 const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
-  const { signOut, user } = useAuth();
+  const { signOut, user, userProfile } = useAuth();
   const isMobile = useIsMobile();
   const location = useLocation();
   const [mounted, setMounted] = useState(false);
-  const [userProfile, setUserProfile] = useState<any>(null);
 
   useEffect(() => {
     setMounted(true);
-    
-    // Fetch user profile when user is available
-    const fetchUserProfile = async () => {
-      if (user) {
-        const { data } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
-          
-        if (data) {
-          setUserProfile(data);
-        }
-      }
-    };
-    
-    fetchUserProfile();
-  }, [user]);
+  }, []);
 
   // Close sidebar on mobile when route changes
   useEffect(() => {
@@ -136,7 +118,11 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
     if (userProfile?.full_name) {
       return userProfile.full_name;
     }
-    // Don't display email username, use a generic name as fallback
+    
+    if (user?.email) {
+      return user.email;
+    }
+    
     return "User";
   };
 

@@ -13,6 +13,10 @@ const InvoiceTemplates: React.FC<InvoiceTemplatesProps> = ({
 }) => {
   const { templates } = useInvoiceDesign();
 
+  const handleTemplateSelection = (templateId: string) => {
+    setSelectedTemplate(templateId);
+  };
+
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
       {templates.map((template) => (
@@ -23,7 +27,7 @@ const InvoiceTemplates: React.FC<InvoiceTemplatesProps> = ({
               ? "ring-2 ring-primary border-primary" 
               : "border-gray-200 dark:border-gray-700"
           }`}
-          onClick={() => setSelectedTemplate(template.id)}
+          onClick={() => handleTemplateSelection(template.id)}
         >
           <div className="aspect-[3/4]">
             <img

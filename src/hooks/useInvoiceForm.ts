@@ -68,32 +68,28 @@ export const useInvoiceForm = () => {
               form.setValue("clientPhone", invoiceData.client.phone || "");
             }
 
-            // Set invoice items with timeout to prevent UI freeze
+            // Set invoice items with proper ids for editing
             if (invoiceData.invoice_items && invoiceData.invoice_items.length > 0) {
-              setTimeout(() => {
-                setItems(
-                  invoiceData.invoice_items.map((item: any, index: number) => ({
-                    id: index + 1,
-                    description: item.description,
-                    quantity: item.quantity,
-                    rate: item.unit_price,
-                    amount: item.amount,
-                    serviceId: item.service_id || "",
-                  }))
-                );
-              }, 0);
+              const mappedItems = invoiceData.invoice_items.map((item: any, index: number) => ({
+                id: index + 1,
+                description: item.description || "",
+                quantity: item.quantity || 0,
+                rate: item.unit_price || 0,
+                amount: item.amount || 0,
+                serviceId: item.service_id || "",
+              }));
+              
+              setItems(mappedItems);
             }
 
-            // Parse and apply metadata with timeout to prevent UI freeze
+            // Parse and apply metadata
             if (invoiceData.metadata) {
               try {
                 const metadata = typeof invoiceData.metadata === 'string' 
                   ? JSON.parse(invoiceData.metadata)
                   : invoiceData.metadata;
                   
-                setTimeout(() => {
-                  applyMetadataToForm(metadata);
-                }, 0);
+                applyMetadataToForm(metadata);
               } catch (e) {
                 console.error("Error parsing invoice metadata", e);
               }
@@ -323,7 +319,7 @@ export const useInvoiceForm = () => {
     };
   };
 
-  // Optimized handleFormSubmit with improved performance - using the updater hook
+  // Optimized handleFormSubmit with improved error handling to prevent freezes
   const handleFormSubmit = async (data: any) => {
     // Only proceed if finalSubmission is true or we're on the last step
     if (!core.finalSubmission && core.currentStep !== 3) {
@@ -361,45 +357,50 @@ export const useInvoiceForm = () => {
         service_id: item.serviceId || null,
       }));
 
-      // Use a Promise to handle the database operations
-      const updatePromise = async () => {
-        if (core.isEditMode && core.invoiceId) {
-          return await formUpdater.updateInvoice(
-            core.invoiceId,
-            invoiceData,
-            invoiceItems
-          );
-        } else if (core.finalSubmission) {
-          const userData = (await supabase.auth.getUser()).data.user;
-          return await formUpdater.createInvoice(
-            { ...invoiceData, user_id: userData?.id },
-            invoiceItems
-          );
-        }
-        return null;
-      };
-
       // Show loading toast
       toast({
         title: core.isEditMode ? "Updating invoice..." : "Creating invoice...",
         description: "Please wait while we process your request.",
       });
 
-      // Execute the promise
-      const result = await updatePromise();
+      let result;
       
-      if (result) {
-        setTimeout(() => {
-          formUpdater.navigate("/invoices");
-        }, 500); // Add small delay for toast visibility
+      try {
+        if (core.isEditMode && core.invoiceId) {
+          result = await formUpdater.updateInvoice(
+            core.invoiceId,
+            invoiceData,
+            invoiceItems
+          );
+        } else if (core.finalSubmission) {
+          const userData = (await supabase.auth.getUser()).data.user;
+          if (userData) {
+            result = await formUpdater.createInvoice(
+              { ...invoiceData, user_id: userData.id },
+              invoiceItems
+            );
+          }
+        }
+        
+        if (result) {
+          // Add a short delay for better UX before navigating
+          setTimeout(() => {
+            navigate("/invoices");
+          }, 300);
+        }
+      } catch (error: any) {
+        console.error("Operation error:", error);
+        toast({
+          title: "Error",
+          description: error.message || "An unexpected error occurred",
+          variant: "destructive",
+        });
       }
     } catch (error: any) {
-      console.error("Error with invoice:", error);
+      console.error("Form error:", error);
       toast({
         title: core.isEditMode ? "Error updating invoice" : "Error creating invoice",
-        description:
-          error.message ||
-          `An error occurred while ${core.isEditMode ? "updating" : "creating"} the invoice`,
+        description: error.message || `An error occurred while ${core.isEditMode ? "updating" : "creating"} the invoice`,
         variant: "destructive",
       });
     }

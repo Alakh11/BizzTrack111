@@ -19,13 +19,13 @@ const InvoiceItems = ({
   handleRemoveItem,
 }: InvoiceItemsProps) => {
   // Handle quantity change and recalculate amount
-  const handleQuantityChange = (id: number, value: number) => {
-    handleItemChange(id, "quantity", value);
+  const handleQuantityChange = (id: number, value: string) => {
+    handleItemChange(id, "quantity", Number(value));
   };
   
   // Handle rate change and recalculate amount
-  const handleRateChange = (id: number, value: number) => {
-    handleItemChange(id, "rate", value);
+  const handleRateChange = (id: number, value: string) => {
+    handleItemChange(id, "rate", Number(value));
   };
 
   // Handle description change
@@ -53,7 +53,7 @@ const InvoiceItems = ({
               className="dark:bg-gray-900 dark:text-white dark:border-gray-700 dark:placeholder-gray-400"
               type="number"
               value={item.quantity}
-              onChange={(e) => handleQuantityChange(item.id, Number(e.target.value))}
+              onChange={(e) => handleQuantityChange(item.id, e.target.value)}
               placeholder="Quantity"
             />
           </div>
@@ -63,7 +63,7 @@ const InvoiceItems = ({
               className="dark:bg-gray-900 dark:text-white dark:border-gray-700 dark:placeholder-gray-400"
               type="number"
               value={item.rate}
-              onChange={(e) => handleRateChange(item.id, Number(e.target.value))}
+              onChange={(e) => handleRateChange(item.id, e.target.value)}
               placeholder="Rate"
             />
           </div>

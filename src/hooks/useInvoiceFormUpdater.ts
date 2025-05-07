@@ -73,7 +73,7 @@ export const useInvoiceFormUpdater = () => {
     }
   };
 
-  // Handle invoice update
+  // Handle invoice update with better error handling to prevent freezes
   const updateInvoice = async (invoiceId: string, invoiceData: any, invoiceItems: any[]) => {
     try {
       // Update invoice data
@@ -116,12 +116,7 @@ export const useInvoiceFormUpdater = () => {
         description: "Your invoice has been updated successfully.",
       });
       
-      // Add a short delay before navigation to prevent UI freezing
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          resolve(invoiceId);
-        }, 300);
-      });
+      return invoiceId;
     } catch (error: any) {
       console.error("Error updating invoice:", error);
       toast({
