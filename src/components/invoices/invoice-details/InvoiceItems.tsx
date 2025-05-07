@@ -18,29 +18,19 @@ const InvoiceItems = ({
   handleAddItem,
   handleRemoveItem,
 }: InvoiceItemsProps) => {
-  // Calculate amount when quantity or rate changes
-  const calculateAmount = (quantity: number, rate: number) => {
-    return (quantity * rate).toFixed(2);
-  };
-  
   // Handle quantity change and recalculate amount
   const handleQuantityChange = (id: number, value: number) => {
-    const item = items.find(item => item.id === id);
-    if (item) {
-      handleItemChange(id, "quantity", value);
-      const amount = calculateAmount(value, item.rate);
-      handleItemChange(id, "amount", parseFloat(amount));
-    }
+    handleItemChange(id, "quantity", value);
   };
   
   // Handle rate change and recalculate amount
   const handleRateChange = (id: number, value: number) => {
-    const item = items.find(item => item.id === id);
-    if (item) {
-      handleItemChange(id, "rate", value);
-      const amount = calculateAmount(item.quantity, value);
-      handleItemChange(id, "amount", parseFloat(amount));
-    }
+    handleItemChange(id, "rate", value);
+  };
+
+  // Handle description change
+  const handleDescriptionChange = (id: number, value: string) => {
+    handleItemChange(id, "description", value);
   };
 
   return (
@@ -53,7 +43,7 @@ const InvoiceItems = ({
             <Input
               className="dark:bg-gray-900 dark:text-white dark:border-gray-700 dark:placeholder-gray-400"
               value={item.description}
-              onChange={(e) => handleItemChange(item.id, "description", e.target.value)}
+              onChange={(e) => handleDescriptionChange(item.id, e.target.value)}
               placeholder="Item description"
             />
           </div>

@@ -118,7 +118,7 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
       const names = userProfile.full_name.split(' ');
       if (names.length >= 2) {
         return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
-      } else if (names.length === 1) {
+      } else if (names.length === 1 && names[0]) {
         return names[0][0].toUpperCase();
       }
     }
@@ -131,11 +131,13 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
     return "U";
   };
 
+  // Get display name prioritizing full_name over email
   const getDisplayName = () => {
     if (userProfile?.full_name) {
       return userProfile.full_name;
     }
-    return user?.email ? user.email.split('@')[0] : "User";
+    // Don't display email username, use a generic name as fallback
+    return "User";
   };
 
   return (
@@ -164,9 +166,11 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
                   <p className="font-semibold dark:text-white text-slate-800 truncate">
                     {getDisplayName()}
                   </p>
-                  <p className="text-xs dark:text-gray-300 text-gray-600 truncate">
-                    {user.email}
-                  </p>
+                  {user.email && (
+                    <p className="text-xs dark:text-gray-300 text-gray-600 truncate">
+                      {user.email}
+                    </p>
+                  )}
                 </div>
               )}
             </div>

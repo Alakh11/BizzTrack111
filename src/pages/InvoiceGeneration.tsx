@@ -33,7 +33,7 @@ const steps = [
   },
 ];
 
-// Add global styles for dark mode inputs
+// Add global styles for dark mode inputs with improved visibility
 const darkModeStyles = document.createElement('style');
 darkModeStyles.textContent = `
   .dark input, .dark textarea, .dark select {
@@ -43,6 +43,9 @@ darkModeStyles.textContent = `
   }
   .dark input::placeholder, .dark textarea::placeholder, .dark select::placeholder {
     color: rgb(156, 163, 175) !important;
+  }
+  .dark .bg-muted {
+    background-color: rgb(31, 41, 55) !important;
   }
 `;
 document.head.appendChild(darkModeStyles);
