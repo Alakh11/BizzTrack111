@@ -1,8 +1,8 @@
 
-# InvoiceFlow - Detailed Project Report
+# BizzTrack - Detailed Report
 
 ## Overview
-InvoiceFlow is a comprehensive financial management system designed for small businesses, freelancers, and entrepreneurs. The application streamlines invoicing, expense tracking, client management, and financial reporting into a single unified platform.
+BizzTrack is a comprehensive financial management system designed for small businesses, freelancers, and entrepreneurs. The application streamlines invoicing, expense tracking, client management, and financial reporting into a single unified platform.
 
 ## Technical Architecture
 
@@ -163,4 +163,4 @@ The application is designed for deployment on modern hosting platforms with:
 - Environment-based configuration
 
 ## Conclusion
-InvoiceFlow represents a comprehensive solution for small business financial management, combining powerful features with an intuitive user interface. The application architecture balances developer productivity, user experience, and future extensibility.
+BizzTrack represents a comprehensive solution for small business financial management, combining powerful features with an intuitive user interface. The application architecture balances developer productivity, user experience, and future extensibility.
