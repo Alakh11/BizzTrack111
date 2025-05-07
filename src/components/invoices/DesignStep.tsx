@@ -1,3 +1,4 @@
+
 import React, { useRef, useState, useEffect } from "react";
 import { FileText } from "lucide-react";
 import InvoiceTemplates from "./InvoiceTemplates";
@@ -503,3 +504,6 @@ const DesignStep: React.FC<DesignStepProps> = ({
     </div>
   );
 };
+
+// Add the default export here
+export default DesignStep;
