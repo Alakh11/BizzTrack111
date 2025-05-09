@@ -13,14 +13,6 @@ We use [Supabase](https://supabase.com/) as a backend-as-a-service for:
 * 👥 User profile management
 * 🔒 Row-Level Security (RLS) to protect data per user
 
-### 📁 Environment Variables
-
-Stored in `.env` or `.env.local`:
-
-```env
-VITE_SUPABASE_URL=https://your-project-id.supabase.co
-VITE_SUPABASE_ANON_KEY=your-anon-key
-```
 
 ### 🛠️ Supabase Client Setup
 
