@@ -82,6 +82,11 @@ invoice-flow/
 
 For a comprehensive project overview, architecture details, and feature documentation, please refer to the [PROJECT_REPORT.md](./PROJECT_REPORT.md) file.
 
+## 📦 Supabase Integration
+
+For a Comprehensive supabase overview, authentication, user profiles, and database operations, please refer to the [SUPABASE.md](./SUPABASE.md) file.
+
+
 ## License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
