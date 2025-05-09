@@ -1,28 +1,16 @@
-
-import React, { useEffect } from "react";
+import React from "react";
+import { useInvoiceDesign } from "@/hooks/useInvoiceDesign";
 
 interface InvoiceTemplatesProps {
   selectedTemplate: string;
   setSelectedTemplate: (template: string) => void;
-  templates: Array<{
-    id: string;
-    name: string;
-    preview: string;
-  }>;
 }
 
 const InvoiceTemplates: React.FC<InvoiceTemplatesProps> = ({
   selectedTemplate,
   setSelectedTemplate,
-  templates
 }) => {
-  // Preload all template images on component mount
-  useEffect(() => {
-    templates.forEach(template => {
-      const img = new Image();
-      img.src = template.preview;
-    });
-  }, [templates]);
+  const { templates } = useInvoiceDesign();
 
   const handleTemplateSelection = (templateId: string) => {
     setSelectedTemplate(templateId);
@@ -40,15 +28,13 @@ const InvoiceTemplates: React.FC<InvoiceTemplatesProps> = ({
           }`}
           onClick={() => handleTemplateSelection(template.id)}
         >
-          <div className="aspect-[3/4] relative">
+          <div className="aspect-[3/4]">
             <img
               src={template.preview}
               alt={template.name}
               className="w-full h-full object-cover"
               loading="lazy"
               onError={(e) => {
-                console.error(`Failed to load template: ${template.name}`);
-                // Fallback on error
                 const target = e.target as HTMLImageElement;
                 target.onerror = null;
                 target.src = "https://i.imgur.com/placeholder.png";

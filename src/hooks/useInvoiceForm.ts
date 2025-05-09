@@ -8,7 +8,7 @@ import { useInvoiceFormUpdater } from "./useInvoiceFormUpdater";
 export const useInvoiceForm = () => {
   const core = useInvoiceFormCore();
   const formUpdater = useInvoiceFormUpdater();
-  
+
   const {
     form,
     setItems,
@@ -80,6 +80,8 @@ export const useInvoiceForm = () => {
               }));
               
               setItems(mappedItems);
+
+
             }
 
             // Parse and apply metadata
@@ -88,8 +90,10 @@ export const useInvoiceForm = () => {
                 const metadata = typeof invoiceData.metadata === 'string' 
                   ? JSON.parse(invoiceData.metadata)
                   : invoiceData.metadata;
-                  
+
                 applyMetadataToForm(metadata);
+
+
               } catch (e) {
                 console.error("Error parsing invoice metadata", e);
               }
@@ -119,20 +123,20 @@ export const useInvoiceForm = () => {
       setSelectedFont(metadata.design.font || "inter");
       setCustomInvoiceTitle(metadata.design.title || "INVOICE");
       setBusinessLogo(metadata.design.logo || "");
-      
+
       if (metadata.design.paperSize) {
         setSelectedPaperSize(metadata.design.paperSize);
       }
-      
+
       if (metadata.design.signature) {
         form.setValue("signature", metadata.design.signature);
       }
     }
-    
+
     // Shipping details
     if (metadata.shipping) {
       setShowShippingDetails(true);
-      
+
       if (metadata.shipping.from) {
         form.setValue("shippedFromName", metadata.shipping.from.name || "");
         form.setValue("shippedFromAddress", metadata.shipping.from.address || "");
@@ -142,7 +146,7 @@ export const useInvoiceForm = () => {
         form.setValue("shippedFromCountry", metadata.shipping.from.country || "india");
         form.setValue("shippedFromWarehouse", metadata.shipping.from.warehouse || "");
       }
-      
+
       if (metadata.shipping.to) {
         form.setValue("shippedToName", metadata.shipping.to.name || "");
         form.setValue("shippedToAddress", metadata.shipping.to.address || "");
@@ -152,7 +156,7 @@ export const useInvoiceForm = () => {
         form.setValue("shippedToCountry", metadata.shipping.to.country || "india");
       }
     }
-    
+
     // Transport details
     if (metadata.transport) {
       setShowTransportDetails(true);
@@ -166,7 +170,7 @@ export const useInvoiceForm = () => {
       form.setValue("transactionType", metadata.transport.transactionType || "");
       form.setValue("supplyType", metadata.transport.supplyType || "");
     }
-    
+
     // Additional details
     if (metadata.additional) {
       setPurchaseOrderNumber(metadata.additional.poNumber || "");
@@ -176,7 +180,7 @@ export const useInvoiceForm = () => {
         setShowAdditionalFields(true);
       }
     }
-    
+
     // GST details
     if (metadata.gst) {
       form.setValue("taxType", metadata.gst.type || "gst");
@@ -186,7 +190,7 @@ export const useInvoiceForm = () => {
       form.setValue("gstReverseCharge", metadata.gst.reverseCharge || false);
       form.setValue("nonGstClient", metadata.gst.nonGstClient || false);
     }
-    
+
     // Payment/banking details
     if (metadata.payment) {
       if (metadata.payment.bank) {
@@ -196,7 +200,7 @@ export const useInvoiceForm = () => {
         form.setValue("accountHolderName", metadata.payment.bank.accountHolderName || "");
         form.setValue("branchName", metadata.payment.bank.branchName || "");
       }
-      
+
       if (metadata.payment.upi) {
         form.setValue("upiId", metadata.payment.upi.id || "");
         form.setValue("upiName", metadata.payment.upi.name || "");
@@ -327,11 +331,11 @@ export const useInvoiceForm = () => {
       core.setCurrentStep(core.currentStep + 1);
       return;
     }
-    
+
     try {
       // Calculate total
       const totalAmount = core.calculateTotal();
-      
+
       // Create metadata
       const metadata = createMetadata(data);
 
@@ -395,12 +399,16 @@ export const useInvoiceForm = () => {
           description: error.message || "An unexpected error occurred",
           variant: "destructive",
         });
+
+
       }
     } catch (error: any) {
       console.error("Form error:", error);
       toast({
         title: core.isEditMode ? "Error updating invoice" : "Error creating invoice",
         description: error.message || `An error occurred while ${core.isEditMode ? "updating" : "creating"} the invoice`,
+
+
         variant: "destructive",
       });
     }
@@ -465,12 +473,12 @@ export const useInvoiceForm = () => {
     finalSubmission: core.finalSubmission,
     setFinalSubmission: core.setFinalSubmission,
     handleFormSubmit,
-    
+
     // Data
     items: core.items,
     clients: core.clients,
     clientsLoading: core.clientsLoading,
-    
+
     // Feature flags
     showShippingDetails: core.showShippingDetails,
     setShowShippingDetails: core.setShowShippingDetails,
@@ -480,7 +488,7 @@ export const useInvoiceForm = () => {
     setIsGstDialogOpen: core.setIsGstDialogOpen,
     showAdditionalFields: core.showAdditionalFields,
     setShowAdditionalFields: core.setShowAdditionalFields,
-    
+
     // Design settings
     customInvoiceTitle: core.customInvoiceTitle,
     setCustomInvoiceTitle: core.setCustomInvoiceTitle,
@@ -503,14 +511,14 @@ export const useInvoiceForm = () => {
     setSelectedPaperSize: core.setSelectedPaperSize,
     setBusinessLogo: core.setBusinessLogo,
     templates: core.templates,
-    
+
     // Handler functions
     handleClientChange,
     handleItemChange: core.handleItemChange,
     handleAddItem: core.handleAddItem,
     handleRemoveItem: core.handleRemoveItem,
     calculateTotal: core.calculateTotal,
-    
+
     // Grouped props for components
     invoiceDetailsProps,
     designProps,

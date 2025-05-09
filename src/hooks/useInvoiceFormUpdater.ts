@@ -16,7 +16,7 @@ export const useInvoiceFormUpdater = () => {
         .select("id")
         .eq("invoice_number", invoiceData.invoice_number)
         .limit(1);
-        
+
       if (existingInvoices && existingInvoices.length > 0) {
         toast({
           title: "Duplicate Invoice Number",
@@ -25,7 +25,7 @@ export const useInvoiceFormUpdater = () => {
         });
         return null;
       }
-      
+
       // Create new invoice
       const { data: result, error } = await supabase
         .from("invoices")
@@ -58,7 +58,7 @@ export const useInvoiceFormUpdater = () => {
           title: "Invoice created",
           description: "Your invoice has been created successfully.",
         });
-        
+
         return result;
       }
       return null;
@@ -115,8 +115,13 @@ export const useInvoiceFormUpdater = () => {
         title: "Invoice updated",
         description: "Your invoice has been updated successfully.",
       });
-      
+
       return invoiceId;
+
+
+
+
+
     } catch (error: any) {
       console.error("Error updating invoice:", error);
       toast({
