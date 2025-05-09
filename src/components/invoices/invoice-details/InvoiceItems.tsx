@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -22,7 +21,7 @@ const InvoiceItems = ({
   const handleQuantityChange = (id: number, value: string) => {
     handleItemChange(id, "quantity", Number(value));
   };
-  
+
   // Handle rate change and recalculate amount
   const handleRateChange = (id: number, value: string) => {
     handleItemChange(id, "rate", Number(value));

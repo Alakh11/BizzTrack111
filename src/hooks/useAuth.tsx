@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
@@ -29,7 +28,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .select('*')
         .eq('id', userId)
         .single();
-      
+
       if (error) {
         console.error("Error fetching user profile:", error);
         return;
@@ -48,7 +47,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     supabase.auth.getSession().then(({ data: { session } }) => {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
-      
+
       if (currentUser) {
         fetchProfile(currentUser.id);
       }
@@ -60,7 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
-      
+
       if (currentUser) {
         fetchProfile(currentUser.id);
       } else {
