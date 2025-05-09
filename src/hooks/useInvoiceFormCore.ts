@@ -15,12 +15,12 @@ export const useInvoiceFormCore = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [invoiceId, setInvoiceId] = useState<string | null>(null);
   const [finalSubmission, setFinalSubmission] = useState(false);
-  
+
   // Feature toggles
   const [showShippingDetails, setShowShippingDetails] = useState(false);
   const [showTransportDetails, setShowTransportDetails] = useState(false);
   const [isGstDialogOpen, setIsGstDialogOpen] = useState(false);
-  
+
   // Hooks
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -28,15 +28,15 @@ export const useInvoiceFormCore = () => {
   const location = useLocation();
   const { clients = [], isLoading: clientsLoading } = useClients();
   const { createInvoice, updateInvoice, getInvoice } = useInvoices();
-  
+
   // Feature-specific hooks
-  const { 
-    items, 
-    setItems, 
-    handleItemChange, 
-    handleAddItem, 
-    handleRemoveItem, 
-    calculateTotal 
+  const {
+    items,
+    setItems,
+    handleItemChange,
+    handleAddItem,
+    handleRemoveItem,
+    calculateTotal,
   } = useInvoiceItems();
 
   const {
@@ -50,22 +50,22 @@ export const useInvoiceFormCore = () => {
     setSelectedPaperSize,
     businessLogo,
     setBusinessLogo,
-    templates
+    templates,
   } = useInvoiceDesign();
 
   const {
-    showAdditionalFields, 
+    showAdditionalFields,
     setShowAdditionalFields,
-    customInvoiceTitle, 
+    customInvoiceTitle,
     setCustomInvoiceTitle,
-    customSubtitle, 
+    customSubtitle,
     setCustomSubtitle,
-    selectedCurrency, 
+    selectedCurrency,
     setSelectedCurrency,
-    purchaseOrderNumber, 
+    purchaseOrderNumber,
     setPurchaseOrderNumber,
-    referenceNumber, 
-    setReferenceNumber
+    referenceNumber,
+    setReferenceNumber,
   } = useInvoiceAdditionalDetails();
 
   // Form definition
@@ -83,13 +83,13 @@ export const useInvoiceFormCore = () => {
       clientAddress: "",
       clientEmail: "",
       clientPhone: "",
-      
+
       // Business details
       businessName: "Alakh Corporation",
       businessAddress: "Mirzapur, UP, India - 231312",
       businessPhone: "+91 9580813770",
       businessEmail: "alakh1304@gmail.com",
-      
+
       // Shipping details
       shippedFromName: "",
       shippedFromAddress: "",
@@ -98,14 +98,14 @@ export const useInvoiceFormCore = () => {
       shippedFromPostal: "",
       shippedFromCountry: "india",
       shippedFromWarehouse: "",
-      
+
       shippedToName: "",
       shippedToAddress: "",
       shippedToCity: "",
       shippedToState: "",
       shippedToPostal: "",
       shippedToCountry: "india",
-      
+
       // Transport details
       transporterName: "",
       distance: "",
@@ -116,7 +116,7 @@ export const useInvoiceFormCore = () => {
       vehicleNumber: "",
       transactionType: "",
       supplyType: "",
-      
+
       // GST details
       taxType: "gst",
       placeOfSupply: "",
@@ -124,31 +124,31 @@ export const useInvoiceFormCore = () => {
       gstNumber: "",
       gstReverseCharge: false,
       nonGstClient: false,
-      
+
       // Payment details - Bank
       bankName: "",
       accountNumber: "",
       ifscCode: "",
       accountHolderName: "",
       branchName: "",
-      
+
       // Payment details - UPI
       upiId: "",
       upiName: "",
-      
+
       notes: "",
       terms: "Payment is due within 14 days of issue.",
-      
+
       // Design details
       watermarkText: "",
       margins: "normal",
       textScale: "100",
-      
+
       // Digital signature
       signature: "",
-      
+
       // Items array for easier access
-      items: items
+      items: items,
     },
   });
 
@@ -211,6 +211,6 @@ export const useInvoiceFormCore = () => {
     setShowTransportDetails,
     isGstDialogOpen,
     setIsGstDialogOpen,
-    supabase
+    supabase,
   };
 };

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 
 // Template images with valid URLs for different invoice templates
@@ -16,13 +15,17 @@ const templateImages = {
 // Dummy template data with actual image URLs
 const dummyTemplates = [
   { id: "standard", name: "Standard", preview: templateImages.standard },
-  { id: "professional", name: "Professional", preview: templateImages.professional },
+  {
+    id: "professional",
+    name: "Professional",
+    preview: templateImages.professional,
+  },
   { id: "modern", name: "Modern", preview: templateImages.modern },
   { id: "minimal", name: "Minimal", preview: templateImages.minimal },
   { id: "classic", name: "Classic", preview: templateImages.classic },
   { id: "elegant", name: "Elegant", preview: templateImages.elegant },
   { id: "corporate", name: "Corporate", preview: templateImages.corporate },
-  { id: "simple", name: "Simple", preview: templateImages.simple }
+  { id: "simple", name: "Simple", preview: templateImages.simple },
 ];
 
 // Font families available for selection
@@ -31,7 +34,11 @@ const fontFamilies = [
   { id: "playfair", name: "Playfair Display", class: "font-playfair" },
   { id: "montserrat", name: "Montserrat", class: "font-montserrat" },
   { id: "poppins", name: "Poppins", class: "font-poppins" },
-  { id: "timesNewRoman", name: "Times New Roman", class: 'font-["Times_New_Roman"]' },
+  {
+    id: "timesNewRoman",
+    name: "Times New Roman",
+    class: 'font-["Times_New_Roman"]',
+  },
   { id: "calibri", name: "Calibri", class: 'font-["Calibri"]' },
   { id: "algerian", name: "Algerian", class: 'font-["Algerian"]' },
 ];
@@ -42,14 +49,14 @@ export const useInvoiceDesign = () => {
   const [selectedFont, setSelectedFont] = useState("inter");
   const [selectedPaperSize, setSelectedPaperSize] = useState("a4");
   const [businessLogo, setBusinessLogo] = useState("");
-  
+
   // Add templates for local use with better preloading
   const templates = dummyTemplates;
 
   // Preload template images to avoid loading issues
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      templates.forEach(template => {
+    if (typeof window !== "undefined") {
+      templates.forEach((template) => {
         const img = new Image();
         img.src = template.preview;
         img.onload = () => {
@@ -75,6 +82,6 @@ export const useInvoiceDesign = () => {
     setBusinessLogo,
     templates,
     templateImages,
-    fontFamilies
+    fontFamilies,
   };
 };

@@ -1,9 +1,19 @@
-
 import React, { useEffect } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { ChevronDown, ChevronUp, PlusCircle, Tag, Truck, Receipt } from "lucide-react";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  ChevronDown,
+  ChevronUp,
+  PlusCircle,
+  Tag,
+  Truck,
+  Receipt,
+} from "lucide-react";
 import { Client } from "@/hooks/useClients";
 import { BillingDetailsForm } from "./BillingDetailsForm";
 import ShippingDetailsForm from "./ShippingDetailsForm";
@@ -11,14 +21,20 @@ import TransportDetailsForm from "./TransportDetailsForm";
 import GstDetailsForm from "./GstDetailsForm";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
-import { 
+import {
   Popover,
   PopoverContent,
-  PopoverTrigger
+  PopoverTrigger,
 } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 
 interface InvoiceDetailsStepProps {
   form: UseFormReturn<any>;
@@ -117,10 +133,7 @@ const InvoiceDetailsStep: React.FC<InvoiceDetailsStepProps> = ({
               <FormItem>
                 <FormLabel>Invoice Number</FormLabel>
                 <FormControl>
-                  <input
-                    className="w-full p-2 border rounded"
-                    {...field}
-                  />
+                  <input className="w-full p-2 border rounded" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -140,7 +153,7 @@ const InvoiceDetailsStep: React.FC<InvoiceDetailsStepProps> = ({
                         variant={"outline"}
                         className={cn(
                           "w-full pl-3 text-left font-normal flex justify-between",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value ? (
@@ -167,7 +180,7 @@ const InvoiceDetailsStep: React.FC<InvoiceDetailsStepProps> = ({
             )}
           />
         </div>
-        
+
         <div className="space-y-4">
           <FormField
             control={form.control}
@@ -182,7 +195,7 @@ const InvoiceDetailsStep: React.FC<InvoiceDetailsStepProps> = ({
                         variant={"outline"}
                         className={cn(
                           "w-full pl-3 text-left font-normal flex justify-between",
-                          !field.value && "text-muted-foreground"
+                          !field.value && "text-muted-foreground",
                         )}
                       >
                         {field.value ? (
@@ -210,14 +223,14 @@ const InvoiceDetailsStep: React.FC<InvoiceDetailsStepProps> = ({
           />
         </div>
       </div>
-      
+
       {/* Billing Details */}
       <BillingDetailsForm
         form={form}
         clients={clients}
         handleClientChange={handleClientChange}
       />
-      
+
       {/* Invoice Items */}
       <div className="space-y-4">
         <h3 className="text-lg font-medium">Invoice Items</h3>
@@ -225,19 +238,34 @@ const InvoiceDetailsStep: React.FC<InvoiceDetailsStepProps> = ({
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-muted/50">
               <tr>
-                <th scope="col" className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-5/12">
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-5/12"
+                >
                   Item Description
                 </th>
-                <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12">
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12"
+                >
                   Quantity
                 </th>
-                <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12">
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12"
+                >
                   Rate
                 </th>
-                <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12">
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-2/12"
+                >
                   Amount
                 </th>
-                <th scope="col" className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12">
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider w-1/12"
+                >
                   Actions
                 </th>
               </tr>
@@ -265,7 +293,7 @@ const InvoiceDetailsStep: React.FC<InvoiceDetailsStepProps> = ({
                         handleItemChange(
                           item.id,
                           "quantity",
-                          parseFloat(e.target.value)
+                          parseFloat(e.target.value),
                         )
                       }
                       placeholder="0"
@@ -280,7 +308,7 @@ const InvoiceDetailsStep: React.FC<InvoiceDetailsStepProps> = ({
                         handleItemChange(
                           item.id,
                           "rate",
-                          parseFloat(e.target.value)
+                          parseFloat(e.target.value),
                         )
                       }
                       placeholder="0.00"
@@ -320,12 +348,14 @@ const InvoiceDetailsStep: React.FC<InvoiceDetailsStepProps> = ({
           <div className="text-right space-y-1">
             <div className="flex justify-end items-center space-x-4">
               <span className="font-medium">Total:</span>
-              <span className="text-lg font-bold">₹{calculateTotal().toLocaleString("en-IN")}</span>
+              <span className="text-lg font-bold">
+                ₹{calculateTotal().toLocaleString("en-IN")}
+              </span>
             </div>
           </div>
         </div>
       </div>
-      
+
       {/* Additional Details Collapsible */}
       <Collapsible
         open={showAdditionalFields}
@@ -415,7 +445,7 @@ const InvoiceDetailsStep: React.FC<InvoiceDetailsStepProps> = ({
           </div>
         </CollapsibleContent>
       </Collapsible>
-      
+
       {/* GST Details */}
       <div className="border rounded-md p-4">
         <div className="flex items-center justify-between">
@@ -432,7 +462,7 @@ const InvoiceDetailsStep: React.FC<InvoiceDetailsStepProps> = ({
             {gstData.gstNumber ? "Edit GST Details" : "Add GST Details"}
           </Button>
         </div>
-        
+
         {gstData.gstNumber && (
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -446,7 +476,7 @@ const InvoiceDetailsStep: React.FC<InvoiceDetailsStepProps> = ({
           </div>
         )}
       </div>
-      
+
       {/* Shipping Details Collapsible */}
       <Collapsible
         open={showShippingDetails}
@@ -472,7 +502,7 @@ const InvoiceDetailsStep: React.FC<InvoiceDetailsStepProps> = ({
           <ShippingDetailsForm form={form} />
         </CollapsibleContent>
       </Collapsible>
-      
+
       {/* Transport Details Collapsible */}
       <Collapsible
         open={showTransportDetails}
@@ -498,7 +528,7 @@ const InvoiceDetailsStep: React.FC<InvoiceDetailsStepProps> = ({
           <TransportDetailsForm form={form} />
         </CollapsibleContent>
       </Collapsible>
-      
+
       {/* Notes and Terms */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <div className="space-y-2">
@@ -510,7 +540,9 @@ const InvoiceDetailsStep: React.FC<InvoiceDetailsStepProps> = ({
           />
         </div>
         <div className="space-y-2">
-          <label className="block text-sm font-medium">Terms and Conditions</label>
+          <label className="block text-sm font-medium">
+            Terms and Conditions
+          </label>
           <textarea
             className="w-full p-2 border rounded h-32"
             placeholder="Enter terms and conditions"
@@ -518,10 +550,10 @@ const InvoiceDetailsStep: React.FC<InvoiceDetailsStepProps> = ({
           />
         </div>
       </div>
-      
+
       {/* GST Dialog */}
-      <GstDetailsForm 
-        open={isGstDialogOpen} 
+      <GstDetailsForm
+        open={isGstDialogOpen}
         onOpenChange={setIsGstDialogOpen}
         form={form}
       />

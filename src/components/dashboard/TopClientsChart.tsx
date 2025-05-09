@@ -1,4 +1,3 @@
-
 import { useClients } from "@/hooks/useClients";
 import { useInvoices } from "@/hooks/useInvoices";
 import { useMemo } from "react";
@@ -12,13 +11,7 @@ interface TopClient {
   color: string;
 }
 
-const COLORS = [
-  "#2563eb",
-  "#3b82f6",
-  "#60a5fa",
-  "#93c5fd",
-  "#bfdbfe",
-];
+const COLORS = ["#2563eb", "#3b82f6", "#60a5fa", "#93c5fd", "#bfdbfe"];
 
 const TopClientsChart = () => {
   const { invoices = [] } = useInvoices();
@@ -31,7 +24,7 @@ const TopClientsChart = () => {
     invoices.forEach((invoice) => {
       const clientId = invoice.client_id;
       if (!clientId) return;
-      
+
       const amount = Number(invoice.total_amount || 0);
       if (clientRevenue[clientId]) {
         clientRevenue[clientId] += amount;
@@ -63,7 +56,7 @@ const TopClientsChart = () => {
         <div className="bg-background p-2 border border-border rounded shadow-md">
           <p className="font-medium">{payload[0].name}</p>
           <p className="text-sm text-primary">
-            ₹{payload[0].value.toLocaleString('en-IN')}
+            ₹{payload[0].value.toLocaleString("en-IN")}
           </p>
         </div>
       );
@@ -72,7 +65,10 @@ const TopClientsChart = () => {
   };
 
   return (
-    <ChartCard title="Top Revenue Clients" description="Top 5 clients by billing">
+    <ChartCard
+      title="Top Revenue Clients"
+      description="Top 5 clients by billing"
+    >
       <div className="h-[230px]">
         {topClients.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
@@ -88,7 +84,10 @@ const TopClientsChart = () => {
                 nameKey="name"
               >
                 {topClients.map((client, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
@@ -106,14 +105,16 @@ const TopClientsChart = () => {
           {topClients.map((client, index) => (
             <li key={client.id} className="flex justify-between items-center">
               <div className="flex items-center">
-                <div 
-                  className="w-3 h-3 rounded-full mr-2" 
+                <div
+                  className="w-3 h-3 rounded-full mr-2"
                   style={{ backgroundColor: COLORS[index % COLORS.length] }}
                 />
-                <span className="text-sm truncate max-w-[160px]">{client.name}</span>
+                <span className="text-sm truncate max-w-[160px]">
+                  {client.name}
+                </span>
               </div>
               <span className="text-sm font-medium">
-                ₹{client.value.toLocaleString('en-IN')}
+                ₹{client.value.toLocaleString("en-IN")}
               </span>
             </li>
           ))}

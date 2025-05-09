@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 
 export const useInvoiceAdditionalDetails = () => {
@@ -21,6 +20,6 @@ export const useInvoiceAdditionalDetails = () => {
     purchaseOrderNumber,
     setPurchaseOrderNumber,
     referenceNumber,
-    setReferenceNumber
+    setReferenceNumber,
   };
 };

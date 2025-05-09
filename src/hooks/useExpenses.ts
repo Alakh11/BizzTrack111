@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "./use-toast";
@@ -21,7 +20,7 @@ export const EXPENSE_CATEGORIES = [
   "Equipment",
   "Utilities",
   "Travel",
-  "Miscellaneous"
+  "Miscellaneous",
 ];
 
 export const useExpenses = () => {
@@ -53,7 +52,7 @@ export const useExpenses = () => {
   });
 
   const createExpense = useMutation({
-    mutationFn: async (newExpense: Omit<Expense, 'id' | 'user_id'>) => {
+    mutationFn: async (newExpense: Omit<Expense, "id" | "user_id">) => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -159,27 +158,27 @@ export const useExpenses = () => {
   // Monthly expense summary
   const getMonthlyExpenses = () => {
     const monthlyData: Record<string, number> = {};
-    
-    expenses.forEach(expense => {
+
+    expenses.forEach((expense) => {
       const date = new Date(expense.date);
       const monthYear = `${date.getMonth() + 1}/${date.getFullYear()}`;
-      
+
       if (monthlyData[monthYear]) {
         monthlyData[monthYear] += Number(expense.amount);
       } else {
         monthlyData[monthYear] = Number(expense.amount);
       }
     });
-    
+
     return Object.entries(monthlyData).map(([month, amount]) => ({
       month,
-      amount
+      amount,
     }));
   };
 
   // Filter expenses by date range
   const filterExpensesByDateRange = (startDate: Date, endDate: Date) => {
-    return expenses.filter(expense => {
+    return expenses.filter((expense) => {
       const expenseDate = new Date(expense.date);
       return expenseDate >= startDate && expenseDate <= endDate;
     });
@@ -187,7 +186,7 @@ export const useExpenses = () => {
 
   // Filter expenses by category
   const filterExpensesByCategory = (category: string) => {
-    return expenses.filter(expense => expense.category === category);
+    return expenses.filter((expense) => expense.category === category);
   };
 
   return {
@@ -198,6 +197,6 @@ export const useExpenses = () => {
     deleteExpense,
     getMonthlyExpenses,
     filterExpensesByDateRange,
-    filterExpensesByCategory
+    filterExpensesByCategory,
   };
 };

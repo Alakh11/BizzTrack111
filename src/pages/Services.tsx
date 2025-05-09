@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -35,9 +34,9 @@ const Services = () => {
               Manage your service offerings
             </p>
           </div>
-          <AddServiceDialog 
-            isOpen={isAddDialogOpen} 
-            setIsOpen={setIsAddDialogOpen} 
+          <AddServiceDialog
+            isOpen={isAddDialogOpen}
+            setIsOpen={setIsAddDialogOpen}
           />
         </div>
 
@@ -77,9 +76,9 @@ const Services = () => {
 
               {categories.map((category) => (
                 <TabsContent key={category.value} value={category.value}>
-                  <ServiceGrid 
-                    searchQuery={searchQuery} 
-                    currentTab={currentTab} 
+                  <ServiceGrid
+                    searchQuery={searchQuery}
+                    currentTab={currentTab}
                   />
                 </TabsContent>
               ))}

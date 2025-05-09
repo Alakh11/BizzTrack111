@@ -1,11 +1,5 @@
-
 import React, { useState } from "react";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   FormField,
   FormItem,
@@ -26,7 +20,7 @@ const PaymentOptionsForm: React.FC<PaymentOptionsFormProps> = ({ form }) => {
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-medium font-playfair">Payment Options</h3>
-      
+
       <Tabs
         value={paymentMethodTab}
         onValueChange={setPaymentMethodTab}
@@ -36,7 +30,7 @@ const PaymentOptionsForm: React.FC<PaymentOptionsFormProps> = ({ form }) => {
           <TabsTrigger value="bank">Bank Transfer</TabsTrigger>
           <TabsTrigger value="upi">UPI Payment</TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="bank">
           <Card>
             <CardContent className="pt-4 space-y-4">
@@ -53,7 +47,7 @@ const PaymentOptionsForm: React.FC<PaymentOptionsFormProps> = ({ form }) => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="accountNumber"
@@ -67,7 +61,7 @@ const PaymentOptionsForm: React.FC<PaymentOptionsFormProps> = ({ form }) => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="ifscCode"
@@ -81,7 +75,7 @@ const PaymentOptionsForm: React.FC<PaymentOptionsFormProps> = ({ form }) => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="accountHolderName"
@@ -89,13 +83,16 @@ const PaymentOptionsForm: React.FC<PaymentOptionsFormProps> = ({ form }) => {
                   <FormItem>
                     <FormLabel>Account Holder Name</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter account holder name" />
+                      <Input
+                        {...field}
+                        placeholder="Enter account holder name"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="branchName"
@@ -112,7 +109,7 @@ const PaymentOptionsForm: React.FC<PaymentOptionsFormProps> = ({ form }) => {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="upi">
           <Card>
             <CardContent className="pt-4 space-y-4">
@@ -129,7 +126,7 @@ const PaymentOptionsForm: React.FC<PaymentOptionsFormProps> = ({ form }) => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="upiName"
@@ -137,7 +134,10 @@ const PaymentOptionsForm: React.FC<PaymentOptionsFormProps> = ({ form }) => {
                   <FormItem>
                     <FormLabel>UPI Display Name</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Name shown during payment" />
+                      <Input
+                        {...field}
+                        placeholder="Name shown during payment"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

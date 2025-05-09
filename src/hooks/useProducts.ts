@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "./use-toast";
@@ -26,7 +25,7 @@ export const PRODUCT_CATEGORIES = [
   "Home & Kitchen",
   "Health & Beauty",
   "Toys & Games",
-  "Others"
+  "Others",
 ];
 
 // Utility functions for products
@@ -65,7 +64,7 @@ export const useProducts = () => {
 
   // Mutation to create a new product
   const createProduct = useMutation({
-    mutationFn: async (newProduct: Omit<Product, 'id' | 'user_id'>) => {
+    mutationFn: async (newProduct: Omit<Product, "id" | "user_id">) => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -178,21 +177,22 @@ export const useProducts = () => {
 
   // Filter products by category
   const filterByCategory = (category: string) => {
-    return products.filter(product => product.category === category);
+    return products.filter((product) => product.category === category);
   };
 
   // Search products by name or SKU
   const searchProducts = (query: string) => {
     const lowercaseQuery = query.toLowerCase();
-    return products.filter(product => 
-      product.name.toLowerCase().includes(lowercaseQuery) || 
-      product.sku.toLowerCase().includes(lowercaseQuery)
+    return products.filter(
+      (product) =>
+        product.name.toLowerCase().includes(lowercaseQuery) ||
+        product.sku.toLowerCase().includes(lowercaseQuery),
     );
   };
 
   // Get low stock products
   const getLowStockProducts = () => {
-    return products.filter(product => {
+    return products.filter((product) => {
       const threshold = product.low_stock_threshold || 10;
       return product.quantity < threshold;
     });
@@ -206,6 +206,6 @@ export const useProducts = () => {
     deleteProduct,
     filterByCategory,
     searchProducts,
-    getLowStockProducts
+    getLowStockProducts,
   };
 };

@@ -1,4 +1,3 @@
-
 import React from "react";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -6,7 +5,12 @@ import { useForm } from "react-hook-form";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { useProducts, Product } from "@/hooks/useProducts";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import ProductFormFields from "./ProductFormFields";
 
 const productSchema = z.object({
@@ -28,32 +32,38 @@ interface AddProductFormProps {
   productToEdit: Product | null;
 }
 
-const AddProductForm = ({ open, onOpenChange, productToEdit }: AddProductFormProps) => {
+const AddProductForm = ({
+  open,
+  onOpenChange,
+  productToEdit,
+}: AddProductFormProps) => {
   const { createProduct, updateProduct } = useProducts();
-  
+
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
-    defaultValues: productToEdit ? {
-      name: productToEdit.name,
-      sku: productToEdit.sku,
-      price: productToEdit.price,
-      quantity: productToEdit.quantity,
-      category: productToEdit.category,
-      low_stock_threshold: productToEdit.low_stock_threshold || 10,
-      description: productToEdit.description || "",
-      barcode: productToEdit.barcode || "",
-    } : {
-      name: "",
-      sku: generateSku(),
-      price: 0,
-      quantity: 0,
-      category: "",
-      low_stock_threshold: 10,
-      description: "",
-      barcode: "",
-    },
+    defaultValues: productToEdit
+      ? {
+          name: productToEdit.name,
+          sku: productToEdit.sku,
+          price: productToEdit.price,
+          quantity: productToEdit.quantity,
+          category: productToEdit.category,
+          low_stock_threshold: productToEdit.low_stock_threshold || 10,
+          description: productToEdit.description || "",
+          barcode: productToEdit.barcode || "",
+        }
+      : {
+          name: "",
+          sku: generateSku(),
+          price: 0,
+          quantity: 0,
+          category: "",
+          low_stock_threshold: 10,
+          description: "",
+          barcode: "",
+        },
   });
-  
+
   React.useEffect(() => {
     if (productToEdit) {
       form.reset({
@@ -79,13 +89,13 @@ const AddProductForm = ({ open, onOpenChange, productToEdit }: AddProductFormPro
       });
     }
   }, [productToEdit, form]);
-  
+
   function generateSku() {
     const prefix = "SKU";
     const randomNum = Math.floor(100000 + Math.random() * 900000);
     return `${prefix}${randomNum}`;
   }
-  
+
   const onSubmit = (data: ProductFormValues) => {
     // Make sure all required fields are provided
     const productData = {
@@ -98,16 +108,19 @@ const AddProductForm = ({ open, onOpenChange, productToEdit }: AddProductFormPro
       low_stock_threshold: data.low_stock_threshold || 10,
       barcode: data.barcode || "",
     };
-    
+
     if (productToEdit) {
-      updateProduct.mutate({
-        ...productData,
-        id: productToEdit.id
-      }, {
-        onSuccess: () => {
-          onOpenChange(false);
-        }
-      });
+      updateProduct.mutate(
+        {
+          ...productData,
+          id: productToEdit.id,
+        },
+        {
+          onSuccess: () => {
+            onOpenChange(false);
+          },
+        },
+      );
     } else {
       createProduct.mutate(productData, {
         onSuccess: () => {
@@ -116,27 +129,34 @@ const AddProductForm = ({ open, onOpenChange, productToEdit }: AddProductFormPro
       });
     }
   };
-  
+
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="overflow-y-auto">
         <SheetHeader>
-          <SheetTitle>{productToEdit ? "Edit Product" : "Add New Product"}</SheetTitle>
+          <SheetTitle>
+            {productToEdit ? "Edit Product" : "Add New Product"}
+          </SheetTitle>
         </SheetHeader>
-        
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-4">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="space-y-4 mt-4"
+          >
             <ProductFormFields form={form} />
-            
+
             <div className="flex justify-end space-x-2">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => onOpenChange(false)}
               >
                 Cancel
               </Button>
-              <Button type="submit">{productToEdit ? "Update" : "Save"} Product</Button>
+              <Button type="submit">
+                {productToEdit ? "Update" : "Save"} Product
+              </Button>
             </div>
           </form>
         </Form>

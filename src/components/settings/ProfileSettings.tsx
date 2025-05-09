@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import {
   Card,
@@ -38,9 +37,11 @@ const ProfileSettings = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [userData, setUserData] = useState<Profile & {
-    email: string;
-  }>();
+  const [userData, setUserData] = useState<
+    Profile & {
+      email: string;
+    }
+  >();
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm({
@@ -61,9 +62,9 @@ const ProfileSettings = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       if (!user) return;
-      
+
       setIsLoading(true);
-      
+
       try {
         const { data, error } = await supabase
           .from("profiles")
@@ -72,13 +73,13 @@ const ProfileSettings = () => {
           .single();
 
         if (error) throw error;
-        
+
         if (data) {
           setUserData({
             ...data,
             email: user.email || "",
           });
-          
+
           // Update form values
           form.reset({
             username: data.username || "",
@@ -104,7 +105,7 @@ const ProfileSettings = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchProfile();
   }, [user, form, toast]);
 
@@ -125,7 +126,7 @@ const ProfileSettings = () => {
         .eq("id", user?.id);
 
       if (error) throw error;
-      
+
       toast({
         title: "Profile updated",
         description: "Your profile has been updated successfully.",
@@ -155,7 +156,9 @@ const ProfileSettings = () => {
               <Avatar className="h-24 w-24">
                 <AvatarImage src={userData.avatar_url || ""} />
                 <AvatarFallback>
-                  {userData.username?.charAt(0) || user?.email?.charAt(0) || "U"}
+                  {userData.username?.charAt(0) ||
+                    user?.email?.charAt(0) ||
+                    "U"}
                 </AvatarFallback>
               </Avatar>
               <div>
@@ -180,10 +183,7 @@ const ProfileSettings = () => {
           )}
 
           <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-6"
-            >
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
                   control={form.control}
@@ -208,9 +208,7 @@ const ProfileSettings = () => {
                       <FormControl>
                         <Input placeholder="Your email" readOnly {...field} />
                       </FormControl>
-                      <FormDescription>
-                        Email cannot be changed
-                      </FormDescription>
+                      <FormDescription>Email cannot be changed</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -237,10 +235,7 @@ const ProfileSettings = () => {
                     <FormItem>
                       <FormLabel>Business Name</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Your business name"
-                          {...field}
-                        />
+                        <Input placeholder="Your business name" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -254,10 +249,7 @@ const ProfileSettings = () => {
                     <FormItem>
                       <FormLabel>Website</FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Your website"
-                          {...field}
-                        />
+                        <Input placeholder="Your website" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

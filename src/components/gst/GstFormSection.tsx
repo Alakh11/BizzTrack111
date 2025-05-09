@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   FormField,
@@ -37,7 +36,9 @@ const GstFormSection = ({ form, fields }: GstFormSectionProps) => {
                   >
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+                        <SelectValue
+                          placeholder={`Select ${field.label.toLowerCase()}`}
+                        />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -52,7 +53,10 @@ const GstFormSection = ({ form, fields }: GstFormSectionProps) => {
               )}
               {field.type === "input" && (
                 <FormControl>
-                  <Input {...formField} placeholder={`Enter ${field.label.toLowerCase()}`} />
+                  <Input
+                    {...formField}
+                    placeholder={`Enter ${field.label.toLowerCase()}`}
+                  />
                 </FormControl>
               )}
               {field.type === "checkbox" && (

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Dialog,
@@ -42,7 +41,7 @@ const GstDetailsForm = ({ open, onOpenChange, form }: GstDetailsFormProps) => {
         { value: "gst", label: "GST" },
         { value: "igst", label: "IGST" },
         { value: "cgst", label: "CGST + SGST" },
-      ]
+      ],
     },
     {
       name: "placeOfSupply",
@@ -83,7 +82,7 @@ const GstDetailsForm = ({ open, onOpenChange, form }: GstDetailsFormProps) => {
       ].sort((a, b) => {
         // Sort by state name alphabetically
         return a.label.localeCompare(b.label);
-      })
+      }),
     },
   ];
 
@@ -98,7 +97,7 @@ const GstDetailsForm = ({ open, onOpenChange, form }: GstDetailsFormProps) => {
         { value: "composition", label: "Composition" },
         { value: "overseas", label: "Overseas" },
         { value: "sez", label: "SEZ" },
-      ]
+      ],
     },
     {
       name: "gstNumber",
@@ -128,20 +127,11 @@ const GstDetailsForm = ({ open, onOpenChange, form }: GstDetailsFormProps) => {
             <DialogTitle>Configure GST Details</DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-4">
-            <GstFormSection 
-              form={form}
-              fields={basicGstFields}
-            />
-            
-            <GstFormSection 
-              form={form}
-              fields={gstTypeFields}
-            />
-            
-            <GstFormSection 
-              form={form}
-              fields={checkboxFields}
-            />
+            <GstFormSection form={form} fields={basicGstFields} />
+
+            <GstFormSection form={form} fields={gstTypeFields} />
+
+            <GstFormSection form={form} fields={checkboxFields} />
           </div>
 
           <DialogFooter className="flex justify-between">

@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -17,19 +16,23 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
 import { Calendar } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useExpenses, EXPENSE_CATEGORIES } from "@/hooks/useExpenses";
 import AddExpenseForm from "@/components/expenses/AddExpenseForm";
 import { formatCurrency, formatDate } from "@/lib/utils";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { DateRange } from "react-day-picker";
 import { DatePickerWithRange } from "@/components/ui/date-range-picker";
 import ExpensesByCategory from "@/components/dashboard/ExpensesByCategory";
@@ -40,28 +43,33 @@ const Expenses = () => {
   const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | "all">("all");
+  const [selectedCategory, setSelectedCategory] = useState<string | "all">(
+    "all",
+  );
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: subMonths(new Date(), 1),
     to: new Date(),
   });
-  
+
   // Filter expenses based on search, category, and date range
   const filteredExpenses = expenses.filter((expense) => {
     // Search filter
-    const matchesSearch = expense.description?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          expense.category?.toLowerCase().includes(searchQuery.toLowerCase());
-    
+    const matchesSearch =
+      expense.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      expense.category?.toLowerCase().includes(searchQuery.toLowerCase());
+
     // Category filter
-    const matchesCategory = selectedCategory === "all" || expense.category === selectedCategory;
-    
+    const matchesCategory =
+      selectedCategory === "all" || expense.category === selectedCategory;
+
     // Date range filter
     let matchesDateRange = true;
     if (dateRange?.from && dateRange?.to) {
       const expenseDate = new Date(expense.date);
-      matchesDateRange = expenseDate >= dateRange.from && expenseDate <= dateRange.to;
+      matchesDateRange =
+        expenseDate >= dateRange.from && expenseDate <= dateRange.to;
     }
-    
+
     return matchesSearch && matchesCategory && matchesDateRange;
   });
 
@@ -77,7 +85,10 @@ const Expenses = () => {
   };
 
   // Calculate total expenses
-  const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
+  const totalExpenses = filteredExpenses.reduce(
+    (sum, expense) => sum + Number(expense.amount),
+    0,
+  );
 
   return (
     <MainLayout>
@@ -89,10 +100,12 @@ const Expenses = () => {
               Track and manage your business expenses
             </p>
           </div>
-          <Button onClick={() => {
-            setExpenseToEdit(null);
-            setIsAddExpenseOpen(true);
-          }}>
+          <Button
+            onClick={() => {
+              setExpenseToEdit(null);
+              setIsAddExpenseOpen(true);
+            }}
+          >
             Add Expense
           </Button>
         </div>
@@ -100,27 +113,47 @@ const Expenses = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="dashboard-card">
             <p className="text-sm text-muted-foreground">Total Expenses</p>
-            <p className="text-2xl font-bold">{formatCurrency(totalExpenses)}</p>
+            <p className="text-2xl font-bold">
+              {formatCurrency(totalExpenses)}
+            </p>
           </div>
           <div className="dashboard-card">
             <p className="text-sm text-muted-foreground">This Month</p>
-            <p className="text-2xl font-bold">{formatCurrency(
-              filteredExpenses
-                .filter(e => new Date(e.date).getMonth() === new Date().getMonth() &&
-                            new Date(e.date).getFullYear() === new Date().getFullYear())
-                .reduce((sum, e) => sum + Number(e.amount), 0)
-            )}</p>
+            <p className="text-2xl font-bold">
+              {formatCurrency(
+                filteredExpenses
+                  .filter(
+                    (e) =>
+                      new Date(e.date).getMonth() === new Date().getMonth() &&
+                      new Date(e.date).getFullYear() ===
+                        new Date().getFullYear(),
+                  )
+                  .reduce((sum, e) => sum + Number(e.amount), 0),
+              )}
+            </p>
           </div>
           <div className="dashboard-card">
             <p className="text-sm text-muted-foreground">Average Per Month</p>
-            <p className="text-2xl font-bold">{formatCurrency(totalExpenses / (dateRange?.from && dateRange?.to ? 
-              Math.max(1, Math.round((dateRange.to.getTime() - dateRange.from.getTime()) / (30 * 24 * 60 * 60 * 1000))) : 1))}</p>
+            <p className="text-2xl font-bold">
+              {formatCurrency(
+                totalExpenses /
+                  (dateRange?.from && dateRange?.to
+                    ? Math.max(
+                        1,
+                        Math.round(
+                          (dateRange.to.getTime() - dateRange.from.getTime()) /
+                            (30 * 24 * 60 * 60 * 1000),
+                        ),
+                      )
+                    : 1),
+              )}
+            </p>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <ExpensesByCategory />
-          
+
           <Card>
             <CardHeader>
               <CardTitle>Monthly Summary</CardTitle>
@@ -131,17 +164,25 @@ const Expenses = () => {
               <div className="space-y-4">
                 {[...Array(3)].map((_, i) => {
                   const date = subMonths(new Date(), i);
-                  const monthExpenses = expenses.filter(e => 
-                    new Date(e.date).getMonth() === date.getMonth() &&
-                    new Date(e.date).getFullYear() === date.getFullYear()
+                  const monthExpenses = expenses.filter(
+                    (e) =>
+                      new Date(e.date).getMonth() === date.getMonth() &&
+                      new Date(e.date).getFullYear() === date.getFullYear(),
                   );
-                  const total = monthExpenses.reduce((sum, e) => sum + Number(e.amount), 0);
-                  
+                  const total = monthExpenses.reduce(
+                    (sum, e) => sum + Number(e.amount),
+                    0,
+                  );
+
                   return (
                     <div key={i} className="flex justify-between items-center">
                       <div>
-                        <p className="font-medium">{format(date, 'MMMM yyyy')}</p>
-                        <p className="text-sm text-muted-foreground">{monthExpenses.length} expenses</p>
+                        <p className="font-medium">
+                          {format(date, "MMMM yyyy")}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {monthExpenses.length} expenses
+                        </p>
                       </div>
                       <p className="font-semibold">{formatCurrency(total)}</p>
                     </div>
@@ -169,13 +210,27 @@ const Expenses = () => {
                   className="pl-10"
                 />
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-search"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-search"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                  </svg>
                 </span>
               </div>
 
               <div className="flex gap-2">
-                <Select 
-                  value={selectedCategory} 
+                <Select
+                  value={selectedCategory}
                   onValueChange={setSelectedCategory}
                 >
                   <SelectTrigger className="w-[180px]">
@@ -183,7 +238,7 @@ const Expenses = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Categories</SelectItem>
-                    {EXPENSE_CATEGORIES.map(category => (
+                    {EXPENSE_CATEGORIES.map((category) => (
                       <SelectItem key={category} value={category}>
                         {category}
                       </SelectItem>
@@ -191,9 +246,9 @@ const Expenses = () => {
                   </SelectContent>
                 </Select>
 
-                <DatePickerWithRange 
+                <DatePickerWithRange
                   dateRange={dateRange}
-                  onChange={setDateRange} 
+                  onChange={setDateRange}
                 />
               </div>
             </div>
@@ -222,17 +277,29 @@ const Expenses = () => {
                         <TableCell>{formatDate(expense.date)}</TableCell>
                         <TableCell>{expense.category}</TableCell>
                         <TableCell>
-                          {expense.description || <span className="text-muted-foreground italic">No description</span>}
+                          {expense.description || (
+                            <span className="text-muted-foreground italic">
+                              No description
+                            </span>
+                          )}
                         </TableCell>
                         <TableCell className="text-right font-medium">
                           {formatCurrency(Number(expense.amount))}
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
-                            <Button size="sm" variant="outline" onClick={() => handleEditExpense(expense)}>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEditExpense(expense)}
+                            >
                               Edit
                             </Button>
-                            <Button size="sm" variant="destructive" onClick={() => handleDeleteExpense(expense.id)}>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleDeleteExpense(expense.id)}
+                            >
                               Delete
                             </Button>
                           </div>

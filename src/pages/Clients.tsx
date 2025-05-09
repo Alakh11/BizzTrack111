@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import {
@@ -44,7 +43,7 @@ const Clients = () => {
   const [isAddClientOpen, setIsAddClientOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isClientDetailsOpen, setIsClientDetailsOpen] = useState(false);
-  
+
   const itemsPerPage = 8;
   const { clients = [], isLoading } = useClients();
   const { invoices = [] } = useInvoices();
@@ -52,7 +51,7 @@ const Clients = () => {
   const filteredClients = clients.filter(
     (client) =>
       client.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.email?.toLowerCase().includes(searchQuery.toLowerCase())
+      client.email?.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Pagination logic
@@ -66,11 +65,14 @@ const Clients = () => {
   // Calculate client stats
   const getClientStats = (clientId: string | undefined) => {
     if (!clientId) return { totalInvoices: 0, totalSpent: 0 };
-    
-    const clientInvoices = invoices.filter(inv => inv.client_id === clientId);
+
+    const clientInvoices = invoices.filter((inv) => inv.client_id === clientId);
     const totalInvoices = clientInvoices.length;
-    const totalSpent = clientInvoices.reduce((sum, inv) => sum + Number(inv.total_amount), 0);
-    
+    const totalSpent = clientInvoices.reduce(
+      (sum, inv) => sum + Number(inv.total_amount),
+      0,
+    );
+
     return { totalInvoices, totalSpent };
   };
 
@@ -81,12 +83,13 @@ const Clients = () => {
 
   // Calculate total revenue from all clients
   const totalRevenue = invoices.reduce(
-    (total, invoice) => total + Number(invoice.total_amount || 0), 
-    0
+    (total, invoice) => total + Number(invoice.total_amount || 0),
+    0,
   );
 
   // Get active projects count (in a real app, you'd have a projects table)
-  const activeProjects = clients.length > 0 ? Math.ceil(clients.length * 0.75) : 0;
+  const activeProjects =
+    clients.length > 0 ? Math.ceil(clients.length * 0.75) : 0;
 
   return (
     <MainLayout>
@@ -98,7 +101,10 @@ const Clients = () => {
               Manage and track all your clients
             </p>
           </div>
-          <Button className="btn-primary" onClick={() => setIsAddClientOpen(true)}>
+          <Button
+            className="btn-primary"
+            onClick={() => setIsAddClientOpen(true)}
+          >
             <Plus className="h-4 w-4 mr-1" /> Add Client
           </Button>
         </div>
@@ -162,14 +168,17 @@ const Clients = () => {
                     </TableRow>
                   ) : paginatedClients.length > 0 ? (
                     paginatedClients.map((client: Client) => {
-                      const { totalInvoices, totalSpent } = getClientStats(client.id);
+                      const { totalInvoices, totalSpent } = getClientStats(
+                        client.id,
+                      );
                       return (
                         <TableRow key={client.id}>
                           <TableCell>
                             <div className="flex items-center gap-3">
                               <Avatar className="h-8 w-8 bg-refrens-light-blue text-primary">
                                 <AvatarFallback>
-                                  {client.name?.substring(0, 2).toUpperCase() || "CL"}
+                                  {client.name?.substring(0, 2).toUpperCase() ||
+                                    "CL"}
                                 </AvatarFallback>
                               </Avatar>
                               <div>
@@ -200,13 +209,19 @@ const Clients = () => {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem onClick={() => handleViewClient(client)}>
+                                <DropdownMenuItem
+                                  onClick={() => handleViewClient(client)}
+                                >
                                   View Client
                                 </DropdownMenuItem>
-                                <DropdownMenuItem onClick={() => handleViewClient(client)}>
+                                <DropdownMenuItem
+                                  onClick={() => handleViewClient(client)}
+                                >
                                   Edit Client
                                 </DropdownMenuItem>
-                                <DropdownMenuItem>Create Invoice</DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  Create Invoice
+                                </DropdownMenuItem>
                                 <DropdownMenuItem className="text-destructive">
                                   Delete Client
                                 </DropdownMenuItem>
@@ -265,12 +280,12 @@ const Clients = () => {
           </CardContent>
         </Card>
       </div>
-      
-      <AddClientModal 
+
+      <AddClientModal
         open={isAddClientOpen}
         onOpenChange={setIsAddClientOpen}
       />
-      
+
       <ClientDetailsModal
         open={isClientDetailsOpen}
         onOpenChange={setIsClientDetailsOpen}

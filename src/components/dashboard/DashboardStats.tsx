@@ -1,9 +1,8 @@
-
-import { ReactNode } from 'react';
-import StatCard from './StatCard';
+import { ReactNode } from "react";
+import StatCard from "./StatCard";
 import { IndianRupee, Users, FileText, CreditCard } from "lucide-react";
-import { useInvoices } from '@/hooks/useInvoices';
-import { useClients } from '@/hooks/useClients';
+import { useInvoices } from "@/hooks/useInvoices";
+import { useClients } from "@/hooks/useClients";
 
 const DashboardStats = () => {
   const { invoices = [], isLoading: isInvoicesLoading } = useInvoices();
@@ -17,30 +16,30 @@ const DashboardStats = () => {
         totalInvoices: 0,
         totalClients: 0,
         pendingAmount: 0,
-        revenueChange: '+0%',
-        invoiceChange: '+0%',
-        clientChange: '+0%',
-        pendingChange: '+0%'
+        revenueChange: "+0%",
+        invoiceChange: "+0%",
+        clientChange: "+0%",
+        pendingChange: "+0%",
       };
     }
 
     const totalRevenue = invoices.reduce((sum, inv) => {
-      if (inv.status === 'paid') return sum + Number(inv.total_amount || 0);
+      if (inv.status === "paid") return sum + Number(inv.total_amount || 0);
       return sum;
     }, 0);
 
     const pendingAmount = invoices.reduce((sum, inv) => {
-      if (inv.status === 'pending' || inv.status === 'overdue') {
+      if (inv.status === "pending" || inv.status === "overdue") {
         return sum + Number(inv.total_amount || 0);
       }
       return sum;
     }, 0);
 
     // For demo purposes, generate some change percentages
-    const revenueChange = '+12.5%';
-    const invoiceChange = '+4.3%';
-    const clientChange = '+2.1%';
-    const pendingChange = '+1.8%';
+    const revenueChange = "+12.5%";
+    const invoiceChange = "+4.3%";
+    const clientChange = "+2.1%";
+    const pendingChange = "+1.8%";
 
     return {
       totalRevenue,
@@ -50,7 +49,7 @@ const DashboardStats = () => {
       revenueChange,
       invoiceChange,
       clientChange,
-      pendingChange
+      pendingChange,
     };
   };
 
@@ -62,7 +61,7 @@ const DashboardStats = () => {
     revenueChange,
     invoiceChange,
     clientChange,
-    pendingChange
+    pendingChange,
   } = calculateStats();
 
   return (

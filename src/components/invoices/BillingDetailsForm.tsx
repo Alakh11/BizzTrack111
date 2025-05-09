@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import {
   FormField,
@@ -8,10 +7,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus } from "lucide-react";
@@ -31,15 +27,15 @@ interface BillingDetailsFormProps {
   handleClientChange: (clientId: string) => void;
 }
 
-export const BillingDetailsForm = ({ 
-  form, 
-  clients = [], 
-  handleClientChange 
+export const BillingDetailsForm = ({
+  form,
+  clients = [],
+  handleClientChange,
 }: BillingDetailsFormProps) => {
   const [isAddClientOpen, setIsAddClientOpen] = useState(false);
   const [showBusinessForm, setShowBusinessForm] = useState(true);
   const [showClientForm, setShowClientForm] = useState(true);
-  
+
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -63,7 +59,7 @@ export const BillingDetailsForm = ({
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="businessAddress"
@@ -77,7 +73,7 @@ export const BillingDetailsForm = ({
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="businessPhone"
@@ -91,7 +87,7 @@ export const BillingDetailsForm = ({
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="businessEmail"
@@ -99,10 +95,10 @@ export const BillingDetailsForm = ({
                 <FormItem>
                   <FormLabel>Business Email</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="email" 
-                      {...field} 
-                      placeholder="Enter business email" 
+                    <Input
+                      type="email"
+                      {...field}
+                      placeholder="Enter business email"
                     />
                   </FormControl>
                   <FormMessage />
@@ -137,9 +133,9 @@ export const BillingDetailsForm = ({
                 </SelectContent>
               </Select>
 
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 size="icon"
                 onClick={() => setIsAddClientOpen(true)}
               >
@@ -162,7 +158,7 @@ export const BillingDetailsForm = ({
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="clientAddress"
@@ -176,7 +172,7 @@ export const BillingDetailsForm = ({
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="clientEmail"
@@ -184,17 +180,17 @@ export const BillingDetailsForm = ({
                 <FormItem>
                   <FormLabel>Client Email</FormLabel>
                   <FormControl>
-                    <Input 
-                      type="email" 
-                      {...field} 
-                      placeholder="Enter client email" 
+                    <Input
+                      type="email"
+                      {...field}
+                      placeholder="Enter client email"
                     />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="clientPhone"
@@ -212,9 +208,9 @@ export const BillingDetailsForm = ({
         </div>
       </div>
 
-      <AddClientModal 
-        open={isAddClientOpen} 
-        onOpenChange={setIsAddClientOpen} 
+      <AddClientModal
+        open={isAddClientOpen}
+        onOpenChange={setIsAddClientOpen}
       />
     </div>
   );

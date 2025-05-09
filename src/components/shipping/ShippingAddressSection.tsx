@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   FormField,
@@ -50,20 +49,20 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({
   setShowExtra,
 }) => {
   const prefix = type === "from" ? "shippedFrom" : "shippedTo";
-  
+
   // Update fields when useSourceAddress changes
   useEffect(() => {
     if (useSourceAddress && addressSource) {
       // Apply source address to the form fields
-      form.setValue(`${prefix}Name`, addressSource.name || '');
-      form.setValue(`${prefix}Address`, addressSource.address || '');
-      form.setValue(`${prefix}City`, addressSource.city || '');
-      form.setValue(`${prefix}State`, addressSource.state || '');
-      form.setValue(`${prefix}Postal`, addressSource.postal || '');
-      form.setValue(`${prefix}Country`, addressSource.country || 'india');
+      form.setValue(`${prefix}Name`, addressSource.name || "");
+      form.setValue(`${prefix}Address`, addressSource.address || "");
+      form.setValue(`${prefix}City`, addressSource.city || "");
+      form.setValue(`${prefix}State`, addressSource.state || "");
+      form.setValue(`${prefix}Postal`, addressSource.postal || "");
+      form.setValue(`${prefix}Country`, addressSource.country || "india");
     }
   }, [useSourceAddress, addressSource, form, prefix]);
-  
+
   const handleSaveToClientDetails = (checked: boolean) => {
     // This would update the client record with the shipping details
     console.log("Save to client details:", checked);
@@ -72,17 +71,24 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({
   return (
     <div className="space-y-4">
       <h3 className="text-lg font-medium">{title}</h3>
-      
+
       <div className="flex items-center space-x-2">
-        <Checkbox 
-          id={`use${type === "from" ? "Business" : "Client"}Address`} 
+        <Checkbox
+          id={`use${type === "from" ? "Business" : "Client"}Address`}
           checked={useSourceAddress}
           onCheckedChange={setUseSourceAddress}
-          disabled={type === "to" && (!addressSource?.name || !addressSource?.address)}
+          disabled={
+            type === "to" && (!addressSource?.name || !addressSource?.address)
+          }
         />
-        <label htmlFor={`use${type === "from" ? "Business" : "Client"}Address`} className="text-sm">{sourceLabel}</label>
+        <label
+          htmlFor={`use${type === "from" ? "Business" : "Client"}Address`}
+          className="text-sm"
+        >
+          {sourceLabel}
+        </label>
       </div>
-      
+
       {type === "from" && (
         <FormField
           control={form.control}
@@ -106,13 +112,17 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({
           )}
         />
       )}
-      
+
       <FormField
         control={form.control}
         name={`${prefix}Name`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>{type === "from" ? "Business / Freelancer Name" : "Client's business name"}</FormLabel>
+            <FormLabel>
+              {type === "from"
+                ? "Business / Freelancer Name"
+                : "Client's business name"}
+            </FormLabel>
             <FormControl>
               <Input {...field} disabled={useSourceAddress} />
             </FormControl>
@@ -120,14 +130,17 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({
           </FormItem>
         )}
       />
-      
+
       <FormField
         control={form.control}
         name={`${prefix}Country`}
         render={({ field }) => (
           <FormItem>
             <FormLabel>Select Country</FormLabel>
-            <Select onValueChange={field.onChange} defaultValue={field.value || "india"}>
+            <Select
+              onValueChange={field.onChange}
+              defaultValue={field.value || "india"}
+            >
               <FormControl>
                 <SelectTrigger>
                   <SelectValue placeholder="Select country" />
@@ -143,7 +156,7 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({
           </FormItem>
         )}
       />
-      
+
       <FormField
         control={form.control}
         name={`${prefix}Address`}
@@ -157,7 +170,7 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({
           </FormItem>
         )}
       />
-      
+
       {showExtra && (
         <>
           <div className="grid grid-cols-2 gap-4">
@@ -174,7 +187,7 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name={`${prefix}Postal`}
@@ -189,7 +202,7 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({
               )}
             />
           </div>
-          
+
           <FormField
             control={form.control}
             name={`${prefix}State`}
@@ -203,19 +216,21 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({
               </FormItem>
             )}
           />
-          
+
           {type === "to" && (
             <div className="flex items-center space-x-2 mt-2">
-              <Checkbox 
-                id="saveToClient" 
+              <Checkbox
+                id="saveToClient"
                 onCheckedChange={handleSaveToClientDetails}
               />
-              <label htmlFor="saveToClient" className="text-sm">Save to client details</label>
+              <label htmlFor="saveToClient" className="text-sm">
+                Save to client details
+              </label>
             </div>
           )}
         </>
       )}
-      
+
       <Button
         type="button"
         variant="ghost"
@@ -223,7 +238,7 @@ const ShippingAddressSection: React.FC<ShippingAddressSectionProps> = ({
         className="mt-2"
         onClick={() => setShowExtra(!showExtra)}
       >
-        <Plus className="h-4 w-4 mr-1" /> 
+        <Plus className="h-4 w-4 mr-1" />
         {showExtra ? "Show Less Fields" : "Add More Fields"}
       </Button>
     </div>

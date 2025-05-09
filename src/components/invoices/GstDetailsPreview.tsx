@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Dialog,
@@ -41,7 +40,9 @@ const GstDetailsPreview: React.FC<GstDetailsPreviewProps> = ({
             </div>
             <div>
               <p className="font-medium text-sm">Place of Supply:</p>
-              <p className="text-sm">{gstDetails.placeOfSupply || "Not specified"}</p>
+              <p className="text-sm">
+                {gstDetails.placeOfSupply || "Not specified"}
+              </p>
             </div>
           </div>
 
@@ -52,7 +53,9 @@ const GstDetailsPreview: React.FC<GstDetailsPreviewProps> = ({
             </div>
             <div>
               <p className="font-medium text-sm">GST Number:</p>
-              <p className="text-sm">{gstDetails.gstNumber || "Not specified"}</p>
+              <p className="text-sm">
+                {gstDetails.gstNumber || "Not specified"}
+              </p>
             </div>
           </div>
 

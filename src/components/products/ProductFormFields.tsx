@@ -1,20 +1,19 @@
-
 import React from "react";
-import { 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormControl, 
-  FormMessage 
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
 import { PRODUCT_CATEGORIES } from "@/hooks/useProducts";
 
@@ -39,7 +38,7 @@ const ProductFormFields = ({ form }: ProductFormFieldsProps) => {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="sku"
@@ -54,7 +53,7 @@ const ProductFormFields = ({ form }: ProductFormFieldsProps) => {
           )}
         />
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <FormField
           control={form.control}
@@ -69,7 +68,7 @@ const ProductFormFields = ({ form }: ProductFormFieldsProps) => {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="quantity"
@@ -92,10 +91,7 @@ const ProductFormFields = ({ form }: ProductFormFieldsProps) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel>Category*</FormLabel>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value}
-              >
+              <Select onValueChange={field.onChange} value={field.value}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a category" />
@@ -103,7 +99,9 @@ const ProductFormFields = ({ form }: ProductFormFieldsProps) => {
                 </FormControl>
                 <SelectContent>
                   {PRODUCT_CATEGORIES.map((category) => (
-                    <SelectItem key={category} value={category}>{category}</SelectItem>
+                    <SelectItem key={category} value={category}>
+                      {category}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -111,7 +109,7 @@ const ProductFormFields = ({ form }: ProductFormFieldsProps) => {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="low_stock_threshold"
@@ -119,19 +117,14 @@ const ProductFormFields = ({ form }: ProductFormFieldsProps) => {
             <FormItem>
               <FormLabel>Low Stock Threshold</FormLabel>
               <FormControl>
-                <Input 
-                  type="number" 
-                  min="0" 
-                  {...field} 
-                  placeholder="10"
-                />
+                <Input type="number" min="0" {...field} placeholder="10" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
       </div>
-      
+
       <FormField
         control={form.control}
         name="description"
@@ -139,16 +132,13 @@ const ProductFormFields = ({ form }: ProductFormFieldsProps) => {
           <FormItem>
             <FormLabel>Description</FormLabel>
             <FormControl>
-              <Textarea 
-                {...field} 
-                placeholder="Product description" 
-              />
+              <Textarea {...field} placeholder="Product description" />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
-      
+
       <FormField
         control={form.control}
         name="barcode"
@@ -156,10 +146,7 @@ const ProductFormFields = ({ form }: ProductFormFieldsProps) => {
           <FormItem>
             <FormLabel>Barcode</FormLabel>
             <FormControl>
-              <Input 
-                {...field} 
-                placeholder="Leave empty for auto-generation" 
-              />
+              <Input {...field} placeholder="Leave empty for auto-generation" />
             </FormControl>
             <FormMessage />
           </FormItem>

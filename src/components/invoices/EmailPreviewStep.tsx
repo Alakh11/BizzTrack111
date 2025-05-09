@@ -1,16 +1,20 @@
-
 import React, { useState } from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { FormField, FormItem, FormLabel, FormControl } from "@/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, Download, Mail, Printer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import InvoicePrintRenderer from "./InvoicePrintRenderer";
 import { useEmailSender } from "@/hooks/useEmailSender";
-import { Invoice } from "@/types/invoice"; 
+import { Invoice } from "@/types/invoice";
 
 interface EmailPreviewStepProps {
   form: UseFormReturn<any>;
@@ -25,13 +29,16 @@ const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
   // Prepare invoice data from form
   const getInvoiceData = () => {
     const formData = form.getValues();
-    
+
     // Calculate total amount
     let totalAmount = 0;
     if (formData.items && Array.isArray(formData.items)) {
-      totalAmount = formData.items.reduce((sum: number, item: any) => sum + (parseFloat(item.amount) || 0), 0);
+      totalAmount = formData.items.reduce(
+        (sum: number, item: any) => sum + (parseFloat(item.amount) || 0),
+        0,
+      );
     }
-    
+
     // Create a valid invoice object that matches the Invoice interface
     const invoice: Invoice = {
       id: formData.id || "preview-invoice",
@@ -50,7 +57,7 @@ const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
         name: formData.clientName,
         address: formData.clientAddress,
         email: formData.clientEmail,
-        phone: formData.clientPhone
+        phone: formData.clientPhone,
       },
       invoice_items: formData.items || [],
       metadata: {
@@ -79,11 +86,11 @@ const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
           upi: {
             id: formData.upiId,
             name: formData.upiName,
-          }
-        }
-      }
+          },
+        },
+      },
     };
-    
+
     return invoice;
   };
 
@@ -109,7 +116,7 @@ const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
     const emailSubject = form.getValues("emailSubject");
     const emailBody = form.getValues("emailBody");
     const invoiceId = form.getValues("id"); // In case of edit mode
-    
+
     if (!clientEmail) {
       toast({
         title: "Missing Email Address",
@@ -118,9 +125,9 @@ const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
       });
       return;
     }
-    
+
     setIsSending(true);
-    
+
     try {
       await sendEmail({
         to: clientEmail,
@@ -130,7 +137,7 @@ const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
         invoiceId: invoiceId,
         // Attachments would be handled by the email service
       });
-      
+
       toast({
         title: "Success",
         description: `Invoice email sent to ${clientName || clientEmail}!`,
@@ -160,10 +167,10 @@ const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
               <FormItem>
                 <FormLabel>To</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
-                    defaultValue={form.getValues("clientEmail")} 
-                    placeholder="Client email address" 
+                  <Input
+                    {...field}
+                    defaultValue={form.getValues("clientEmail")}
+                    placeholder="Client email address"
                   />
                 </FormControl>
               </FormItem>
@@ -177,10 +184,10 @@ const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
               <FormItem>
                 <FormLabel>Subject</FormLabel>
                 <FormControl>
-                  <Input 
-                    {...field} 
-                    defaultValue={`Invoice #${form.getValues("invoiceNumber")}`} 
-                    placeholder="Email subject" 
+                  <Input
+                    {...field}
+                    defaultValue={`Invoice #${form.getValues("invoiceNumber")}`}
+                    placeholder="Email subject"
                   />
                 </FormControl>
               </FormItem>
@@ -204,11 +211,11 @@ const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
               </FormItem>
             )}
           />
-          
+
           <div className="flex justify-end space-x-2">
-            <Button 
-              type="button" 
-              onClick={handleSendEmail} 
+            <Button
+              type="button"
+              onClick={handleSendEmail}
               disabled={isSending}
             >
               <Mail className="mr-2 h-4 w-4" />
@@ -223,7 +230,7 @@ const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
               <TabsTrigger value="preview">Invoice Preview</TabsTrigger>
               <TabsTrigger value="actions">Invoice Actions</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="preview" className="space-y-4">
               <div className="border rounded-md p-4 h-96 overflow-auto bg-gray-50">
                 <div className="flex justify-center items-center h-full flex-col">
@@ -237,11 +244,15 @@ const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
                 </div>
               </div>
             </TabsContent>
-            
+
             <TabsContent value="actions" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <Card className="p-6 flex flex-col items-center justify-center text-center">
-                  <Button onClick={handlePrintInvoice} variant="outline" className="w-full">
+                  <Button
+                    onClick={handlePrintInvoice}
+                    variant="outline"
+                    className="w-full"
+                  >
                     <Printer className="mr-2 h-4 w-4" />
                     Print Invoice
                   </Button>
@@ -249,9 +260,13 @@ const EmailPreviewStep: React.FC<EmailPreviewStepProps> = ({ form }) => {
                     Send the invoice directly to your printer
                   </p>
                 </Card>
-                
+
                 <Card className="p-6 flex flex-col items-center justify-center text-center">
-                  <Button onClick={handleDownloadInvoice} variant="outline" className="w-full">
+                  <Button
+                    onClick={handleDownloadInvoice}
+                    variant="outline"
+                    className="w-full"
+                  >
                     <Download className="mr-2 h-4 w-4" />
                     Download Invoice
                   </Button>

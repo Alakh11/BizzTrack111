@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { IndianRupee } from "lucide-react";
 
@@ -76,7 +75,10 @@ const services = [
   },
 ];
 
-const ServiceGrid: React.FC<ServiceGridProps> = ({ searchQuery, currentTab }) => {
+const ServiceGrid: React.FC<ServiceGridProps> = ({
+  searchQuery,
+  currentTab,
+}) => {
   // Filter services based on search query and selected category
   const filteredServices = services.filter((service) => {
     const matchesSearch = service.name
