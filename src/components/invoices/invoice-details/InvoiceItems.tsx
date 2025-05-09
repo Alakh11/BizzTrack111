@@ -36,7 +36,10 @@ const InvoiceItems = ({
     <div className="dark:text-gray-100">
       <h3 className="text-lg font-semibold mb-2">Invoice Items</h3>
       {items.map((item) => (
-        <div key={item.id} className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 p-4 border rounded-md dark:bg-gray-800/50 bg-muted/10">
+        <div
+          key={item.id}
+          className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-4 p-4 border rounded-md dark:bg-gray-800/50 bg-muted/10"
+        >
           <div className="col-span-1 md:col-span-2">
             <Label className="dark:text-gray-200">Description</Label>
             <Input

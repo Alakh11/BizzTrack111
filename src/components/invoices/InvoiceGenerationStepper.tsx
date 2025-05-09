@@ -1,4 +1,3 @@
-
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ArrowLeft, Save } from "lucide-react";
@@ -56,7 +55,7 @@ const InvoiceGenerationStepper = ({
         steps={steps}
         onChange={handleStepChange}
       />
-      
+
       <div>{children}</div>
 
       <div className="flex justify-between mt-8">

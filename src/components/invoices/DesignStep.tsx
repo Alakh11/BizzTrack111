@@ -1,4 +1,3 @@
-
 import React, { useRef, useState, useEffect } from "react";
 import { FileText } from "lucide-react";
 import InvoiceTemplates from "./InvoiceTemplates";
@@ -42,7 +41,7 @@ const DesignStep: React.FC<DesignStepProps> = ({
   setSelectedColor,
   setSelectedFont,
   setSelectedPaperSize,
-  setBusinessLogo
+  setBusinessLogo,
 }) => {
   const [signature, setSignature] = useState<string>("");
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -53,7 +52,14 @@ const DesignStep: React.FC<DesignStepProps> = ({
     invoiceDate: "May 5, 2025",
     dueDate: "May 19, 2025",
     total: "$200.00",
-    items: [{ description: "Product Name", quantity: 2, rate: "$100.00", amount: "$200.00" }]
+    items: [
+      {
+        description: "Product Name",
+        quantity: 2,
+        rate: "$100.00",
+        amount: "$200.00",
+      },
+    ],
   });
 
   // Update preview with real form data
@@ -61,23 +67,42 @@ const DesignStep: React.FC<DesignStepProps> = ({
     const formValues = form.getValues();
     if (formValues) {
       // Calculate currency symbol
-      const currencySymbol = formValues.selectedCurrency === 'usd' ? '$' : 
-                            formValues.selectedCurrency === 'eur' ? '€' : 
-                            formValues.selectedCurrency === 'gbp' ? '£' : '₹';
+      const currencySymbol =
+        formValues.selectedCurrency === "usd"
+          ? "$"
+          : formValues.selectedCurrency === "eur"
+            ? "€"
+            : formValues.selectedCurrency === "gbp"
+              ? "£"
+              : "₹";
 
       // Calculate total
-      const total = formValues.items?.reduce((sum: number, item: any) => 
-        sum + (parseFloat(item.amount) || 0), 0) || 0;
+      const total =
+        formValues.items?.reduce(
+          (sum: number, item: any) => sum + (parseFloat(item.amount) || 0),
+          0,
+        ) || 0;
 
       const newPreviewData = {
         clientName: formValues.clientName || "Client Name",
         clientAddress: formValues.clientAddress || "Client Address",
         clientEmail: formValues.clientEmail || "client@example.com",
         invoiceNumber: formValues.invoiceNumber || "INV-2023-001",
-        invoiceDate: formValues.invoiceDate ? new Date(formValues.invoiceDate).toLocaleDateString() : "May 5, 2025",
-        dueDate: formValues.dueDate ? new Date(formValues.dueDate).toLocaleDateString() : "May 19, 2025",
+        invoiceDate: formValues.invoiceDate
+          ? new Date(formValues.invoiceDate).toLocaleDateString()
+          : "May 5, 2025",
+        dueDate: formValues.dueDate
+          ? new Date(formValues.dueDate).toLocaleDateString()
+          : "May 19, 2025",
         total: `${currencySymbol}${total.toFixed(2)}`,
-        items: formValues.items || [{ description: "Product Name", quantity: 2, rate: "$100.00", amount: "$200.00" }],
+        items: formValues.items || [
+          {
+            description: "Product Name",
+            quantity: 2,
+            rate: "$100.00",
+            amount: "$200.00",
+          },
+        ],
         gstNumber: formValues.gstNumber || "",
         shippingDetails: {
           from: {
@@ -87,10 +112,10 @@ const DesignStep: React.FC<DesignStepProps> = ({
           to: {
             name: formValues.shippedToName || "",
             address: formValues.shippedToAddress || "",
-          }
+          },
         },
         notes: formValues.notes || "",
-        terms: formValues.terms || ""
+        terms: formValues.terms || "",
       };
       setPreviewData(newPreviewData);
     }
@@ -101,7 +126,7 @@ const DesignStep: React.FC<DesignStepProps> = ({
       const file = e.target.files[0];
       const reader = new FileReader();
       reader.onloadend = () => {
-        if (typeof reader.result === 'string') {
+        if (typeof reader.result === "string") {
           setBusinessLogo(reader.result);
         }
       };
@@ -113,15 +138,12 @@ const DesignStep: React.FC<DesignStepProps> = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     setIsDrawing(true);
     ctx.beginPath();
-    ctx.moveTo(
-      e.nativeEvent.offsetX, 
-      e.nativeEvent.offsetY
-    );
+    ctx.moveTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
   };
 
   const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -130,17 +152,14 @@ const DesignStep: React.FC<DesignStepProps> = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     ctx.lineWidth = 2;
-    ctx.lineCap = 'round';
-    ctx.strokeStyle = 'black';
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "black";
 
-    ctx.lineTo(
-      e.nativeEvent.offsetX, 
-      e.nativeEvent.offsetY
-    );
+    ctx.lineTo(e.nativeEvent.offsetX, e.nativeEvent.offsetY);
     ctx.stroke();
   };
 
@@ -150,15 +169,15 @@ const DesignStep: React.FC<DesignStepProps> = ({
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    setSignature(canvas.toDataURL('image/png'));
-    form.setValue("signature", canvas.toDataURL('image/png'));
+    setSignature(canvas.toDataURL("image/png"));
+    form.setValue("signature", canvas.toDataURL("image/png"));
   };
 
   const clearSignature = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -168,32 +187,51 @@ const DesignStep: React.FC<DesignStepProps> = ({
 
   const getColorStyles = (color: string) => {
     // Convert simple color names to proper hex or tailwind-like colors
-    switch(color) {
-      case 'blue': return { textColor: '#3B82F6', accentColor: '#60A5FA' };
-      case 'green': return { textColor: '#10B981', accentColor: '#34D399' };
-      case 'red': return { textColor: '#EF4444', accentColor: '#F87171' };
-      case 'purple': return { textColor: '#8B5CF6', accentColor: '#A78BFA' };
-      case 'orange': return { textColor: '#F97316', accentColor: '#FB923C' };
-      case 'teal': return { textColor: '#14B8A6', accentColor: '#2DD4BF' };
-      case 'pink': return { textColor: '#EC4899', accentColor: '#F472B6' };
-      case 'gray': return { textColor: '#4B5563', accentColor: '#9CA3AF' };
-      case 'black': return { textColor: '#1F2937', accentColor: '#4B5563' };
-      case 'indigo': return { textColor: '#6366F1', accentColor: '#818CF8' };
-      default: return { textColor: '#3B82F6', accentColor: '#60A5FA' };
+    switch (color) {
+      case "blue":
+        return { textColor: "#3B82F6", accentColor: "#60A5FA" };
+      case "green":
+        return { textColor: "#10B981", accentColor: "#34D399" };
+      case "red":
+        return { textColor: "#EF4444", accentColor: "#F87171" };
+      case "purple":
+        return { textColor: "#8B5CF6", accentColor: "#A78BFA" };
+      case "orange":
+        return { textColor: "#F97316", accentColor: "#FB923C" };
+      case "teal":
+        return { textColor: "#14B8A6", accentColor: "#2DD4BF" };
+      case "pink":
+        return { textColor: "#EC4899", accentColor: "#F472B6" };
+      case "gray":
+        return { textColor: "#4B5563", accentColor: "#9CA3AF" };
+      case "black":
+        return { textColor: "#1F2937", accentColor: "#4B5563" };
+      case "indigo":
+        return { textColor: "#6366F1", accentColor: "#818CF8" };
+      default:
+        return { textColor: "#3B82F6", accentColor: "#60A5FA" };
     }
   };
 
   // Get font style based on selected font
   const getFontStyle = (font: string) => {
-    switch(font) {
-      case 'inter': return 'font-["Inter"]';
-      case 'roboto': return 'font-["Roboto"]';
-      case 'poppins': return 'font-["Poppins"]';
-      case 'montserrat': return 'font-["Montserrat"]';
-      case 'times': return 'font-["Times_New_Roman"]';
-      case 'calibri': return 'font-["Calibri"]';
-      case 'algerian': return 'font-["Algerian"]';
-      default: return 'font-["Inter"]';
+    switch (font) {
+      case "inter":
+        return 'font-["Inter"]';
+      case "roboto":
+        return 'font-["Roboto"]';
+      case "poppins":
+        return 'font-["Poppins"]';
+      case "montserrat":
+        return 'font-["Montserrat"]';
+      case "times":
+        return 'font-["Times_New_Roman"]';
+      case "calibri":
+        return 'font-["Calibri"]';
+      case "algerian":
+        return 'font-["Algerian"]';
+      default:
+        return 'font-["Inter"]';
     }
   };
 
@@ -205,28 +243,32 @@ const DesignStep: React.FC<DesignStepProps> = ({
     // For standard web fonts like Times New Roman and Calibri,
     // we don't need to load them as they are system fonts
     const fontLinks = {
-      inter: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
-      roboto: "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap",
-      poppins: "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap",
-      montserrat: "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap",
+      inter:
+        "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap",
+      roboto:
+        "https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap",
+      poppins:
+        "https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap",
+      montserrat:
+        "https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap",
     };
-    
+
     // Only add link for web fonts
     if (fontLinks[selectedFont as keyof typeof fontLinks]) {
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
       link.href = fontLinks[selectedFont as keyof typeof fontLinks];
       link.id = `font-${selectedFont}`;
-      
+
       // Check if link already exists
       if (!document.getElementById(link.id)) {
         document.head.appendChild(link);
       }
     }
-    
+
     return () => {
       // Clean up any font links we added
-      Object.keys(fontLinks).forEach(font => {
+      Object.keys(fontLinks).forEach((font) => {
         const linkId = `font-${font}`;
         const existingLink = document.getElementById(linkId);
         if (existingLink) {
@@ -245,26 +287,47 @@ const DesignStep: React.FC<DesignStepProps> = ({
             <CardContent className="pt-6">
               <Tabs defaultValue="templates">
                 <TabsList className="mb-4 w-full">
-                  <TabsTrigger value="templates" className="flex-1">Templates</TabsTrigger>
-                  <TabsTrigger value="colors" className="flex-1">Colors</TabsTrigger>
-                  <TabsTrigger value="fonts" className="flex-1">Fonts</TabsTrigger>
-                  <TabsTrigger value="signature" className="flex-1">Signature</TabsTrigger>
+                  <TabsTrigger value="templates" className="flex-1">
+                    Templates
+                  </TabsTrigger>
+                  <TabsTrigger value="colors" className="flex-1">
+                    Colors
+                  </TabsTrigger>
+                  <TabsTrigger value="fonts" className="flex-1">
+                    Fonts
+                  </TabsTrigger>
+                  <TabsTrigger value="signature" className="flex-1">
+                    Signature
+                  </TabsTrigger>
                 </TabsList>
                 <TabsContent value="templates" className="space-y-4">
-                  <InvoiceTemplates 
-                    selectedTemplate={selectedTemplate} 
-                    setSelectedTemplate={setSelectedTemplate} 
+                  <InvoiceTemplates
+                    selectedTemplate={selectedTemplate}
+                    setSelectedTemplate={setSelectedTemplate}
                   />
                 </TabsContent>
 
                 <TabsContent value="colors" className="space-y-4">
                   <Label>Choose Primary Color</Label>
                   <div className="grid grid-cols-5 gap-2">
-                    {['blue', 'green', 'red', 'purple', 'orange', 'teal', 'pink', 'gray', 'black', 'indigo'].map((color) => (
-                      <div 
+                    {[
+                      "blue",
+                      "green",
+                      "red",
+                      "purple",
+                      "orange",
+                      "teal",
+                      "pink",
+                      "gray",
+                      "black",
+                      "indigo",
+                    ].map((color) => (
+                      <div
                         key={color}
-                        className={`w-10 h-10 rounded-full cursor-pointer border-2 ${selectedColor === color ? 'ring-2 ring-offset-2' : ''}`}
-                        style={{ backgroundColor: getColorStyles(color).textColor }}
+                        className={`w-10 h-10 rounded-full cursor-pointer border-2 ${selectedColor === color ? "ring-2 ring-offset-2" : ""}`}
+                        style={{
+                          backgroundColor: getColorStyles(color).textColor,
+                        }}
                         onClick={() => setSelectedColor(color)}
                       />
                     ))}
@@ -273,34 +336,66 @@ const DesignStep: React.FC<DesignStepProps> = ({
 
                 <TabsContent value="fonts" className="space-y-4">
                   <Label>Font Family</Label>
-                  <RadioGroup value={selectedFont} onValueChange={setSelectedFont}>
+                  <RadioGroup
+                    value={selectedFont}
+                    onValueChange={setSelectedFont}
+                  >
                     <div className="flex items-center space-x-2 mb-2">
                       <RadioGroupItem value="inter" id="font-inter" />
-                      <Label htmlFor="font-inter" className="font-['Inter']">Inter</Label>
+                      <Label htmlFor="font-inter" className="font-['Inter']">
+                        Inter
+                      </Label>
                     </div>
                     <div className="flex items-center space-x-2 mb-2">
                       <RadioGroupItem value="roboto" id="font-roboto" />
-                      <Label htmlFor="font-roboto" className="font-['Roboto']">Roboto</Label>
+                      <Label htmlFor="font-roboto" className="font-['Roboto']">
+                        Roboto
+                      </Label>
                     </div>
                     <div className="flex items-center space-x-2 mb-2">
                       <RadioGroupItem value="poppins" id="font-poppins" />
-                      <Label htmlFor="font-poppins" className="font-['Poppins']">Poppins</Label>
+                      <Label
+                        htmlFor="font-poppins"
+                        className="font-['Poppins']"
+                      >
+                        Poppins
+                      </Label>
                     </div>
                     <div className="flex items-center space-x-2 mb-2">
                       <RadioGroupItem value="montserrat" id="font-montserrat" />
-                      <Label htmlFor="font-montserrat" className="font-['Montserrat']">Montserrat</Label>
+                      <Label
+                        htmlFor="font-montserrat"
+                        className="font-['Montserrat']"
+                      >
+                        Montserrat
+                      </Label>
                     </div>
                     <div className="flex items-center space-x-2 mb-2">
                       <RadioGroupItem value="times" id="font-times" />
-                      <Label htmlFor="font-times" className="font-['Times_New_Roman']">Times New Roman</Label>
+                      <Label
+                        htmlFor="font-times"
+                        className="font-['Times_New_Roman']"
+                      >
+                        Times New Roman
+                      </Label>
                     </div>
                     <div className="flex items-center space-x-2 mb-2">
                       <RadioGroupItem value="calibri" id="font-calibri" />
-                      <Label htmlFor="font-calibri" className="font-['Calibri']">Calibri</Label>
+                      <Label
+                        htmlFor="font-calibri"
+                        className="font-['Calibri']"
+                      >
+                        Calibri
+                      </Label>
                     </div>
                     <div className="flex items-center space-x-2">
                       <RadioGroupItem value="algerian" id="font-algerian" />
-                      <Label htmlFor="font-algerian" className="font-['Algerian']">Algerian</Label>
+                      <Label
+                        htmlFor="font-algerian"
+                        className="font-['Algerian']"
+                      >
+                        Algerian
+                      </Label>
                     </div>
                   </RadioGroup>
                 </TabsContent>
@@ -319,9 +414,9 @@ const DesignStep: React.FC<DesignStepProps> = ({
                       onMouseLeave={stopDrawing}
                     />
                     <div className="flex justify-end mt-2">
-                      <Button 
-                        variant="outline" 
-                        type="button" 
+                      <Button
+                        variant="outline"
+                        type="button"
                         onClick={clearSignature}
                         className="text-sm"
                       >
@@ -330,7 +425,8 @@ const DesignStep: React.FC<DesignStepProps> = ({
                     </div>
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    Draw your signature above. It will be included in the final invoice.
+                    Draw your signature above. It will be included in the final
+                    invoice.
                   </div>
                 </TabsContent>
               </Tabs>
@@ -341,7 +437,10 @@ const DesignStep: React.FC<DesignStepProps> = ({
             <CardContent className="pt-6 space-y-4">
               <div className="space-y-2">
                 <Label>Paper Size</Label>
-                <Select value={selectedPaperSize} onValueChange={setSelectedPaperSize}>
+                <Select
+                  value={selectedPaperSize}
+                  onValueChange={setSelectedPaperSize}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder="Select paper size" />
                   </SelectTrigger>
@@ -358,17 +457,17 @@ const DesignStep: React.FC<DesignStepProps> = ({
                 <div className="flex flex-col space-y-2">
                   {businessLogo && (
                     <div className="mb-2 border p-2 rounded-md">
-                      <img 
-                        src={businessLogo} 
-                        alt="Business Logo" 
+                      <img
+                        src={businessLogo}
+                        alt="Business Logo"
                         className="max-h-24 max-w-full mx-auto"
                       />
                     </div>
                   )}
-                  <Input 
-                    type="file" 
-                    accept="image/*" 
-                    onChange={handleLogoUpload} 
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoUpload}
                     className="cursor-pointer"
                   />
                 </div>
@@ -387,45 +486,72 @@ const DesignStep: React.FC<DesignStepProps> = ({
           <div className="h-full flex flex-col">
             <h3 className="text-lg font-medium mb-4">Preview</h3>
             <div className="flex-grow bg-muted/10 border rounded-md p-4 flex items-center justify-center">
-              <div className={`w-full max-w-md p-6 border rounded-md bg-white shadow-sm ${fontClass}`}>
+              <div
+                className={`w-full max-w-md p-6 border rounded-md bg-white shadow-sm ${fontClass}`}
+              >
                 <div className="flex justify-between items-start mb-6">
                   {businessLogo ? (
-                    <img src={businessLogo} alt="Logo" className="h-12 max-w-[120px] object-contain" />
+                    <img
+                      src={businessLogo}
+                      alt="Logo"
+                      className="h-12 max-w-[120px] object-contain"
+                    />
                   ) : (
                     <div className="h-12 w-32 bg-muted/20 rounded flex items-center justify-center text-xs text-muted-foreground">
                       Your Logo
                     </div>
                   )}
                   <div className="text-right">
-                    <h2 className="text-xl font-bold" style={{ color: colorStyles.textColor }}>INVOICE</h2>
-                    <p className="text-sm text-muted-foreground">#{previewData.invoiceNumber}</p>
+                    <h2
+                      className="text-xl font-bold"
+                      style={{ color: colorStyles.textColor }}
+                    >
+                      INVOICE
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      #{previewData.invoiceNumber}
+                    </p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4 mb-6">
                   <div>
                     <p className="text-xs text-muted-foreground">From:</p>
-                    <p className="font-medium">{form.getValues("businessName") || "Your Business"}</p>
-                    <p className="text-sm">{form.getValues("businessAddress") || "Business Address"}</p>
-                    <p className="text-sm">{form.getValues("businessPhone") || ""}</p>
+                    <p className="font-medium">
+                      {form.getValues("businessName") || "Your Business"}
+                    </p>
+                    <p className="text-sm">
+                      {form.getValues("businessAddress") || "Business Address"}
+                    </p>
+                    <p className="text-sm">
+                      {form.getValues("businessPhone") || ""}
+                    </p>
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">To:</p>
                     <p className="font-medium">{previewData.clientName}</p>
-                    <p className="text-sm">{previewData.clientAddress || "Client Address"}</p>
-                    <p className="text-sm">{previewData.clientEmail || "client@example.com"}</p>
+                    <p className="text-sm">
+                      {previewData.clientAddress || "Client Address"}
+                    </p>
+                    <p className="text-sm">
+                      {previewData.clientEmail || "client@example.com"}
+                    </p>
                   </div>
                 </div>
 
                 {previewData.gstNumber && (
                   <div className="border-t border-b py-2 mb-4">
-                    <p className="text-xs text-muted-foreground">GST Number: {previewData.gstNumber}</p>
+                    <p className="text-xs text-muted-foreground">
+                      GST Number: {previewData.gstNumber}
+                    </p>
                   </div>
                 )}
 
                 <div className="border-t border-b py-2 mb-4 grid grid-cols-4">
                   <div>
-                    <p className="text-xs text-muted-foreground">Invoice Date</p>
+                    <p className="text-xs text-muted-foreground">
+                      Invoice Date
+                    </p>
                     <p className="text-sm">{previewData.invoiceDate}</p>
                   </div>
                   <div>
@@ -438,7 +564,12 @@ const DesignStep: React.FC<DesignStepProps> = ({
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Amount Due</p>
-                    <p className="text-sm font-semibold" style={{ color: colorStyles.textColor }}>{previewData.total}</p>
+                    <p
+                      className="text-sm font-semibold"
+                      style={{ color: colorStyles.textColor }}
+                    >
+                      {previewData.total}
+                    </p>
                   </div>
                 </div>
 
@@ -449,47 +580,84 @@ const DesignStep: React.FC<DesignStepProps> = ({
                     <div className="col-span-2 text-right">Rate</div>
                     <div className="col-span-2 text-right">Amount</div>
                   </div>
-                  {previewData.items && previewData.items.slice(0, 3).map((item: any, index: number) => (
-                    <div className="grid grid-cols-12 mb-1" key={index}>
-                      <div className="col-span-6 truncate">{item.description || "Product"}</div>
-                      <div className="col-span-2 text-right">{item.quantity || 1}</div>
-                      <div className="col-span-2 text-right">{item.rate || 0}</div>
-                      <div className="col-span-2 text-right">{item.amount || 0}</div>
-                    </div>
-                  ))}
+                  {previewData.items &&
+                    previewData.items
+                      .slice(0, 3)
+                      .map((item: any, index: number) => (
+                        <div className="grid grid-cols-12 mb-1" key={index}>
+                          <div className="col-span-6 truncate">
+                            {item.description || "Product"}
+                          </div>
+                          <div className="col-span-2 text-right">
+                            {item.quantity || 1}
+                          </div>
+                          <div className="col-span-2 text-right">
+                            {item.rate || 0}
+                          </div>
+                          <div className="col-span-2 text-right">
+                            {item.amount || 0}
+                          </div>
+                        </div>
+                      ))}
                 </div>
 
                 <div className="text-right text-sm mt-4 mb-2">
                   <div className="flex justify-between">
                     <span>Total:</span>
-                    <span className="font-bold" style={{ color: colorStyles.textColor }}>{previewData.total}</span>
+                    <span
+                      className="font-bold"
+                      style={{ color: colorStyles.textColor }}
+                    >
+                      {previewData.total}
+                    </span>
                   </div>
                 </div>
 
                 {/* Show shipping details if available */}
-                {(previewData.shippingDetails?.from?.name || previewData.shippingDetails?.to?.name) && (
+                {(previewData.shippingDetails?.from?.name ||
+                  previewData.shippingDetails?.to?.name) && (
                   <div className="text-xs border-t pt-2 mt-3">
                     <p className="font-medium">Shipping Details:</p>
                     {previewData.shippingDetails.from.name && (
-                      <p>From: {previewData.shippingDetails.from.name}, {previewData.shippingDetails.from.address}</p>
+                      <p>
+                        From: {previewData.shippingDetails.from.name},{" "}
+                        {previewData.shippingDetails.from.address}
+                      </p>
                     )}
                     {previewData.shippingDetails.to.name && (
-                      <p>To: {previewData.shippingDetails.to.name}, {previewData.shippingDetails.to.address}</p>
+                      <p>
+                        To: {previewData.shippingDetails.to.name},{" "}
+                        {previewData.shippingDetails.to.address}
+                      </p>
                     )}
                   </div>
                 )}
 
                 {signature && (
                   <div className="mt-4 pt-2 text-right">
-                    <img src={signature} alt="Signature" className="max-h-16 inline-block" />
-                    <p className="text-xs mt-1 border-t border-gray-300 inline-block pt-1">Authorized Signature</p>
+                    <img
+                      src={signature}
+                      alt="Signature"
+                      className="max-h-16 inline-block"
+                    />
+                    <p className="text-xs mt-1 border-t border-gray-300 inline-block pt-1">
+                      Authorized Signature
+                    </p>
                   </div>
                 )}
 
                 {(previewData.notes || previewData.terms) && (
                   <div className="text-xs text-muted-foreground mt-4 border-t pt-2">
-                    {previewData.notes && <p className="mb-1"><strong>Notes:</strong> {previewData.notes}</p>}
-                    {previewData.terms && <p><strong>Terms:</strong> {previewData.terms}</p>}
+                    {previewData.notes && (
+                      <p className="mb-1">
+                        <strong>Notes:</strong> {previewData.notes}
+                      </p>
+                    )}
+                    {previewData.terms && (
+                      <p>
+                        <strong>Terms:</strong> {previewData.terms}
+                      </p>
+                    )}
                   </div>
                 )}
 

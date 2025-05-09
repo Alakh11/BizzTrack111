@@ -22,8 +22,8 @@ const InvoiceTemplates: React.FC<InvoiceTemplatesProps> = ({
         <div
           key={template.id}
           className={`border rounded-md cursor-pointer overflow-hidden transition-all hover:shadow-md ${
-            selectedTemplate === template.id 
-              ? "ring-2 ring-primary border-primary" 
+            selectedTemplate === template.id
+              ? "ring-2 ring-primary border-primary"
               : "border-gray-200 dark:border-gray-700"
           }`}
           onClick={() => handleTemplateSelection(template.id)}

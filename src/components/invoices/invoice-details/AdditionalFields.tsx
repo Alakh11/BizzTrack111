@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -59,10 +58,7 @@ const AdditionalFields = ({
         </div>
         <div className="space-y-2">
           <Label htmlFor="currency">Currency</Label>
-          <Select
-            value={selectedCurrency}
-            onValueChange={setSelectedCurrency}
-          >
+          <Select value={selectedCurrency} onValueChange={setSelectedCurrency}>
             <SelectTrigger>
               <SelectValue placeholder="Select currency" />
             </SelectTrigger>

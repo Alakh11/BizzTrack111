@@ -1,4 +1,3 @@
-
 import { useMemo } from "react";
 import {
   AreaChart,
@@ -33,13 +32,15 @@ const RevenueChart = () => {
 
     // Aggregate revenue from invoices
     if (invoices && invoices.length > 0) {
-      invoices.forEach(invoice => {
+      invoices.forEach((invoice) => {
         if (invoice.invoice_date) {
           const invoiceDate = new Date(invoice.invoice_date);
           const matchingMonth = months.find(
-            m => m.month === invoiceDate.getMonth() && m.year === invoiceDate.getFullYear()
+            (m) =>
+              m.month === invoiceDate.getMonth() &&
+              m.year === invoiceDate.getFullYear(),
           );
-          if (matchingMonth && invoice.status === 'paid') {
+          if (matchingMonth && invoice.status === "paid") {
             matchingMonth.revenue += Number(invoice.total_amount || 0);
           }
         }
@@ -47,14 +48,16 @@ const RevenueChart = () => {
     }
 
     // Add some mock data if no real data exists
-    if (months.every(m => m.revenue === 0)) {
+    if (months.every((m) => m.revenue === 0)) {
       months.forEach((month, index) => {
-        month.revenue = Math.round(5000 + Math.random() * 10000 * (index % 3 + 1));
+        month.revenue = Math.round(
+          5000 + Math.random() * 10000 * ((index % 3) + 1),
+        );
       });
     }
 
     // Add expense data
-    return months.map(month => ({
+    return months.map((month) => ({
       ...month,
       expenses: Math.round(month.revenue * (0.3 + Math.random() * 0.4)),
     }));
@@ -76,8 +79,12 @@ const RevenueChart = () => {
       return (
         <div className="bg-background p-2 border border-border rounded shadow-md">
           <p className="font-medium">{payload[0].payload.name}</p>
-          <p className="text-sm text-primary">Revenue: {formatCurrency(revenue)}</p>
-          <p className="text-sm text-destructive">Expenses: {formatCurrency(expenses)}</p>
+          <p className="text-sm text-primary">
+            Revenue: {formatCurrency(revenue)}
+          </p>
+          <p className="text-sm text-destructive">
+            Expenses: {formatCurrency(expenses)}
+          </p>
           <p className="text-sm font-medium">
             Profit: {formatCurrency(profit)} ({margin.toFixed(1)}%)
           </p>

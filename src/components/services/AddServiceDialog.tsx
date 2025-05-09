@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +35,10 @@ interface AddServiceDialogProps {
   setIsOpen: (open: boolean) => void;
 }
 
-const AddServiceDialog: React.FC<AddServiceDialogProps> = ({ isOpen, setIsOpen }) => {
+const AddServiceDialog: React.FC<AddServiceDialogProps> = ({
+  isOpen,
+  setIsOpen,
+}) => {
   const { createService, isLoading } = useServices();
   const { toast } = useToast();
 
@@ -122,9 +124,7 @@ const AddServiceDialog: React.FC<AddServiceDialogProps> = ({ isOpen, setIsOpen }
                     <Input
                       type="number"
                       {...field}
-                      onChange={(e) =>
-                        field.onChange(Number(e.target.value))
-                      }
+                      onChange={(e) => field.onChange(Number(e.target.value))}
                     />
                   </FormControl>
                   <FormMessage />
@@ -143,10 +143,7 @@ const AddServiceDialog: React.FC<AddServiceDialogProps> = ({ isOpen, setIsOpen }
                       {...field}
                     >
                       {categories.map((category) => (
-                        <option
-                          key={category.value}
-                          value={category.value}
-                        >
+                        <option key={category.value} value={category.value}>
                           {category.label}
                         </option>
                       ))}

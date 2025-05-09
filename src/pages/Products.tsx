@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
@@ -17,12 +16,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Package, AlertCircle, Search, Barcode } from "lucide-react";
@@ -30,23 +29,36 @@ import { useProducts, PRODUCT_CATEGORIES, Product } from "@/hooks/useProducts";
 import AddProductForm from "@/components/products/AddProductForm";
 import { formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 const Products = () => {
-  const { products = [], isLoading, deleteProduct, getLowStockProducts } = useProducts();
+  const {
+    products = [],
+    isLoading,
+    deleteProduct,
+    getLowStockProducts,
+  } = useProducts();
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | "all">("all");
+  const [selectedCategory, setSelectedCategory] = useState<string | "all">(
+    "all",
+  );
 
   // Filter products based on search and category
   const filteredProducts = products.filter((product) => {
-    const matchesSearch = 
-      product.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    const matchesSearch =
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       product.sku.toLowerCase().includes(searchQuery.toLowerCase());
-    
-    const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
-    
+
+    const matchesCategory =
+      selectedCategory === "all" || product.category === selectedCategory;
+
     return matchesSearch && matchesCategory;
   });
 
@@ -73,10 +85,12 @@ const Products = () => {
               Manage your product inventory
             </p>
           </div>
-          <Button onClick={() => {
-            setProductToEdit(null);
-            setIsAddProductOpen(true);
-          }}>
+          <Button
+            onClick={() => {
+              setProductToEdit(null);
+              setIsAddProductOpen(true);
+            }}
+          >
             Add Product
           </Button>
         </div>
@@ -98,11 +112,18 @@ const Products = () => {
           </div>
           <div className="dashboard-card">
             <div className="flex items-center justify-between">
-              <p className="text-sm text-muted-foreground">Total Inventory Value</p>
+              <p className="text-sm text-muted-foreground">
+                Total Inventory Value
+              </p>
               <span className="text-muted-foreground text-xs">₹</span>
             </div>
             <p className="text-2xl font-bold">
-              {formatCurrency(products.reduce((sum, product) => sum + product.price * product.quantity, 0))}
+              {formatCurrency(
+                products.reduce(
+                  (sum, product) => sum + product.price * product.quantity,
+                  0,
+                ),
+              )}
             </p>
           </div>
         </div>
@@ -114,10 +135,14 @@ const Products = () => {
               <h3 className="font-medium text-amber-800">Low Stock Alert</h3>
             </div>
             <div className="mt-2 text-sm text-amber-700">
-              <p>{lowStockProducts.length} products are running low on stock.</p>
+              <p>
+                {lowStockProducts.length} products are running low on stock.
+              </p>
               <ul className="mt-1 list-disc pl-5 space-y-1">
-                {lowStockProducts.slice(0, 3).map(product => (
-                  <li key={product.id}>{product.name} - Only {product.quantity} left</li>
+                {lowStockProducts.slice(0, 3).map((product) => (
+                  <li key={product.id}>
+                    {product.name} - Only {product.quantity} left
+                  </li>
                 ))}
                 {lowStockProducts.length > 3 && (
                   <li>And {lowStockProducts.length - 3} more...</li>
@@ -130,9 +155,7 @@ const Products = () => {
         <Card>
           <CardHeader>
             <CardTitle>Inventory List</CardTitle>
-            <CardDescription>
-              View and manage all your products
-            </CardDescription>
+            <CardDescription>View and manage all your products</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex flex-col md:flex-row gap-4 mb-6">
@@ -146,8 +169,8 @@ const Products = () => {
                 />
               </div>
 
-              <Select 
-                value={selectedCategory} 
+              <Select
+                value={selectedCategory}
                 onValueChange={setSelectedCategory}
               >
                 <SelectTrigger className="w-[180px]">
@@ -155,7 +178,7 @@ const Products = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
-                  {PRODUCT_CATEGORIES.map(category => (
+                  {PRODUCT_CATEGORIES.map((category) => (
                     <SelectItem key={category} value={category}>
                       {category}
                     </SelectItem>
@@ -189,7 +212,9 @@ const Products = () => {
                       <TableRow key={product.id}>
                         <TableCell className="font-medium">
                           {product.name}
-                          <div className="text-xs text-muted-foreground truncate max-w-[200px]">{product.description}</div>
+                          <div className="text-xs text-muted-foreground truncate max-w-[200px]">
+                            {product.description}
+                          </div>
                         </TableCell>
                         <TableCell>{product.sku}</TableCell>
                         <TableCell>
@@ -199,11 +224,14 @@ const Products = () => {
                           {formatCurrency(Number(product.price))}
                         </TableCell>
                         <TableCell className="text-right">
-                          <span className={
-                            product.quantity <= (product.low_stock_threshold || 10) 
-                            ? "text-red-500 font-medium" 
-                            : ""
-                          }>
+                          <span
+                            className={
+                              product.quantity <=
+                              (product.low_stock_threshold || 10)
+                                ? "text-red-500 font-medium"
+                                : ""
+                            }
+                          >
                             {product.quantity}
                           </span>
                         </TableCell>
@@ -216,17 +244,27 @@ const Products = () => {
                                 </Button>
                               </TooltipTrigger>
                               <TooltipContent>
-                                <p className="font-mono text-xs">{product.barcode}</p>
+                                <p className="font-mono text-xs">
+                                  {product.barcode}
+                                </p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
-                            <Button size="sm" variant="outline" onClick={() => handleEditProduct(product)}>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEditProduct(product)}
+                            >
                               Edit
                             </Button>
-                            <Button size="sm" variant="destructive" onClick={() => handleDeleteProduct(product.id)}>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleDeleteProduct(product.id)}
+                            >
                               Delete
                             </Button>
                           </div>

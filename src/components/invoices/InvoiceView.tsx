@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   DialogContent,
@@ -29,8 +28,10 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
   let metadata: any = {};
   try {
     if (invoice.metadata) {
-      metadata = typeof invoice.metadata === 'string' ? 
-        JSON.parse(invoice.metadata) : invoice.metadata;
+      metadata =
+        typeof invoice.metadata === "string"
+          ? JSON.parse(invoice.metadata)
+          : invoice.metadata;
     }
   } catch (e) {
     console.error("Error parsing invoice metadata", e);
@@ -55,7 +56,7 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
   const handleDownload = () => {
     InvoicePrintRenderer.downloadInvoice(invoice);
   };
-  
+
   const handleShare = () => {
     // Preview in a new tab
     InvoicePrintRenderer.previewInvoice(invoice);
@@ -75,19 +76,30 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
   // Get color style for the invoice based on metadata
   const getColorStyle = () => {
     if (!design.color) return {};
-    
-    switch(design.color) {
-      case 'blue': return { color: '#3B82F6' };
-      case 'green': return { color: '#10B981' };
-      case 'red': return { color: '#EF4444' };
-      case 'purple': return { color: '#8B5CF6' };
-      case 'orange': return { color: '#F97316' };
-      case 'teal': return { color: '#14B8A6' };
-      case 'pink': return { color: '#EC4899' };
-      case 'gray': return { color: '#4B5563' };
-      case 'black': return { color: '#1F2937' };
-      case 'indigo': return { color: '#6366F1' };
-      default: return { color: '#3B82F6' };
+
+    switch (design.color) {
+      case "blue":
+        return { color: "#3B82F6" };
+      case "green":
+        return { color: "#10B981" };
+      case "red":
+        return { color: "#EF4444" };
+      case "purple":
+        return { color: "#8B5CF6" };
+      case "orange":
+        return { color: "#F97316" };
+      case "teal":
+        return { color: "#14B8A6" };
+      case "pink":
+        return { color: "#EC4899" };
+      case "gray":
+        return { color: "#4B5563" };
+      case "black":
+        return { color: "#1F2937" };
+      case "indigo":
+        return { color: "#6366F1" };
+      default:
+        return { color: "#3B82F6" };
     }
   };
 
@@ -115,7 +127,10 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
         {/* Invoice Header with Logo */}
         <div className="flex justify-between items-start">
           <div>
-            <div className="text-2xl font-bold font-playfair" style={colorStyle}>
+            <div
+              className="text-2xl font-bold font-playfair"
+              style={colorStyle}
+            >
               {design.title || "INVOICE"}
             </div>
             <div className="text-muted-foreground text-sm">
@@ -124,7 +139,11 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
           </div>
           <div className="h-16 w-16 bg-gray-100 flex items-center justify-center rounded border">
             {design.logo ? (
-              <img src={design.logo} alt="Logo" className="max-h-full max-w-full object-contain" />
+              <img
+                src={design.logo}
+                alt="Logo"
+                className="max-h-full max-w-full object-contain"
+              />
             ) : (
               <span className="text-xl font-bold">Logo</span>
             )}
@@ -134,16 +153,12 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
         {/* Business and Client Information */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="space-y-2">
-            <h3 className="font-medium text-sm text-muted-foreground">
-              From
-            </h3>
+            <h3 className="font-medium text-sm text-muted-foreground">From</h3>
             <div className="font-medium">Alakh Corporation</div>
             <div className="text-sm text-muted-foreground">
               Mirzapur, UP, India - 231312
             </div>
-            <div className="text-sm text-muted-foreground">
-              +91 9580813770
-            </div>
+            <div className="text-sm text-muted-foreground">+91 9580813770</div>
             <div className="text-sm text-muted-foreground">
               alakh1304@gmail.com
             </div>
@@ -171,18 +186,24 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
             <h3 className="font-medium">GST Details</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <span className="text-sm text-muted-foreground">GST Number:</span>
+                <span className="text-sm text-muted-foreground">
+                  GST Number:
+                </span>
                 <p>{gst.gstNumber}</p>
               </div>
               {gst.gstType && (
                 <div>
-                  <span className="text-sm text-muted-foreground">GST Type:</span>
+                  <span className="text-sm text-muted-foreground">
+                    GST Type:
+                  </span>
                   <p>{gst.gstType}</p>
                 </div>
               )}
               {gst.placeOfSupply && (
                 <div>
-                  <span className="text-sm text-muted-foreground">Place of Supply:</span>
+                  <span className="text-sm text-muted-foreground">
+                    Place of Supply:
+                  </span>
                   <p>{gst.placeOfSupply}</p>
                 </div>
               )}
@@ -200,7 +221,10 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
                   <span className="text-sm text-muted-foreground">From:</span>
                   <p>{shipping.from.name}</p>
                   <p>{shipping.from.address}</p>
-                  <p>{shipping.from.city} {shipping.from.state} {shipping.from.postal}</p>
+                  <p>
+                    {shipping.from.city} {shipping.from.state}{" "}
+                    {shipping.from.postal}
+                  </p>
                 </div>
               )}
               {shipping.to && (
@@ -208,7 +232,9 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
                   <span className="text-sm text-muted-foreground">To:</span>
                   <p>{shipping.to.name}</p>
                   <p>{shipping.to.address}</p>
-                  <p>{shipping.to.city} {shipping.to.state} {shipping.to.postal}</p>
+                  <p>
+                    {shipping.to.city} {shipping.to.state} {shipping.to.postal}
+                  </p>
                 </div>
               )}
             </div>
@@ -221,7 +247,9 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
             <h3 className="font-medium">Transport Details</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <span className="text-sm text-muted-foreground">Transporter:</span>
+                <span className="text-sm text-muted-foreground">
+                  Transporter:
+                </span>
                 <p>{transport.transporter}</p>
               </div>
               {transport.mode && (
@@ -232,7 +260,9 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
               )}
               {transport.vehicleNumber && (
                 <div>
-                  <span className="text-sm text-muted-foreground">Vehicle Number:</span>
+                  <span className="text-sm text-muted-foreground">
+                    Vehicle Number:
+                  </span>
                   <p>{transport.vehicleNumber}</p>
                 </div>
               )}
@@ -258,7 +288,10 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
             <h3 className="text-sm font-medium text-muted-foreground">
               Total Amount
             </h3>
-            <p className="flex items-center font-medium text-lg" style={colorStyle}>
+            <p
+              className="flex items-center font-medium text-lg"
+              style={colorStyle}
+            >
               <IndianRupee className="h-4 w-4 mr-1" />
               {invoice.total_amount.toLocaleString("en-IN")}
             </p>
@@ -329,7 +362,10 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
                   Total:
                 </th>
                 <th className="px-4 py-3 text-right text-sm font-medium">
-                  <div className="flex items-center justify-end" style={colorStyle}>
+                  <div
+                    className="flex items-center justify-end"
+                    style={colorStyle}
+                  >
                     <IndianRupee className="h-3 w-3 mr-1" />
                     {invoice.total_amount.toLocaleString("en-IN")}
                   </div>
@@ -346,17 +382,27 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
             {payment.bank?.accountNumber && (
               <div className="space-y-1 mb-2">
                 <h4 className="text-sm font-medium">Bank Details:</h4>
-                <p className="text-sm">Bank: {payment.bank.name || 'N/A'}</p>
-                <p className="text-sm">Account Number: {payment.bank.accountNumber}</p>
-                {payment.bank.ifscCode && <p className="text-sm">IFSC: {payment.bank.ifscCode}</p>}
-                {payment.bank.accountHolderName && <p className="text-sm">Account Holder: {payment.bank.accountHolderName}</p>}
+                <p className="text-sm">Bank: {payment.bank.name || "N/A"}</p>
+                <p className="text-sm">
+                  Account Number: {payment.bank.accountNumber}
+                </p>
+                {payment.bank.ifscCode && (
+                  <p className="text-sm">IFSC: {payment.bank.ifscCode}</p>
+                )}
+                {payment.bank.accountHolderName && (
+                  <p className="text-sm">
+                    Account Holder: {payment.bank.accountHolderName}
+                  </p>
+                )}
               </div>
             )}
             {payment.upi?.id && (
               <div className="space-y-1">
                 <h4 className="text-sm font-medium">UPI Details:</h4>
                 <p className="text-sm">UPI ID: {payment.upi.id}</p>
-                {payment.upi.name && <p className="text-sm">UPI Name: {payment.upi.name}</p>}
+                {payment.upi.name && (
+                  <p className="text-sm">UPI Name: {payment.upi.name}</p>
+                )}
               </div>
             )}
           </div>
@@ -368,17 +414,13 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
             {invoice.notes && (
               <div className="space-y-2">
                 <h3 className="font-medium">Notes</h3>
-                <p className="text-sm text-muted-foreground">
-                  {invoice.notes}
-                </p>
+                <p className="text-sm text-muted-foreground">{invoice.notes}</p>
               </div>
             )}
             {invoice.terms && (
               <div className="space-y-2">
                 <h3 className="font-medium">Terms and Conditions</h3>
-                <p className="text-sm text-muted-foreground">
-                  {invoice.terms}
-                </p>
+                <p className="text-sm text-muted-foreground">{invoice.terms}</p>
               </div>
             )}
           </div>
@@ -388,10 +430,10 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
         {design.signature && (
           <div className="mt-6 border-t pt-4">
             <div className="text-right">
-              <img 
-                src={design.signature} 
-                alt="Signature" 
-                className="max-h-16 inline-block" 
+              <img
+                src={design.signature}
+                alt="Signature"
+                className="max-h-16 inline-block"
               />
               <p className="text-xs mt-1 border-t border-gray-300 inline-block pt-1">
                 Authorized Signature
@@ -402,7 +444,10 @@ const InvoiceView = ({ invoice, open, onOpenChange }: InvoiceViewProps) => {
       </div>
 
       <DialogFooter className="flex justify-between items-center mt-8">
-        <Button variant="outline" onClick={() => onOpenChange && onOpenChange(false)}>
+        <Button
+          variant="outline"
+          onClick={() => onOpenChange && onOpenChange(false)}
+        >
           <ArrowLeft className="h-4 w-4 mr-2" /> Back
         </Button>
         <div className="flex space-x-2">

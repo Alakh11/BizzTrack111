@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -10,27 +9,27 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { 
+import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
+  FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { 
+import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
-  SelectValue
+  SelectValue,
 } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
-import { 
+import {
   Popover,
   PopoverContent,
-  PopoverTrigger
+  PopoverTrigger,
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
@@ -43,10 +42,10 @@ interface AddExpenseFormProps {
   expenseToEdit?: any;
 }
 
-const AddExpenseForm = ({ 
-  open, 
-  onOpenChange, 
-  expenseToEdit = null 
+const AddExpenseForm = ({
+  open,
+  onOpenChange,
+  expenseToEdit = null,
 }: AddExpenseFormProps) => {
   const { createExpense, updateExpense } = useExpenses();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -78,7 +77,7 @@ const AddExpenseForm = ({
       } else {
         await createExpense.mutateAsync(expenseData);
       }
-      
+
       onOpenChange(false);
       form.reset();
     } catch (error) {
@@ -96,7 +95,7 @@ const AddExpenseForm = ({
             {expenseToEdit ? "Edit Expense" : "Add New Expense"}
           </DialogTitle>
         </DialogHeader>
-        
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -104,7 +103,7 @@ const AddExpenseForm = ({
               name="amount"
               rules={{
                 required: "Amount is required",
-                min: { value: 0.01, message: "Amount must be greater than 0" }
+                min: { value: 0.01, message: "Amount must be greater than 0" },
               }}
               render={({ field }) => (
                 <FormItem>
@@ -121,7 +120,7 @@ const AddExpenseForm = ({
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="category"
@@ -129,10 +128,7 @@ const AddExpenseForm = ({
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
-                  <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                  >
+                  <Select value={field.value} onValueChange={field.onChange}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select a category" />
@@ -150,7 +146,7 @@ const AddExpenseForm = ({
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="date"
@@ -165,7 +161,7 @@ const AddExpenseForm = ({
                           variant="outline"
                           className={cn(
                             "pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
+                            !field.value && "text-muted-foreground",
                           )}
                         >
                           {field.value ? (
@@ -193,7 +189,7 @@ const AddExpenseForm = ({
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="description"
@@ -211,11 +207,11 @@ const AddExpenseForm = ({
                 </FormItem>
               )}
             />
-          
+
             <DialogFooter>
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => onOpenChange(false)}
               >
                 Cancel
@@ -224,8 +220,8 @@ const AddExpenseForm = ({
                 {isSubmitting
                   ? "Saving..."
                   : expenseToEdit
-                  ? "Update Expense"
-                  : "Add Expense"}
+                    ? "Update Expense"
+                    : "Add Expense"}
               </Button>
             </DialogFooter>
           </form>

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { FormProvider } from "react-hook-form";
 import MainLayout from "@/components/layout/MainLayout";
@@ -34,7 +33,7 @@ const steps = [
 ];
 
 // Add global styles for dark mode inputs with improved visibility
-const darkModeStyles = document.createElement('style');
+const darkModeStyles = document.createElement("style");
 darkModeStyles.textContent = `
   .dark input, .dark textarea, .dark select {
     background-color: rgb(17, 24, 39) !important;

@@ -1,4 +1,3 @@
-
 import MainLayout from "@/components/layout/MainLayout";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import RevenueChart from "@/components/dashboard/RevenueChart";
@@ -23,14 +22,18 @@ const Dashboard = () => {
           </p>
         </div>
 
-        <Tabs defaultValue="overview" value={activeTab} onValueChange={setActiveTab}>
+        <Tabs
+          defaultValue="overview"
+          value={activeTab}
+          onValueChange={setActiveTab}
+        >
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="invoices">Invoices</TabsTrigger>
             <TabsTrigger value="payments">Payments</TabsTrigger>
             <TabsTrigger value="expenses">Expenses</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="overview" className="space-y-6">
             <DashboardStats />
             <RevenueChart />
@@ -39,15 +42,15 @@ const Dashboard = () => {
               <ExpensesByCategory />
             </div>
           </TabsContent>
-          
+
           <TabsContent value="invoices" className="space-y-6">
             <RecentInvoices />
           </TabsContent>
-          
+
           <TabsContent value="payments" className="space-y-6">
             <PaymentDuesAlert />
           </TabsContent>
-          
+
           <TabsContent value="expenses" className="space-y-6">
             <ExpensesByCategory />
           </TabsContent>

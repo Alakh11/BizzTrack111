@@ -1,12 +1,11 @@
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
   DialogTitle,
-  DialogFooter 
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,14 +23,19 @@ const AddClientModal = ({ open, onOpenChange }: AddClientModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { createClient } = useClients();
   const { toast } = useToast();
-  
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       name: "",
       email: "",
       phone: "",
-      address: ""
-    }
+      address: "",
+    },
   });
 
   const onSubmit = async (data: any) => {
@@ -70,7 +74,11 @@ const AddClientModal = ({ open, onOpenChange }: AddClientModalProps) => {
               {...register("name", { required: "Client name is required" })}
               placeholder="Enter client name"
             />
-            {errors.name && <p className="text-sm text-red-500">{errors.name.message as string}</p>}
+            {errors.name && (
+              <p className="text-sm text-red-500">
+                {errors.name.message as string}
+              </p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -102,7 +110,11 @@ const AddClientModal = ({ open, onOpenChange }: AddClientModalProps) => {
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
             <Button type="submit" disabled={isSubmitting}>

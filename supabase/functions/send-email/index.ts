@@ -1,4 +1,3 @@
-
 // Follow these steps to set up email sending with Resend:
 // 1. Create a free account at https://resend.com
 // 2. Create an API key at https://resend.com/api-keys
@@ -10,7 +9,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
@@ -26,7 +26,7 @@ serve(async (req) => {
     // Mock response for now - in production you'd use a real email service
     // like Resend, SendGrid, or Mailgun
     const { to, subject, content, recipientName, invoiceId } = await req.json();
-    
+
     // Basic validation
     if (!to || !subject || !content) {
       return new Response(
@@ -34,7 +34,7 @@ serve(async (req) => {
         {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
-        }
+        },
       );
     }
 
@@ -54,26 +54,23 @@ serve(async (req) => {
 
     // Mock successful response
     return new Response(
-      JSON.stringify({ 
-        success: true, 
+      JSON.stringify({
+        success: true,
         messageId: `mock-msg-${Date.now()}`,
-        to, 
-        subject
+        to,
+        subject,
       }),
       {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
+      },
     );
   } catch (error) {
     console.error("Error sending email:", error);
-    
-    return new Response(
-      JSON.stringify({ error: error.message }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      }
-    );
+
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   }
 });

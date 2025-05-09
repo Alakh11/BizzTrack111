@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React from "react";
 import {
   FormField,
   FormItem,
@@ -22,7 +21,7 @@ interface TransportFormSectionProps {
   fields: {
     name: string;
     label: string;
-    type: 'select' | 'input' | 'date';
+    type: "select" | "input" | "date";
     options?: { value: string; label: string }[];
     buttonText?: string;
     onButtonClick?: () => void;
@@ -34,12 +33,12 @@ const TransportFormSection: React.FC<TransportFormSectionProps> = ({
   form,
   title,
   fields,
-  className = '',
+  className = "",
 }) => {
   return (
     <div className={`space-y-4 ${className}`}>
       {title && <h4 className="font-medium">{title}</h4>}
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {fields.map((field) => (
           <FormField
@@ -50,26 +49,25 @@ const TransportFormSection: React.FC<TransportFormSectionProps> = ({
               <FormItem>
                 <FormLabel>{field.label}</FormLabel>
                 <FormControl>
-                  {field.type === 'select' && field.options ? (
-                    <Select 
-                      onValueChange={formField.onChange} 
+                  {field.type === "select" && field.options ? (
+                    <Select
+                      onValueChange={formField.onChange}
                       value={formField.value || ""}
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder={`Select ${field.label.toLowerCase()}`} />
+                        <SelectValue
+                          placeholder={`Select ${field.label.toLowerCase()}`}
+                        />
                       </SelectTrigger>
                       <SelectContent>
-                        {field.options.map(option => (
-                          <SelectItem 
-                            key={option.value} 
-                            value={option.value}
-                          >
+                        {field.options.map((option) => (
+                          <SelectItem key={option.value} value={option.value}>
                             {option.label}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                  ) : field.type === 'input' ? (
+                  ) : field.type === "input" ? (
                     <Input {...formField} />
                   ) : (
                     <Input type="date" {...formField} />

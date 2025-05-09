@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import {
   Table,
@@ -64,11 +63,14 @@ const InvoicesList = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(
+    null,
+  );
   const [isEditStatusModalOpen, setIsEditStatusModalOpen] = useState(false);
   const [newStatus, setNewStatus] = useState("");
 
-  const { invoices, isLoading, deleteInvoice, updateInvoice, getInvoice } = useInvoices();
+  const { invoices, isLoading, deleteInvoice, updateInvoice, getInvoice } =
+    useInvoices();
 
   if (isLoading) {
     return (
@@ -88,10 +90,7 @@ const InvoicesList = () => {
           <p className="text-muted-foreground mt-1">
             Create your first invoice to get started.
           </p>
-          <Button
-            className="mt-4"
-            onClick={() => navigate("/invoices/new")}
-          >
+          <Button className="mt-4" onClick={() => navigate("/invoices/new")}>
             Create Invoice
           </Button>
         </div>
@@ -118,12 +117,12 @@ const InvoicesList = () => {
             status: newStatus,
           },
         });
-        
+
         toast({
           title: "Status updated",
           description: "Invoice status has been updated successfully.",
         });
-        
+
         setIsEditStatusModalOpen(false);
       } catch (error) {
         console.error("Error updating status:", error);
@@ -150,7 +149,7 @@ const InvoicesList = () => {
 
   const handleViewInvoice = async (id: string) => {
     try {
-      const invoice = await getInvoice(id) as unknown as Invoice;
+      const invoice = (await getInvoice(id)) as unknown as Invoice;
       if (invoice) {
         InvoicePrintRenderer.previewInvoice(invoice);
       }
@@ -166,10 +165,10 @@ const InvoicesList = () => {
 
   const handleDownloadInvoice = async (id: string) => {
     try {
-      const invoice = await getInvoice(id) as unknown as Invoice;
+      const invoice = (await getInvoice(id)) as unknown as Invoice;
       if (invoice) {
         InvoicePrintRenderer.downloadInvoice(invoice);
-        
+
         toast({
           title: "Success",
           description: "Invoice downloaded successfully",
@@ -187,7 +186,7 @@ const InvoicesList = () => {
 
   const handlePrintInvoice = async (id: string) => {
     try {
-      const invoice = await getInvoice(id) as unknown as Invoice;
+      const invoice = (await getInvoice(id)) as unknown as Invoice;
       if (invoice) {
         InvoicePrintRenderer.printInvoice(invoice);
       }
@@ -206,20 +205,24 @@ const InvoicesList = () => {
     .filter((invoice) => {
       const matchesSearch =
         (invoice.invoice_number &&
-          invoice.invoice_number.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          invoice.invoice_number
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase())) ||
         (invoice.client?.name &&
-          invoice.client.name.toLowerCase().includes(searchQuery.toLowerCase()));
-      
+          invoice.client.name
+            .toLowerCase()
+            .includes(searchQuery.toLowerCase()));
+
       const matchesStatus =
         statusFilter === "all" || invoice.status === statusFilter;
-      
+
       return matchesSearch && matchesStatus;
     })
     .sort((a, b) => {
       // Sort by date
       const dateA = new Date(a.created_at).getTime();
       const dateB = new Date(b.created_at).getTime();
-      
+
       return sortDirection === "asc" ? dateA - dateB : dateB - dateA;
     });
 
@@ -254,10 +257,7 @@ const InvoicesList = () => {
           </div>
 
           <div className="flex gap-2 w-full md:w-auto">
-            <Select
-              value={statusFilter}
-              onValueChange={setStatusFilter}
-            >
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
@@ -269,7 +269,7 @@ const InvoicesList = () => {
                 <SelectItem value="draft">Draft</SelectItem>
               </SelectContent>
             </Select>
-            
+
             <Button variant="outline" size="icon" onClick={handleSort}>
               {sortDirection === "desc" ? (
                 <ArrowDown className="h-4 w-4" />
@@ -299,9 +299,7 @@ const InvoicesList = () => {
                   <TableCell className="font-medium">
                     {invoice.invoice_number}
                   </TableCell>
-                  <TableCell>
-                    {invoice.client?.name || "No client"}
-                  </TableCell>
+                  <TableCell>{invoice.client?.name || "No client"}</TableCell>
                   <TableCell>
                     {invoice.invoice_date
                       ? format(new Date(invoice.invoice_date), "MMM d, yyyy")
@@ -318,14 +316,21 @@ const InvoicesList = () => {
                   <TableCell>
                     <Badge
                       variant={
-                        getStatusBadgeVariant(
-                          invoice.status
-                        ) as "default" | "secondary" | "outline" | "destructive" | "success" | "warning"
+                        getStatusBadgeVariant(invoice.status) as
+                          | "default"
+                          | "secondary"
+                          | "outline"
+                          | "destructive"
+                          | "success"
+                          | "warning"
                       }
                       className="cursor-pointer"
-                      onClick={() => handleEditStatus(invoice.id, invoice.status)}
+                      onClick={() =>
+                        handleEditStatus(invoice.id, invoice.status)
+                      }
                     >
-                      {invoice.status?.charAt(0).toUpperCase() + invoice.status?.slice(1)}
+                      {invoice.status?.charAt(0).toUpperCase() +
+                        invoice.status?.slice(1)}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
@@ -339,24 +344,36 @@ const InvoicesList = () => {
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          onClick={() => navigate(`/invoices/edit/${invoice.id}`)}
+                          onClick={() =>
+                            navigate(`/invoices/edit/${invoice.id}`)
+                          }
                         >
                           <FileEdit className="mr-2 h-4 w-4" />
                           Edit
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleEditStatus(invoice.id, invoice.status)}>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            handleEditStatus(invoice.id, invoice.status)
+                          }
+                        >
                           <Clock className="mr-2 h-4 w-4" />
                           Change Status
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleViewInvoice(invoice.id)}>
+                        <DropdownMenuItem
+                          onClick={() => handleViewInvoice(invoice.id)}
+                        >
                           <Eye className="mr-2 h-4 w-4" />
                           View
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handleDownloadInvoice(invoice.id)}>
+                        <DropdownMenuItem
+                          onClick={() => handleDownloadInvoice(invoice.id)}
+                        >
                           <Download className="mr-2 h-4 w-4" />
                           Download
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => handlePrintInvoice(invoice.id)}>
+                        <DropdownMenuItem
+                          onClick={() => handlePrintInvoice(invoice.id)}
+                        >
                           <Printer className="mr-2 h-4 w-4" />
                           Print
                         </DropdownMenuItem>
@@ -394,7 +411,10 @@ const InvoicesList = () => {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground">
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              className="bg-destructive text-destructive-foreground"
+            >
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>
@@ -402,7 +422,10 @@ const InvoicesList = () => {
       </AlertDialog>
 
       {/* Edit Status Dialog */}
-      <AlertDialog open={isEditStatusModalOpen} onOpenChange={setIsEditStatusModalOpen}>
+      <AlertDialog
+        open={isEditStatusModalOpen}
+        onOpenChange={setIsEditStatusModalOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Update Invoice Status</AlertDialogTitle>
@@ -426,7 +449,9 @@ const InvoicesList = () => {
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleUpdateStatus}>Update</AlertDialogAction>
+            <AlertDialogAction onClick={handleUpdateStatus}>
+              Update
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

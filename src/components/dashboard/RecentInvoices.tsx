@@ -1,4 +1,3 @@
-
 import { useMemo } from "react";
 import {
   Table,
@@ -17,13 +16,16 @@ import { format } from "date-fns";
 
 const RecentInvoices = () => {
   const { invoices, isLoading } = useInvoices();
-  
+
   // Get the 5 most recent invoices
   const recentInvoices = useMemo(() => {
     if (!invoices || invoices.length === 0) return [];
-    
+
     return [...invoices]
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      )
       .slice(0, 5);
   }, [invoices]);
 
@@ -60,7 +62,9 @@ const RecentInvoices = () => {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-4">Loading...</TableCell>
+                <TableCell colSpan={5} className="text-center py-4">
+                  Loading...
+                </TableCell>
               </TableRow>
             ) : recentInvoices.length > 0 ? (
               recentInvoices.map((invoice) => (
@@ -75,7 +79,8 @@ const RecentInvoices = () => {
                   </TableCell>
                   <TableCell>{invoice.client?.name || "N/A"}</TableCell>
                   <TableCell>
-                    {invoice.invoice_date && format(new Date(invoice.invoice_date), "MMM dd, yyyy")}
+                    {invoice.invoice_date &&
+                      format(new Date(invoice.invoice_date), "MMM dd, yyyy")}
                   </TableCell>
                   <TableCell>
                     <Badge
@@ -92,7 +97,9 @@ const RecentInvoices = () => {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-4">No recent invoices found</TableCell>
+                <TableCell colSpan={5} className="text-center py-4">
+                  No recent invoices found
+                </TableCell>
               </TableRow>
             )}
           </TableBody>

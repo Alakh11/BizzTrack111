@@ -1,4 +1,3 @@
-
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,7 +19,8 @@ export const useInvoiceFormUpdater = () => {
       if (existingInvoices && existingInvoices.length > 0) {
         toast({
           title: "Duplicate Invoice Number",
-          description: "This invoice number already exists. Please use a unique number.",
+          description:
+            "This invoice number already exists. Please use a unique number.",
           variant: "destructive",
         });
         return null;
@@ -44,7 +44,7 @@ export const useInvoiceFormUpdater = () => {
           unit_price: item.rate || 0,
           amount: item.amount || 0,
           service_id: item.serviceId || null,
-          invoice_id: result.id
+          invoice_id: result.id,
         }));
 
         // Insert invoice items
@@ -66,7 +66,8 @@ export const useInvoiceFormUpdater = () => {
       console.error("Error creating invoice:", error);
       toast({
         title: "Error creating invoice",
-        description: error.message || "An error occurred while creating the invoice",
+        description:
+          error.message || "An error occurred while creating the invoice",
         variant: "destructive",
       });
       return null;
@@ -74,7 +75,11 @@ export const useInvoiceFormUpdater = () => {
   };
 
   // Handle invoice update with better error handling to prevent freezes
-  const updateInvoice = async (invoiceId: string, invoiceData: any, invoiceItems: any[]) => {
+  const updateInvoice = async (
+    invoiceId: string,
+    invoiceData: any,
+    invoiceItems: any[],
+  ) => {
     try {
       // Update invoice data
       const { error } = await supabase
@@ -101,7 +106,7 @@ export const useInvoiceFormUpdater = () => {
           unit_price: item.rate || 0,
           amount: item.amount || 0,
           service_id: item.serviceId || null,
-          invoice_id: invoiceId
+          invoice_id: invoiceId,
         }));
 
         const { error: itemsError } = await supabase
@@ -117,16 +122,12 @@ export const useInvoiceFormUpdater = () => {
       });
 
       return invoiceId;
-
-
-
-
-
     } catch (error: any) {
       console.error("Error updating invoice:", error);
       toast({
         title: "Error updating invoice",
-        description: error.message || "An error occurred while updating the invoice",
+        description:
+          error.message || "An error occurred while updating the invoice",
         variant: "destructive",
       });
       return null;
@@ -136,6 +137,6 @@ export const useInvoiceFormUpdater = () => {
   return {
     createInvoice,
     updateInvoice,
-    navigate
+    navigate,
   };
 };

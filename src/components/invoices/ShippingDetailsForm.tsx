@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import ShippingAddressSection from "../shipping/ShippingAddressSection";
 
@@ -17,7 +16,7 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
   const [showExtraToFields, setShowExtraToFields] = useState(false);
   const [useBusinessAddress, setUseBusinessAddress] = useState(false);
   const [useClientAddress, setUseClientAddress] = useState(false);
-  
+
   const handleUseBusinessAddress = (checked: boolean) => {
     setUseBusinessAddress(checked);
     if (checked) {
@@ -28,7 +27,7 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
       form.setValue("shippedFromAddress", "");
     }
   };
-  
+
   const handleUseClientAddress = (checked: boolean) => {
     setUseClientAddress(checked);
     if (checked) {
@@ -54,7 +53,7 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
           showExtra={showExtraFromFields}
           setShowExtra={setShowExtraFromFields}
         />
-        
+
         {/* Shipped To */}
         <ShippingAddressSection
           form={form}
@@ -62,7 +61,7 @@ const ShippingDetailsForm: React.FC<ShippingDetailsFormProps> = ({
           title="Shipped To"
           addressSource={{
             name: clientName,
-            address: clientAddress
+            address: clientAddress,
           }}
           useSourceAddress={useClientAddress}
           setUseSourceAddress={handleUseClientAddress}

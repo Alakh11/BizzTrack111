@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Menu, Bell, Sun, Moon } from "lucide-react";
@@ -21,7 +20,12 @@ interface HeaderProps {
   toggleTheme?: () => void;
 }
 
-const Header = ({ toggleSidebar, isSidebarOpen, isDarkMode, toggleTheme }: HeaderProps) => {
+const Header = ({
+  toggleSidebar,
+  isSidebarOpen,
+  isDarkMode,
+  toggleTheme,
+}: HeaderProps) => {
   const { signOut, user } = useAuth();
 
   const getInitials = (email: string) => {
@@ -31,7 +35,9 @@ const Header = ({ toggleSidebar, isSidebarOpen, isDarkMode, toggleTheme }: Heade
   };
 
   return (
-    <header className={`sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:bg-[#0f172a] dark:border-gray-800 transition-colors duration-300`}>
+    <header
+      className={`sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:bg-[#0f172a] dark:border-gray-800 transition-colors duration-300`}
+    >
       <div className="flex h-16 items-center px-4">
         <div className="flex items-center">
           <Button
@@ -75,10 +81,7 @@ const Header = ({ toggleSidebar, isSidebarOpen, isDarkMode, toggleTheme }: Heade
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="relative h-8 w-8 rounded-full"
-              >
+              <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-9 w-9">
                   <AvatarFallback>
                     {user ? getInitials(user.email) : "U"}

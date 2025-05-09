@@ -1,13 +1,12 @@
-
 import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
   DialogTitle,
   DialogFooter,
-  DialogDescription
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +16,14 @@ import { useClients } from "@/hooks/useClients";
 import { Client } from "@/hooks/useClients";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useInvoices } from "@/hooks/useInvoices";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { IndianRupee } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
@@ -28,20 +34,29 @@ interface ClientDetailsModalProps {
   client: Client | null;
 }
 
-const ClientDetailsModal = ({ open, onOpenChange, client }: ClientDetailsModalProps) => {
+const ClientDetailsModal = ({
+  open,
+  onOpenChange,
+  client,
+}: ClientDetailsModalProps) => {
   const [activeTab, setActiveTab] = useState("details");
   const { updateClient } = useClients();
   const { invoices = [] } = useInvoices();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
     defaultValues: {
       name: client?.name || "",
       email: client?.email || "",
       phone: client?.phone || "",
-      address: client?.address || ""
-    }
+      address: client?.address || "",
+    },
   });
 
   // Reset form when client changes
@@ -51,19 +66,19 @@ const ClientDetailsModal = ({ open, onOpenChange, client }: ClientDetailsModalPr
         name: client.name || "",
         email: client.email || "",
         phone: client.phone || "",
-        address: client.address || ""
+        address: client.address || "",
       });
     }
   }, [client, reset]);
 
   const onSubmit = async (data: any) => {
     if (!client?.id) return;
-    
+
     setIsSubmitting(true);
     try {
       await updateClient.mutateAsync({
         id: client.id,
-        ...data
+        ...data,
       });
       toast({
         title: "Success",
@@ -84,7 +99,7 @@ const ClientDetailsModal = ({ open, onOpenChange, client }: ClientDetailsModalPr
 
   // Find invoices for this client
   const clientInvoices = invoices.filter(
-    (invoice) => invoice.client_id === client?.id
+    (invoice) => invoice.client_id === client?.id,
   );
 
   return (
@@ -96,13 +111,13 @@ const ClientDetailsModal = ({ open, onOpenChange, client }: ClientDetailsModalPr
             View and manage client information
           </DialogDescription>
         </DialogHeader>
-        
+
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="details">Client Details</TabsTrigger>
             <TabsTrigger value="invoices">Invoice History</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="details" className="mt-4">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
@@ -112,7 +127,11 @@ const ClientDetailsModal = ({ open, onOpenChange, client }: ClientDetailsModalPr
                   {...register("name", { required: "Client name is required" })}
                   placeholder="Enter client name"
                 />
-                {errors.name && <p className="text-sm text-red-500">{errors.name.message as string}</p>}
+                {errors.name && (
+                  <p className="text-sm text-red-500">
+                    {errors.name.message as string}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -144,7 +163,11 @@ const ClientDetailsModal = ({ open, onOpenChange, client }: ClientDetailsModalPr
               </div>
 
               <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                >
                   Cancel
                 </Button>
                 <Button type="submit" disabled={isSubmitting}>
@@ -153,7 +176,7 @@ const ClientDetailsModal = ({ open, onOpenChange, client }: ClientDetailsModalPr
               </DialogFooter>
             </form>
           </TabsContent>
-          
+
           <TabsContent value="invoices" className="mt-4">
             {clientInvoices.length > 0 ? (
               <div className="overflow-x-auto">
@@ -170,24 +193,30 @@ const ClientDetailsModal = ({ open, onOpenChange, client }: ClientDetailsModalPr
                   <TableBody>
                     {clientInvoices.map((invoice) => (
                       <TableRow key={invoice.id}>
-                        <TableCell className="font-medium">{invoice.invoice_number}</TableCell>
-                        <TableCell>{formatDate(invoice.invoice_date)}</TableCell>
+                        <TableCell className="font-medium">
+                          {invoice.invoice_number}
+                        </TableCell>
+                        <TableCell>
+                          {formatDate(invoice.invoice_date)}
+                        </TableCell>
                         <TableCell>{formatDate(invoice.due_date)}</TableCell>
                         <TableCell>
-                          <span className={`px-2 py-1 rounded-full text-xs ${
-                            invoice.status === 'paid' 
-                              ? 'bg-green-100 text-green-800' 
-                              : invoice.status === 'overdue'
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}>
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs ${
+                              invoice.status === "paid"
+                                ? "bg-green-100 text-green-800"
+                                : invoice.status === "overdue"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
                             {invoice.status}
                           </span>
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end">
                             <IndianRupee className="h-3 w-3 mr-1" />
-                            {invoice.total_amount?.toLocaleString() || '0'}
+                            {invoice.total_amount?.toLocaleString() || "0"}
                           </div>
                         </TableCell>
                       </TableRow>

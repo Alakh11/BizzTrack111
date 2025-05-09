@@ -1,9 +1,14 @@
-
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FormField, FormItem, FormLabel, FormControl, FormDescription } from "@/components/ui/form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormDescription,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
 interface BankingDetailsStepProps {
@@ -20,7 +25,7 @@ const BankingDetailsStep: React.FC<BankingDetailsStepProps> = ({ form }) => {
               <TabsTrigger value="bank">Bank Transfer</TabsTrigger>
               <TabsTrigger value="upi">UPI</TabsTrigger>
             </TabsList>
-            
+
             <TabsContent value="bank" className="space-y-4">
               <FormField
                 control={form.control}
@@ -34,7 +39,7 @@ const BankingDetailsStep: React.FC<BankingDetailsStepProps> = ({ form }) => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="accountNumber"
@@ -47,7 +52,7 @@ const BankingDetailsStep: React.FC<BankingDetailsStepProps> = ({ form }) => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="ifscCode"
@@ -60,7 +65,7 @@ const BankingDetailsStep: React.FC<BankingDetailsStepProps> = ({ form }) => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="accountHolderName"
@@ -68,12 +73,15 @@ const BankingDetailsStep: React.FC<BankingDetailsStepProps> = ({ form }) => {
                   <FormItem>
                     <FormLabel>Account Holder Name</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter account holder name" />
+                      <Input
+                        {...field}
+                        placeholder="Enter account holder name"
+                      />
                     </FormControl>
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="branchName"
@@ -87,7 +95,7 @@ const BankingDetailsStep: React.FC<BankingDetailsStepProps> = ({ form }) => {
                 )}
               />
             </TabsContent>
-            
+
             <TabsContent value="upi" className="space-y-4">
               <FormField
                 control={form.control}
@@ -96,7 +104,10 @@ const BankingDetailsStep: React.FC<BankingDetailsStepProps> = ({ form }) => {
                   <FormItem>
                     <FormLabel>UPI ID</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter UPI ID (e.g., yourname@bank)" />
+                      <Input
+                        {...field}
+                        placeholder="Enter UPI ID (e.g., yourname@bank)"
+                      />
                     </FormControl>
                     <FormDescription>
                       This will be displayed on the invoice for direct payments
@@ -104,7 +115,7 @@ const BankingDetailsStep: React.FC<BankingDetailsStepProps> = ({ form }) => {
                   </FormItem>
                 )}
               />
-              
+
               <FormField
                 control={form.control}
                 name="upiName"
@@ -112,7 +123,10 @@ const BankingDetailsStep: React.FC<BankingDetailsStepProps> = ({ form }) => {
                   <FormItem>
                     <FormLabel>UPI Display Name</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter name to display with UPI ID" />
+                      <Input
+                        {...field}
+                        placeholder="Enter name to display with UPI ID"
+                      />
                     </FormControl>
                   </FormItem>
                 )}

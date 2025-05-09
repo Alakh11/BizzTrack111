@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   FormControl,
@@ -21,7 +20,11 @@ interface ClientSelectionProps {
   handleClientChange: (clientId: string) => void;
 }
 
-const ClientSelection = ({ form, clients, handleClientChange }: ClientSelectionProps) => {
+const ClientSelection = ({
+  form,
+  clients,
+  handleClientChange,
+}: ClientSelectionProps) => {
   return (
     <div>
       <h3 className="text-lg font-semibold mb-2">Client Information</h3>

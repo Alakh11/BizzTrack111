@@ -6,7 +6,6 @@
 
 There are several ways of editing your application.
 
-
 **Use your preferred IDE**
 
 If you want to work locally using your own IDE, you can clone this repo and push changes.
@@ -42,7 +41,6 @@ npm run dev
 - Select the "Codespaces" tab.
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
-
 
 ## Overview
 
@@ -85,7 +83,6 @@ For a comprehensive project overview, architecture details, and feature document
 ## 📦 Supabase Integration
 
 For a Comprehensive supabase overview, authentication, user profiles, and database operations, please refer to the [SUPABASE.md](./SUPABASE.md) file.
-
 
 ## License
 

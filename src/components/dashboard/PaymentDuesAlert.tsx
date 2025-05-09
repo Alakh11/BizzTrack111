@@ -1,4 +1,3 @@
-
 import { useInvoices } from "@/hooks/useInvoices";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,22 +20,20 @@ const PaymentDuesAlert = () => {
 
   // Filter for overdue and upcoming invoices using real data
   const overdueInvoices = invoices.filter(
-    (inv) => 
-      inv.status === "pending" && 
-      isAfter(today, new Date(inv.due_date))
+    (inv) => inv.status === "pending" && isAfter(today, new Date(inv.due_date)),
   );
 
   const upcomingInvoices = invoices.filter(
-    (inv) => 
-      inv.status === "pending" && 
+    (inv) =>
+      inv.status === "pending" &&
       !isAfter(today, new Date(inv.due_date)) &&
-      isAfter(nextWeek, new Date(inv.due_date))
+      isAfter(nextWeek, new Date(inv.due_date)),
   );
 
   // Sort by due date (most urgent first)
-  const sortedDues = [...overdueInvoices, ...upcomingInvoices].sort((a, b) => 
-    compareDesc(new Date(b.due_date), new Date(a.due_date))
-  ).slice(0, 5);
+  const sortedDues = [...overdueInvoices, ...upcomingInvoices]
+    .sort((a, b) => compareDesc(new Date(b.due_date), new Date(a.due_date)))
+    .slice(0, 5);
 
   const handleSendReminder = (invoiceId: string, clientName: string) => {
     // Mock sending email
@@ -44,7 +41,7 @@ const PaymentDuesAlert = () => {
       title: "Payment reminder sent",
       description: `Email reminder sent to ${clientName}`,
     });
-    
+
     // Add to sent reminders list
     setSentReminders((prev) => new Set([...prev, invoiceId]));
   };
@@ -71,10 +68,10 @@ const PaymentDuesAlert = () => {
           <CardTitle className="text-base">
             <Bell className="w-4 h-4 inline-block mr-1" /> Payment Dues
           </CardTitle>
-          <Button 
-            variant="link" 
+          <Button
+            variant="link"
             className="text-sm p-0"
-            onClick={() => navigate('/invoices')}
+            onClick={() => navigate("/invoices")}
           >
             View all <ArrowRight className="h-4 w-4 ml-1" />
           </Button>
@@ -84,13 +81,15 @@ const PaymentDuesAlert = () => {
         {sortedDues.length > 0 ? (
           <div className="space-y-4">
             {sortedDues.map((invoice) => (
-              <div 
+              <div
                 key={invoice.id}
                 className="flex justify-between items-center border-b pb-4 last:border-0 last:pb-0"
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <p className="font-medium">{invoice.client?.name || "Unknown client"}</p>
+                    <p className="font-medium">
+                      {invoice.client?.name || "Unknown client"}
+                    </p>
                     {isAfter(today, new Date(invoice.due_date)) ? (
                       <Badge variant="destructive">Overdue</Badge>
                     ) : (
@@ -98,21 +97,28 @@ const PaymentDuesAlert = () => {
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Invoice #{invoice.invoice_number} | Due: {formatDate(invoice.due_date)}
+                    Invoice #{invoice.invoice_number} | Due:{" "}
+                    {formatDate(invoice.due_date)}
                   </p>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  <p className="font-medium">{formatCurrency(Number(invoice.total_amount))}</p>
-                  <Button 
-                    variant="secondary" 
+                  <p className="font-medium">
+                    {formatCurrency(Number(invoice.total_amount))}
+                  </p>
+                  <Button
+                    variant="secondary"
                     size="sm"
                     disabled={sentReminders.has(invoice.id)}
-                    onClick={() => handleSendReminder(
-                      invoice.id, 
-                      invoice.client?.name || "client"
-                    )}
+                    onClick={() =>
+                      handleSendReminder(
+                        invoice.id,
+                        invoice.client?.name || "client",
+                      )
+                    }
                   >
-                    {sentReminders.has(invoice.id) ? "Reminder Sent" : "Send Reminder"}
+                    {sentReminders.has(invoice.id)
+                      ? "Reminder Sent"
+                      : "Send Reminder"}
                   </Button>
                 </div>
               </div>

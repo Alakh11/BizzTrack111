@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -8,7 +7,10 @@ interface ColorSelectorProps {
   onChange: (color: string) => void;
 }
 
-const ColorSelector: React.FC<ColorSelectorProps> = ({ selectedColor, onChange }) => {
+const ColorSelector: React.FC<ColorSelectorProps> = ({
+  selectedColor,
+  onChange,
+}) => {
   const colors = [
     { id: "blue", name: "Blue", class: "bg-blue-500" },
     { id: "red", name: "Red", class: "bg-red-500" },
@@ -33,7 +35,7 @@ const ColorSelector: React.FC<ColorSelectorProps> = ({ selectedColor, onChange }
               color.class,
               selectedColor === color.id
                 ? "ring-2 ring-offset-2 ring-primary scale-110"
-                : "hover:scale-110"
+                : "hover:scale-110",
             )}
             title={color.name}
             onClick={() => onChange(color.id)}

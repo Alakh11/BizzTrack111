@@ -1,6 +1,12 @@
-
 import ChartCard from "./ChartCard";
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import {
+  Cell,
+  Pie,
+  PieChart,
+  ResponsiveContainer,
+  Tooltip,
+  Legend,
+} from "recharts";
 import { useExpenses } from "@/hooks/useExpenses";
 import { useMemo } from "react";
 
@@ -21,15 +27,15 @@ const ExpensesByCategory = () => {
     if (!expenses || expenses.length === 0) return [];
 
     const categories: Record<string, number> = {};
-    
-    expenses.forEach(expense => {
+
+    expenses.forEach((expense) => {
       if (!expense.amount || !expense.category) return;
-      
+
       const category = expense.category;
       const amount = parseFloat(expense.amount.toString());
-      
+
       if (isNaN(amount)) return;
-      
+
       if (categories[category]) {
         categories[category] += amount;
       } else {
@@ -49,7 +55,7 @@ const ExpensesByCategory = () => {
         <div className="bg-background p-2 border border-border rounded shadow-md">
           <p className="font-medium">{payload[0].name}</p>
           <p className="text-sm text-primary">
-            ₹{payload[0].value.toLocaleString('en-IN')}
+            ₹{payload[0].value.toLocaleString("en-IN")}
           </p>
         </div>
       );
@@ -58,7 +64,10 @@ const ExpensesByCategory = () => {
   };
 
   return (
-    <ChartCard title="Expenses by Category" description="Distribution of expenses">
+    <ChartCard
+      title="Expenses by Category"
+      description="Distribution of expenses"
+    >
       <div className="h-[230px]">
         {categoryData.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
@@ -73,7 +82,10 @@ const ExpensesByCategory = () => {
                 labelLine={false}
               >
                 {categoryData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
               <Tooltip content={<CustomTooltip />} />

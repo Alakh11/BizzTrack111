@@ -1,4 +1,3 @@
-
 import React from "react";
 import { UseFormReturn } from "react-hook-form";
 import { Card, CardHeader, CardContent, CardTitle } from "@/components/ui/card";
@@ -15,7 +14,9 @@ const DigitalSignature: React.FC<DigitalSignatureProps> = ({ form }) => {
       </CardHeader>
       <CardContent>
         <div className="space-y-2">
-          <label className="text-sm font-medium dark:text-gray-200">Signature</label>
+          <label className="text-sm font-medium dark:text-gray-200">
+            Signature
+          </label>
           <textarea
             className="w-full rounded-md border p-2 h-20 dark:bg-gray-800 dark:text-white dark:border-gray-700 bg-white"
             placeholder="Type your name to create a digital signature"

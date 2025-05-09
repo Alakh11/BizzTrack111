@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useInvoiceFormCore } from "./useInvoiceFormCore";
 import { useInvoiceFormUpdater } from "./useInvoiceFormUpdater";
@@ -31,7 +30,7 @@ export const useInvoiceForm = () => {
     setPurchaseOrderNumber,
     setReferenceNumber,
     setSelectedCurrency,
-    supabase
+    supabase,
   } = core;
 
   // Check if we're in edit mode
@@ -69,31 +68,33 @@ export const useInvoiceForm = () => {
             }
 
             // Set invoice items with proper ids for editing
-            if (invoiceData.invoice_items && invoiceData.invoice_items.length > 0) {
-              const mappedItems = invoiceData.invoice_items.map((item: any, index: number) => ({
-                id: index + 1,
-                description: item.description || "",
-                quantity: item.quantity || 0,
-                rate: item.unit_price || 0,
-                amount: item.amount || 0,
-                serviceId: item.service_id || "",
-              }));
-              
+            if (
+              invoiceData.invoice_items &&
+              invoiceData.invoice_items.length > 0
+            ) {
+              const mappedItems = invoiceData.invoice_items.map(
+                (item: any, index: number) => ({
+                  id: index + 1,
+                  description: item.description || "",
+                  quantity: item.quantity || 0,
+                  rate: item.unit_price || 0,
+                  amount: item.amount || 0,
+                  serviceId: item.service_id || "",
+                }),
+              );
+
               setItems(mappedItems);
-
-
             }
 
             // Parse and apply metadata
             if (invoiceData.metadata) {
               try {
-                const metadata = typeof invoiceData.metadata === 'string' 
-                  ? JSON.parse(invoiceData.metadata)
-                  : invoiceData.metadata;
+                const metadata =
+                  typeof invoiceData.metadata === "string"
+                    ? JSON.parse(invoiceData.metadata)
+                    : invoiceData.metadata;
 
                 applyMetadataToForm(metadata);
-
-
               } catch (e) {
                 console.error("Error parsing invoice metadata", e);
               }
@@ -139,12 +140,21 @@ export const useInvoiceForm = () => {
 
       if (metadata.shipping.from) {
         form.setValue("shippedFromName", metadata.shipping.from.name || "");
-        form.setValue("shippedFromAddress", metadata.shipping.from.address || "");
+        form.setValue(
+          "shippedFromAddress",
+          metadata.shipping.from.address || "",
+        );
         form.setValue("shippedFromCity", metadata.shipping.from.city || "");
         form.setValue("shippedFromState", metadata.shipping.from.state || "");
         form.setValue("shippedFromPostal", metadata.shipping.from.postal || "");
-        form.setValue("shippedFromCountry", metadata.shipping.from.country || "india");
-        form.setValue("shippedFromWarehouse", metadata.shipping.from.warehouse || "");
+        form.setValue(
+          "shippedFromCountry",
+          metadata.shipping.from.country || "india",
+        );
+        form.setValue(
+          "shippedFromWarehouse",
+          metadata.shipping.from.warehouse || "",
+        );
       }
 
       if (metadata.shipping.to) {
@@ -153,7 +163,10 @@ export const useInvoiceForm = () => {
         form.setValue("shippedToCity", metadata.shipping.to.city || "");
         form.setValue("shippedToState", metadata.shipping.to.state || "");
         form.setValue("shippedToPostal", metadata.shipping.to.postal || "");
-        form.setValue("shippedToCountry", metadata.shipping.to.country || "india");
+        form.setValue(
+          "shippedToCountry",
+          metadata.shipping.to.country || "india",
+        );
       }
     }
 
@@ -167,7 +180,10 @@ export const useInvoiceForm = () => {
       form.setValue("transportDocDate", metadata.transport.docDate || "");
       form.setValue("vehicleType", metadata.transport.vehicleType || "");
       form.setValue("vehicleNumber", metadata.transport.vehicleNumber || "");
-      form.setValue("transactionType", metadata.transport.transactionType || "");
+      form.setValue(
+        "transactionType",
+        metadata.transport.transactionType || "",
+      );
       form.setValue("supplyType", metadata.transport.supplyType || "");
     }
 
@@ -195,9 +211,15 @@ export const useInvoiceForm = () => {
     if (metadata.payment) {
       if (metadata.payment.bank) {
         form.setValue("bankName", metadata.payment.bank.name || "");
-        form.setValue("accountNumber", metadata.payment.bank.accountNumber || "");
+        form.setValue(
+          "accountNumber",
+          metadata.payment.bank.accountNumber || "",
+        );
         form.setValue("ifscCode", metadata.payment.bank.ifscCode || "");
-        form.setValue("accountHolderName", metadata.payment.bank.accountHolderName || "");
+        form.setValue(
+          "accountHolderName",
+          metadata.payment.bank.accountHolderName || "",
+        );
         form.setValue("branchName", metadata.payment.bank.branchName || "");
       }
 
@@ -269,36 +291,40 @@ export const useInvoiceForm = () => {
         refNumber: core.referenceNumber,
         currency: core.selectedCurrency,
       },
-      shipping: core.showShippingDetails ? {
-        from: {
-          name: data.shippedFromName,
-          address: data.shippedFromAddress,
-          city: data.shippedFromCity,
-          state: data.shippedFromState,
-          postal: data.shippedFromPostal,
-          country: data.shippedFromCountry,
-          warehouse: data.shippedFromWarehouse,
-        },
-        to: {
-          name: data.shippedToName,
-          address: data.shippedToAddress,
-          city: data.shippedToCity,
-          state: data.shippedToState,
-          postal: data.shippedToPostal,
-          country: data.shippedToCountry,
-        }
-      } : null,
-      transport: core.showTransportDetails ? {
-        transporter: data.transporterName,
-        distance: data.distance,
-        mode: data.transportMode,
-        docNo: data.transportDocNo,
-        docDate: data.transportDocDate,
-        vehicleType: data.vehicleType,
-        vehicleNumber: data.vehicleNumber,
-        transactionType: data.transactionType,
-        supplyType: data.supplyType,
-      } : null,
+      shipping: core.showShippingDetails
+        ? {
+            from: {
+              name: data.shippedFromName,
+              address: data.shippedFromAddress,
+              city: data.shippedFromCity,
+              state: data.shippedFromState,
+              postal: data.shippedFromPostal,
+              country: data.shippedFromCountry,
+              warehouse: data.shippedFromWarehouse,
+            },
+            to: {
+              name: data.shippedToName,
+              address: data.shippedToAddress,
+              city: data.shippedToCity,
+              state: data.shippedToState,
+              postal: data.shippedToPostal,
+              country: data.shippedToCountry,
+            },
+          }
+        : null,
+      transport: core.showTransportDetails
+        ? {
+            transporter: data.transporterName,
+            distance: data.distance,
+            mode: data.transportMode,
+            docNo: data.transportDocNo,
+            docDate: data.transportDocDate,
+            vehicleType: data.vehicleType,
+            vehicleNumber: data.vehicleNumber,
+            transactionType: data.transactionType,
+            supplyType: data.supplyType,
+          }
+        : null,
       gst: {
         type: data.taxType,
         placeOfSupply: data.placeOfSupply,
@@ -318,8 +344,8 @@ export const useInvoiceForm = () => {
         upi: {
           id: data.upiId,
           name: data.upiName,
-        }
-      }
+        },
+      },
     };
   };
 
@@ -368,24 +394,24 @@ export const useInvoiceForm = () => {
       });
 
       let result;
-      
+
       try {
         if (core.isEditMode && core.invoiceId) {
           result = await formUpdater.updateInvoice(
             core.invoiceId,
             invoiceData,
-            invoiceItems
+            invoiceItems,
           );
         } else if (core.finalSubmission) {
           const userData = (await supabase.auth.getUser()).data.user;
           if (userData) {
             result = await formUpdater.createInvoice(
               { ...invoiceData, user_id: userData.id },
-              invoiceItems
+              invoiceItems,
             );
           }
         }
-        
+
         if (result) {
           // Add a short delay for better UX before navigating
           setTimeout(() => {
@@ -399,15 +425,16 @@ export const useInvoiceForm = () => {
           description: error.message || "An unexpected error occurred",
           variant: "destructive",
         });
-
-
       }
     } catch (error: any) {
       console.error("Form error:", error);
       toast({
-        title: core.isEditMode ? "Error updating invoice" : "Error creating invoice",
-        description: error.message || `An error occurred while ${core.isEditMode ? "updating" : "creating"} the invoice`,
-
+        title: core.isEditMode
+          ? "Error updating invoice"
+          : "Error creating invoice",
+        description:
+          error.message ||
+          `An error occurred while ${core.isEditMode ? "updating" : "creating"} the invoice`,
 
         variant: "destructive",
       });
