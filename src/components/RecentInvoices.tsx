@@ -1,49 +1,83 @@
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import DashboardCard from "./DashboardCard";
+import React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { ArrowRight } from "lucide-react";
 
-const mockInvoices = [
-  { id: "INV-001", client: "Acme Corp", amount: "$1,200", date: "2025-04-20", status: "Paid" },
-  { id: "INV-002", client: "TechStart", amount: "$850", date: "2025-04-15", status: "Pending" },
-  { id: "INV-003", client: "Global Inc", amount: "$2,300", date: "2025-04-10", status: "Paid" },
-];
+interface Invoice {
+  id: string;
+  invoiceNumber: string;
+  client: string;
+  amount: number;
+  date: string;
+  status: "paid" | "pending" | "overdue";
+}
 
-const RecentInvoices = () => {
+const RecentInvoices: React.FC = () => {
+  // Sample invoices data
+  const invoices: Invoice[] = [
+    { id: "1", invoiceNumber: "INV-001", client: "Acme Inc.", amount: 1200, date: "2024-04-10", status: "paid" },
+    { id: "2", invoiceNumber: "INV-002", client: "TechGiant", amount: 3500, date: "2024-04-15", status: "pending" },
+    { id: "3", invoiceNumber: "INV-003", client: "GlobalMedia", amount: 800, date: "2024-04-02", status: "overdue" },
+  ];
+
   return (
-    <DashboardCard title="Recent Invoices" className="col-span-2">
+    <div className="w-full overflow-hidden">
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-semibold">Recent Invoices</h3>
+        <a href="/invoices" className="text-sm text-blue-600 hover:text-blue-800 flex items-center">
+          View All <ArrowRight className="h-4 w-4 ml-1" />
+        </a>
+      </div>
+
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Invoice</TableHead>
             <TableHead>Client</TableHead>
             <TableHead>Amount</TableHead>
-            <TableHead>Date</TableHead>
             <TableHead>Status</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {mockInvoices.map((invoice) => (
+          {invoices.map((invoice) => (
             <TableRow key={invoice.id}>
-              <TableCell className="font-medium">{invoice.id}</TableCell>
+              <TableCell>{invoice.invoiceNumber}</TableCell>
               <TableCell>{invoice.client}</TableCell>
-              <TableCell>{invoice.amount}</TableCell>
-              <TableCell>{invoice.date}</TableCell>
+              <TableCell>${invoice.amount}</TableCell>
               <TableCell>
-                <span
-                  className={`px-2 py-1 rounded-full text-sm ${
-                    invoice.status === "Paid"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
+                <Badge
+                  variant={
+                    invoice.status === "paid"
+                      ? "outline"
+                      : invoice.status === "pending"
+                      ? "outline"
+                      : "destructive"
+                  }
+                  className={
+                    invoice.status === "paid"
+                      ? "bg-green-50 text-green-700 border-green-200"
+                      : invoice.status === "pending"
+                      ? "bg-yellow-50 text-yellow-700 border-yellow-200"
+                      : ""
+                  }
                 >
                   {invoice.status}
-                </span>
+                </Badge>
               </TableCell>
             </TableRow>
-          )TableBody>
-        </Table>
-      </DashboardCard>
-    );
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
 };
 
 export default RecentInvoices;
