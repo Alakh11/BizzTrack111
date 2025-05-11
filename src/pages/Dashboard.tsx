@@ -1,11 +1,17 @@
-import { IndianRupee, Users, FileText, CreditCard } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
-import StatCard from "@/components/dashboard/StatCard";
+import DashboardStats from "@/components/dashboard/DashboardStats";
 import RevenueChart from "@/components/dashboard/RevenueChart";
 import RecentInvoices from "@/components/dashboard/RecentInvoices";
 import TopClients from "@/components/dashboard/TopClients";
+import PaymentDuesAlert from "@/components/dashboard/PaymentDuesAlert";
+import TopClientsChart from "@/components/dashboard/TopClientsChart";
+import ExpensesByCategory from "@/components/dashboard/ExpensesByCategory";
+import { useState } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Dashboard = () => {
+  const [activeTab, setActiveTab] = useState("overview");
+
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -16,42 +22,43 @@ const Dashboard = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard
-            title="Total Revenue"
-            value="₹45,231.89"
-            change="12.5%"
-            isPositive={true}
-            icon={<IndianRupee className="h-5 w-5" />}
-          />
-          <StatCard
-            title="Invoices"
-            value="145"
-            change="4.3%"
-            isPositive={true}
-            icon={<FileText className="h-5 w-5" />}
-          />
-          <StatCard
-            title="Clients"
-            value="32"
-            change="2.1%"
-            isPositive={true}
-            icon={<Users className="h-5 w-5" />}
-          />
-          <StatCard
-            title="Pending"
-            value="₹12,450.00"
-            change="1.8%"
-            isPositive={false}
-            icon={<CreditCard className="h-5 w-5" />}
-          />
-        </div>
+        <Tabs
+          defaultValue="overview"
+          value={activeTab}
+          onValueChange={setActiveTab}
+        >
+          <TabsList>
+            <TabsTrigger value="overview">Overview</TabsTrigger>
+            <TabsTrigger value="invoices">Invoices</TabsTrigger>
+            <TabsTrigger value="payments">Payments</TabsTrigger>
+            <TabsTrigger value="expenses">Expenses</TabsTrigger>
+          </TabsList>
 
-        <RevenueChart />
+          <TabsContent value="overview" className="space-y-6">
+            <DashboardStats />
+            <RevenueChart />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <TopClientsChart />
+              <ExpensesByCategory />
+            </div>
+          </TabsContent>
+
+          <TabsContent value="invoices" className="space-y-6">
+            <RecentInvoices />
+          </TabsContent>
+
+          <TabsContent value="payments" className="space-y-6">
+            <PaymentDuesAlert />
+          </TabsContent>
+
+          <TabsContent value="expenses" className="space-y-6">
+            <ExpensesByCategory />
+          </TabsContent>
+        </Tabs>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <RecentInvoices />
-          <TopClients />
+          <PaymentDuesAlert />
         </div>
       </div>
     </MainLayout>

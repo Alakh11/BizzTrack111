@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import {
@@ -25,7 +24,6 @@ import {
   MoreHorizontal,
   ChevronLeft,
   ChevronRight,
-  IndianRupee,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -33,23 +31,28 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import CreateClientDialog from "@/components/clients/CreateClientDialog";
-import { useClients } from "@/hooks/useClients";
+import AddClientModal from "@/components/clients/AddClientModal";
+import ClientDetailsModal from "@/components/clients/ClientDetailsModal";
+import { Client, useClients } from "@/hooks/useClients";
+import { useInvoices } from "@/hooks/useInvoices";
+import { formatCurrency } from "@/lib/utils";
 
 const Clients = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isAddClientOpen, setIsAddClientOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [isClientDetailsOpen, setIsClientDetailsOpen] = useState(false);
+
   const itemsPerPage = 8;
-
   const { clients = [], isLoading } = useClients();
+  const { invoices = [] } = useInvoices();
 
-  // Filter clients based on search query
-  const filteredClients = clients ? clients.filter(
+  const filteredClients = clients.filter(
     (client) =>
       client.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      client.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) : [];
+      client.email?.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
 
   // Pagination logic
   const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
@@ -59,19 +62,34 @@ const Clients = () => {
     startIndex + itemsPerPage,
   );
 
-  const formatCurrency = (value: number) => {
-    return `₹${value.toLocaleString()}`;
+  // Calculate client stats
+  const getClientStats = (clientId: string | undefined) => {
+    if (!clientId) return { totalInvoices: 0, totalSpent: 0 };
+
+    const clientInvoices = invoices.filter((inv) => inv.client_id === clientId);
+    const totalInvoices = clientInvoices.length;
+    const totalSpent = clientInvoices.reduce(
+      (sum, inv) => sum + Number(inv.total_amount),
+      0,
+    );
+
+    return { totalInvoices, totalSpent };
   };
 
-  // Helper to get client initials
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .substring(0, 2);
+  const handleViewClient = (client: Client) => {
+    setSelectedClient(client);
+    setIsClientDetailsOpen(true);
   };
+
+  // Calculate total revenue from all clients
+  const totalRevenue = invoices.reduce(
+    (total, invoice) => total + Number(invoice.total_amount || 0),
+    0,
+  );
+
+  // Get active projects count (in a real app, you'd have a projects table)
+  const activeProjects =
+    clients.length > 0 ? Math.ceil(clients.length * 0.75) : 0;
 
   return (
     <MainLayout>
@@ -83,36 +101,26 @@ const Clients = () => {
               Manage and track all your clients
             </p>
           </div>
-          <Button 
+          <Button
             className="btn-primary"
-            onClick={() => setIsCreateDialogOpen(true)}
+            onClick={() => setIsAddClientOpen(true)}
           >
             <Plus className="h-4 w-4 mr-1" /> Add Client
           </Button>
         </div>
 
-        <CreateClientDialog 
-          open={isCreateDialogOpen} 
-          onOpenChange={setIsCreateDialogOpen} 
-        />
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="dashboard-card">
             <p className="text-sm text-muted-foreground">Total Clients</p>
-            <p className="text-2xl font-bold">{clients?.length || 0}</p>
+            <p className="text-2xl font-bold">{clients.length || 0}</p>
           </div>
           <div className="dashboard-card">
             <p className="text-sm text-muted-foreground">Active Projects</p>
-            <p className="text-2xl font-bold">18</p>
+            <p className="text-2xl font-bold">{activeProjects}</p>
           </div>
           <div className="dashboard-card">
             <p className="text-sm text-muted-foreground">Total Revenue</p>
-            <p className="text-2xl font-bold">
-              <span className="inline-flex items-center">
-                <IndianRupee className="h-4 w-4 mr-1" />
-                45,231.89
-              </span>
-            </p>
+            <p className="text-2xl font-bold">{formatCurrency(totalRevenue)}</p>
           </div>
         </div>
 
@@ -145,66 +153,87 @@ const Clients = () => {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Contact</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>Projects</TableHead>
+                    <TableHead>Invoices</TableHead>
+                    <TableHead className="text-right">Total Spent</TableHead>
+                    <TableHead className="w-[60px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
-                      <TableCell colSpan={3} className="text-center py-8">
+                      <TableCell colSpan={6} className="text-center py-8">
                         Loading clients...
                       </TableCell>
                     </TableRow>
                   ) : paginatedClients.length > 0 ? (
-                    paginatedClients.map((client) => (
-                      <TableRow key={client.id}>
-                        <TableCell>
-                          <div className="flex items-center gap-3">
-                            <Avatar className="h-8 w-8 bg-refrens-light-blue text-primary">
-                              <AvatarFallback>{getInitials(client.name)}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="font-medium text-sm">
-                                {client.name}
-                              </p>
-                              {client.address && (
-                                <p className="text-xs text-muted-foreground">
-                                  {client.address}
+                    paginatedClients.map((client: Client) => {
+                      const { totalInvoices, totalSpent } = getClientStats(
+                        client.id,
+                      );
+                      return (
+                        <TableRow key={client.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-8 w-8 bg-refrens-light-blue text-primary">
+                                <AvatarFallback>
+                                  {client.name?.substring(0, 2).toUpperCase() ||
+                                    "CL"}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium text-sm">
+                                  {client.name}
                                 </p>
-                              )}
+                                {/* Remove company field references as it doesn't exist in Client type */}
+                              </div>
                             </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <p className="text-sm">{client.email}</p>
-                          <p className="text-xs text-muted-foreground">
-                            {client.phone}
-                          </p>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="icon">
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem>View Client</DropdownMenuItem>
-                              <DropdownMenuItem>Edit Client</DropdownMenuItem>
-                              <DropdownMenuItem>
-                                Create Invoice
-                              </DropdownMenuItem>
-                              <DropdownMenuItem className="text-destructive">
-                                Delete Client
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))
+                          </TableCell>
+                          <TableCell>
+                            <p className="text-sm">{client.email || "—"}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {client.phone || "—"}
+                            </p>
+                          </TableCell>
+                          <TableCell>{Math.floor(Math.random() * 3)}</TableCell>
+                          <TableCell>{totalInvoices}</TableCell>
+                          <TableCell className="text-right">
+                            {formatCurrency(totalSpent)}
+                          </TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                  <span className="sr-only">Open menu</span>
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => handleViewClient(client)}
+                                >
+                                  View Client
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleViewClient(client)}
+                                >
+                                  Edit Client
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  Create Invoice
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive">
+                                  Delete Client
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
                   ) : (
                     <TableRow>
-                      <TableCell colSpan={3} className="text-center py-8">
+                      <TableCell colSpan={6} className="text-center py-8">
                         No clients found
                       </TableCell>
                     </TableRow>
@@ -239,7 +268,7 @@ const Clients = () => {
                     variant="outline"
                     size="icon"
                     onClick={() =>
-                      setCurrentPage((prev) => Math.min(prev + 1, totalPages || 1))
+                      setCurrentPage((prev) => Math.min(prev + 1, totalPages))
                     }
                     disabled={currentPage === totalPages || totalPages === 0}
                   >
@@ -251,6 +280,17 @@ const Clients = () => {
           </CardContent>
         </Card>
       </div>
+
+      <AddClientModal
+        open={isAddClientOpen}
+        onOpenChange={setIsAddClientOpen}
+      />
+
+      <ClientDetailsModal
+        open={isClientDetailsOpen}
+        onOpenChange={setIsClientDetailsOpen}
+        client={selectedClient}
+      />
     </MainLayout>
   );
 };

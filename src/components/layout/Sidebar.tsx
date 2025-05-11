@@ -1,230 +1,216 @@
-import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { cn } from "@/lib/utils";
+import { useState, useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
-  Home,
-  FileText,
-  Users,
-  ClipboardList,
-  Settings,
-  LogOut,
-  Menu,
-  X,
-  Plus,
+  LayoutDashboard,
   Receipt,
-  ChartPie,
+  Users,
+  PackageOpen,
+  FileText,
+  BarChartBig,
+  Settings,
+  Briefcase,
+  LogOut,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/hooks/useAuth";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 
 interface SidebarProps {
-  isOpen?: boolean;
+  isCollapsed: boolean;
+  setIsCollapsed: (collapsed: boolean) => void;
 }
 
-const Sidebar = ({ isOpen = true }: SidebarProps) => {
+const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
+  const { signOut, user, userProfile } = useAuth();
+  const isMobile = useIsMobile();
   const location = useLocation();
-  const { user, signOut } = useAuth();
-  const navigate = useNavigate();
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
-  const navItems = [
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Close sidebar on mobile when route changes
+  useEffect(() => {
+    if (isMobile && !isCollapsed) {
+      setIsCollapsed(true);
+    }
+  }, [location.pathname, isMobile, isCollapsed, setIsCollapsed]);
+
+  const sidebarItems = [
     {
-      name: "Dashboard",
-      icon: <Home className="h-5 w-5" />,
+      title: "Dashboard",
+      icon: <LayoutDashboard size={24} />,
       href: "/",
+      active: location.pathname === "/",
     },
     {
-      name: "Invoices",
-      icon: <FileText className="h-5 w-5" />,
-      isDropdown: true,
-      items: [
-        {
-          name: "All Invoices",
-          href: "/invoices",
-        },
-        {
-          name: "Create Invoice",
-          href: "/invoices/new",
-        },
-      ],
+      title: "Invoices",
+      icon: <Receipt size={24} />,
+      href: "/invoices",
+      active: location.pathname.includes("/invoices"),
     },
     {
-      name: "Expenses",
-      icon: <Receipt className="h-5 w-5" />,
-      href: "/expenses",
-    },
-    {
-      name: "Reports",
-      icon: <ChartPie className="h-5 w-5" />,
-      href: "/reports",
-    },
-    {
-      name: "Clients",
-      icon: <Users className="h-5 w-5" />,
+      title: "Clients",
+      icon: <Users size={24} />,
       href: "/clients",
+      active: location.pathname.includes("/clients"),
     },
     {
-      name: "Services",
-      icon: <ClipboardList className="h-5 w-5" />,
+      title: "Products",
+      icon: <PackageOpen size={24} />,
+      href: "/products",
+      active: location.pathname.includes("/products"),
+    },
+    {
+      title: "Services",
+      icon: <Briefcase size={24} />,
       href: "/services",
+      active: location.pathname.includes("/services"),
     },
     {
-      name: "Settings",
-      icon: <Settings className="h-5 w-5" />,
+      title: "Expenses",
+      icon: <FileText size={24} />,
+      href: "/expenses",
+      active: location.pathname.includes("/expenses"),
+    },
+    {
+      title: "Reports",
+      icon: <BarChartBig size={24} />,
+      href: "/reports",
+      active: location.pathname.includes("/reports"),
+    },
+    {
+      title: "Settings",
+      icon: <Settings size={24} />,
       href: "/settings",
+      active: location.pathname.includes("/settings"),
     },
   ];
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
+  if (!mounted) return null;
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate("/login");
-  };
-
-  const renderNavItem = (item: any) => {
-    if (item.isDropdown) {
-      return (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className={cn(
-                "nav-link w-full",
-                location.pathname.startsWith(item.items[0].href) &&
-                  "nav-link-active",
-              )}
-            >
-              {item.icon}
-              <span>{item.name}</span>
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-48">
-            {item.items.map((subItem: any) => (
-              <DropdownMenuItem key={subItem.href} asChild>
-                <Link
-                  to={subItem.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="w-full"
-                >
-                  {subItem.name === "Create Invoice" && (
-                    <Plus className="mr-2 h-4 w-4" />
-                  )}
-                  {subItem.name}
-                </Link>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      );
+  // Get user initials for the avatar
+  const getInitials = () => {
+    if (userProfile?.full_name) {
+      const names = userProfile.full_name.split(" ");
+      if (names.length >= 2) {
+        return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
+      } else if (names.length === 1 && names[0]) {
+        return names[0][0].toUpperCase();
+      }
     }
 
-    return (
-      <Link
-        to={item.href}
-        className={cn(
-          "nav-link",
-          location.pathname === item.href && "nav-link-active",
-        )}
-        onClick={() => setIsMobileMenuOpen(false)}
-      >
-        {item.icon}
-        <span>{item.name}</span>
-      </Link>
-    );
+    // Fallback to email
+    if (user?.email) {
+      return user.email[0].toUpperCase();
+    }
+
+    return "U";
+  };
+
+  // Get display name prioritizing full_name over email
+  const getDisplayName = () => {
+    if (userProfile?.full_name) {
+      return userProfile.full_name;
+    }
+
+    if (user?.email) {
+      return user.email;
+    }
+
+    return "User";
   };
 
   return (
-    <>
-      {/* Mobile Menu Button */}
-      <div className="lg:hidden fixed top-4 left-4 z-50">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={toggleMobileMenu}
-          className="relative"
-        >
-          {isMobileMenuOpen ? (
-            <X className="h-5 w-5" />
-          ) : (
-            <Menu className="h-5 w-5" />
-          )}
-        </Button>
-      </div>
-
-      {/* Sidebar */}
-      <div
-        className={cn(
-          "fixed inset-y-0 left-0 z-40 w-64 bg-white border-r border-border transform transition-transform duration-300 ease-in-out lg:translate-x-0",
-          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full",
-          !isOpen && "lg:-translate-x-full",
-        )}
-      >
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="p-4 border-b border-border">
-            <Link to="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center">
-                <span className="text-white font-bold">B</span>
-              </div>
-              <span className="text-primary font-bold text-xl font-playfair">
-                BizzTrack
-              </span>
-            </Link>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto p-4 space-y-1">
-            {navItems.map((item) => (
-              <div key={item.name} className="group/menu-item relative">
-                {renderNavItem(item)}
-              </div>
-            ))}
-          </nav>
-
-          {/* User Profile & Logout */}
-          <div className="border-t border-border p-4 bg-gray-50">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <span className="font-medium text-primary text-xl">
-                  {user?.email?.[0].toUpperCase() || "U"}
-                </span>
-              </div>
-              <div>
-                <p className="font-semibold text-primary text-sm">
-                  {user?.email}
-                </p>
-                <p className="text-xs text-muted-foreground">Logged in</p>
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              className="w-full justify-start text-primary hover:bg-primary/5"
-              onClick={handleSignOut}
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Backdrop */}
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
+    <div
+      className={cn(
+        "relative h-full border-r transition-all duration-300 ease-in-out shadow-lg",
+        isCollapsed ? "w-16" : "w-64",
+        "dark:bg-gradient-to-b dark:from-[#0f172a] dark:via-[#1e293b] dark:to-[#334155] dark:text-white",
+        "bg-white text-slate-800",
       )}
-    </>
+    >
+      <div className="p-4 flex flex-col h-full">
+        {/* User Info */}
+        {user && (
+          <div
+            className={cn(
+              "mb-6 border-b pb-4 dark:border-gray-600 border-gray-200",
+              isCollapsed ? "flex justify-center" : "",
+            )}
+          >
+            <div
+              className={cn(
+                "flex items-center",
+                isCollapsed ? "flex-col" : "flex-row",
+              )}
+            >
+              <Avatar className="h-10 w-10 border shadow-md dark:border-white border-slate-300">
+                <AvatarImage src="" alt="User" />
+                <AvatarFallback className="bg-primary text-primary-foreground">
+                  {getInitials()}
+                </AvatarFallback>
+              </Avatar>
+
+              {!isCollapsed && (
+                <div className="ml-3 overflow-hidden">
+                  <p className="font-semibold dark:text-white text-slate-800 truncate">
+                    {getDisplayName()}
+                  </p>
+                  {user.email && (
+                    <p className="text-xs dark:text-gray-300 text-gray-600 truncate">
+                      {user.email}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Navigation Links */}
+        <nav className="flex-1 space-y-1">
+          {sidebarItems.map((item) => (
+            <Link
+              key={item.href}
+              to={item.href}
+              className={cn(
+                "flex items-center py-3 px-3 rounded-md transition-colors font-medium",
+                item.active
+                  ? "bg-primary text-primary-foreground dark:bg-white dark:text-black"
+                  : "dark:text-gray-300 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700/40 dark:hover:text-white hover:text-black",
+                isCollapsed ? "justify-center" : "justify-start",
+              )}
+            >
+              <span>{item.icon}</span>
+              {!isCollapsed && <span className="ml-3">{item.title}</span>}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Logout Button */}
+        <button
+          onClick={signOut}
+          className={cn(
+            "flex items-center py-3 px-3 mt-4 rounded-md dark:text-gray-300 text-gray-600 hover:bg-red-100 dark:hover:bg-red-600 hover:text-red-600 dark:hover:text-white transition-colors",
+            isCollapsed ? "justify-center" : "justify-start",
+          )}
+        >
+          <LogOut size={24} />
+          {!isCollapsed && <span className="ml-3">Sign Out</span>}
+        </button>
+
+        {/* Decorative Bottom Design */}
+        {!isCollapsed && (
+          <div className="mt-auto pt-4 text-center text-sm dark:text-gray-400 text-gray-500 border-t dark:border-gray-600 border-gray-200">
+            <p>BizzTrack © {new Date().getFullYear()}</p>
+            <p className="text-xs">Crafted with ❤️ by Alakh</p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

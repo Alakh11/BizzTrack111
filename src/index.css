@@ -66,7 +66,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-poppins;
+    @apply bg-background text-foreground font-poppins transition-colors duration-300;
     font-feature-settings:
       "rlig" 1,
       "calt" 1;
@@ -122,6 +122,10 @@
   .playfair-heading {
     @apply font-playfair;
   }
+
+  .dark-gradient {
+    @apply dark:bg-gradient-to-b dark:from-[#0f172a] dark:via-[#1e293b] dark:to-[#334155] dark:text-white;
+  }
 }
 
 /* Additional utility classes for font variants */
@@ -135,4 +139,16 @@
 
 .font-montserrat {
   font-family: "Montserrat", sans-serif;
+}
+
+.font-\[\"Times_New_Roman\"\] {
+  font-family: "Times New Roman", Times, serif;
+}
+
+.font-\[\"Calibri\"\] {
+  font-family: Calibri, "Segoe UI", sans-serif;
+}
+
+.font-\[\"Algerian\"\] {
+  font-family: Algerian, fantasy;
 }
