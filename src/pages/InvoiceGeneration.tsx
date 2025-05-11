@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useParams, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import { FormProvider } from "react-hook-form";
 import MainLayout from "@/components/layout/MainLayout";
+<<<<<<< HEAD
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -56,52 +57,64 @@ import GstDetails from "@/components/invoices/GstDetails";
 import PaymentOptions from "@/components/invoices/PaymentOptions";
 import EditableBillingSection from "@/components/invoices/EditableBillingSection";
 import CreateClientDialog from "@/components/clients/CreateClientDialog";
+=======
+import { Card } from "@/components/ui/card";
+import InvoiceGenerationStepper from "@/components/invoices/InvoiceGenerationStepper";
+import InvoiceDetailsStep from "@/components/invoices/InvoiceDetailsStep";
+import BankingDetailsStep from "@/components/invoices/BankingDetailsStep";
+import DesignStep from "@/components/invoices/DesignStep";
+import EmailPreviewStep from "@/components/invoices/EmailPreviewStep";
+import { useInvoiceForm } from "@/hooks/useInvoiceForm";
+>>>>>>> Bizztrack/main
 
 const steps = [
   {
     id: "details",
-    name: "Add Invoice Details",
-    description: "Client info and invoice details",
+    name: "Invoice Details",
+    description: "Basic information about the invoice",
   },
   {
     id: "banking",
-    name: "Add Banking Details",
-    description: "Payment information",
+    name: "Banking Details",
+    description: "Add payment information",
   },
   {
     id: "design",
     name: "Design & Share",
-    description: "Customize and send",
+    description: "Customize the look and feel",
+  },
+  {
+    id: "preview",
+    name: "Email & Preview",
+    description: "Review and finalize",
   },
 ];
 
-// Font options
-const fontOptions = [
-  { id: "inter", name: "Inter" },
-  { id: "roboto", name: "Roboto" },
-  { id: "poppins", name: "Poppins" },
-  { id: "opensans", name: "Open Sans" },
-  { id: "lato", name: "Lato" },
-];
-
-const paperSizes = [
-  { id: "a4", name: "A4" },
-  { id: "letter", name: "Letter" },
-  { id: "legal", name: "Legal" },
-  { id: "a3", name: "A3" },
-];
-
-// Color themes
-const colorThemes = [
-  { id: "blue", name: "Blue", color: "#3b82f6" },
-  { id: "green", name: "Green", color: "#10b981" },
-  { id: "purple", name: "Purple", color: "#8b5cf6" },
-  { id: "orange", name: "Orange", color: "#f97316" },
-  { id: "red", name: "Red", color: "#ef4444" },
-  { id: "gray", name: "Gray", color: "#6b7280" },
-];
+// Add global styles for dark mode inputs with improved visibility
+const darkModeStyles = document.createElement("style");
+darkModeStyles.textContent = `
+  .dark input, .dark textarea, .dark select {
+    background-color: rgb(17, 24, 39) !important;
+    color: white !important;
+    border-color: rgb(55, 65, 81) !important;
+  }
+  .dark input::placeholder, .dark textarea::placeholder, .dark select::placeholder {
+    color: rgb(156, 163, 175) !important;
+  }
+  .dark .bg-muted {
+    background-color: rgb(31, 41, 55) !important;
+  }
+  .dark input[type=number] {
+    color: white !important;
+  }
+  .dark input[readonly] {
+    opacity: 0.7;
+  }
+`;
+document.head.appendChild(darkModeStyles);
 
 const InvoiceGeneration = () => {
+<<<<<<< HEAD
   const [currentStep, setCurrentStep] = useState(0);
   const [items, setItems] = useState([
     { id: 1, description: "", quantity: 1, rate: 0, amount: 0, serviceId: "" },
@@ -991,3 +1004,81 @@ const InvoiceGeneration = () => {
                   <tfoot>
                     <tr>
                       <td colSpan
+=======
+  const [formSubmitAttempted, setFormSubmitAttempted] = useState(false);
+  const {
+    form,
+    currentStep,
+    setCurrentStep,
+    isEditMode,
+    invoiceId,
+    handleFormSubmit,
+    setFinalSubmission,
+    // Group related props together
+    invoiceDetailsProps,
+    designProps,
+    renderingProps,
+  } = useInvoiceForm();
+
+  // Wrapper for form submission
+  const onSubmit = () => {
+    setFormSubmitAttempted(true);
+    // Only set finalSubmission to true if we're on the last step
+    if (currentStep === steps.length - 1) {
+      setFinalSubmission(true);
+      form.handleSubmit(handleFormSubmit)();
+    } else {
+      form.handleSubmit(handleFormSubmit)();
+    }
+  };
+
+  const renderStep = () => {
+    switch (currentStep) {
+      case 0:
+        return <InvoiceDetailsStep {...invoiceDetailsProps} />;
+      case 1:
+        return <BankingDetailsStep form={form} />;
+      case 2:
+        return <DesignStep form={form} {...designProps} />;
+      case 3:
+        return <EmailPreviewStep form={form} />;
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <MainLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold">
+            {isEditMode ? "Edit Invoice" : "Create New Invoice"}
+          </h1>
+          <p className="text-muted-foreground">
+            {isEditMode
+              ? `You are editing invoice ${invoiceId}`
+              : "Enter the details to create a new invoice"}
+          </p>
+        </div>
+
+        <Card className="p-6 dark:bg-gray-900/50">
+          <FormProvider {...form}>
+            <InvoiceGenerationStepper
+              steps={steps}
+              currentStep={currentStep}
+              setCurrentStep={setCurrentStep}
+              isEditMode={isEditMode}
+              handleSubmit={onSubmit}
+              showFinalSubmitButton={true}
+            >
+              {renderStep()}
+            </InvoiceGenerationStepper>
+          </FormProvider>
+        </Card>
+      </div>
+    </MainLayout>
+  );
+};
+
+export default InvoiceGeneration;
+>>>>>>> Bizztrack/main

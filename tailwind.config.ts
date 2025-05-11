@@ -22,6 +22,9 @@ export default {
         playfair: ["Playfair Display", "serif"],
         poppins: ["Poppins", "sans-serif"],
         montserrat: ["Montserrat", "sans-serif"],
+        "times-new-roman": ['"Times New Roman"', "Times", "serif"],
+        calibri: ["Calibri", '"Segoe UI"', "sans-serif"],
+        algerian: ["Algerian", "fantasy"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -110,6 +113,10 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+      },
+      backgroundImage: {
+        "gradient-dark":
+          "linear-gradient(to bottom, #0f172a, #1e293b, #334155)",
       },
     },
   },

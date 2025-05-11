@@ -3,6 +3,18 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "./use-toast";
 
+export interface Client {
+  id?: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  user_id?: string;
+  company?: string; // Added company field since it's used in the UI
+  created_at?: string;
+  updated_at?: string;
+}
+
 export const useClients = () => {
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -21,8 +33,12 @@ export const useClients = () => {
       const { data, error } = await supabase
         .from("clients")
         .select("*")
+<<<<<<< HEAD
         .eq("user_id", session.user.id)
         .order("created_at", { ascending: false });
+=======
+        .eq("user_id", session.user.id);
+>>>>>>> Bizztrack/main
 
       if (error) throw error;
       return data || [];
@@ -30,8 +46,12 @@ export const useClients = () => {
   });
 
   const createClient = useMutation({
+<<<<<<< HEAD
     mutationFn: async (newClient: any) => {
       // Get current user ID
+=======
+    mutationFn: async (newClient: Client) => {
+>>>>>>> Bizztrack/main
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -40,7 +60,10 @@ export const useClients = () => {
         throw new Error("You must be logged in to create a client");
       }
 
+<<<<<<< HEAD
       // Add user_id to the client
+=======
+>>>>>>> Bizztrack/main
       const clientWithUserId = {
         ...newClient,
         user_id: session.user.id,
@@ -71,6 +94,7 @@ export const useClients = () => {
     },
   });
 
+<<<<<<< HEAD
   // Update client
   const updateClient = useMutation({
     mutationFn: async ({ id, clientData }: { id: string; clientData: any }) => {
@@ -81,6 +105,29 @@ export const useClients = () => {
 
       if (error) throw error;
       return id;
+=======
+  const updateClient = useMutation({
+    mutationFn: async (client: Client) => {
+      if (!client.id) {
+        throw new Error("Client ID is required for update");
+      }
+
+      const { data, error } = await supabase
+        .from("clients")
+        .update({
+          name: client.name,
+          email: client.email,
+          phone: client.phone,
+          address: client.address,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", client.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+>>>>>>> Bizztrack/main
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
@@ -98,15 +145,28 @@ export const useClients = () => {
     },
   });
 
+<<<<<<< HEAD
   // Delete client
   const deleteClient = useMutation({
     mutationFn: async (clientId: string) => {
       const { error } = await supabase.from("clients").delete().eq("id", clientId);
+=======
+  const deleteClient = useMutation({
+    mutationFn: async (clientId: string) => {
+      const { error } = await supabase
+        .from("clients")
+        .delete()
+        .eq("id", clientId);
+>>>>>>> Bizztrack/main
 
       if (error) throw error;
       return clientId;
     },
+<<<<<<< HEAD
     onSuccess: () => {
+=======
+    onSuccess: (clientId) => {
+>>>>>>> Bizztrack/main
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       toast({
         title: "Success",

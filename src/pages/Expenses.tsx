@@ -1,8 +1,13 @@
 import { useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -12,203 +17,78 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Badge } from "@/components/ui/badge";
-import {
-  Plus,
-  Search,
-  FileText,
-  Download,
-  MoreHorizontal,
-  Receipt,
-  ChevronLeft,
-  ChevronRight,
-  IndianRupee,
-} from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { useForm } from "react-hook-form";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { Calendar } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useExpenses, EXPENSE_CATEGORIES } from "@/hooks/useExpenses";
+import AddExpenseForm from "@/components/expenses/AddExpenseForm";
+import { formatCurrency, formatDate } from "@/lib/utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { DateRange } from "react-day-picker";
+import { DatePickerWithRange } from "@/components/ui/date-range-picker";
+import ExpensesByCategory from "@/components/dashboard/ExpensesByCategory";
+import { format, subMonths } from "date-fns";
 
-// Sample expense data
-const sampleExpenses = [
-  {
-    id: "exp-001",
-    date: "2023-05-10",
-    category: "Office Supplies",
-    vendor: "Staples",
-    amount: 1250.75,
-    status: "approved",
-    paymentMethod: "Credit Card",
-  },
-  {
-    id: "exp-002",
-    date: "2023-05-15",
-    category: "Travel",
-    vendor: "Indian Railways",
-    amount: 3400.0,
-    status: "pending",
-    paymentMethod: "Cash",
-  },
-  {
-    id: "exp-003",
-    date: "2023-05-18",
-    category: "Software",
-    vendor: "Adobe",
-    amount: 1799.99,
-    status: "approved",
-    paymentMethod: "Credit Card",
-  },
-  {
-    id: "exp-004",
-    date: "2023-05-22",
-    category: "Utilities",
-    vendor: "Airtel",
-    amount: 899.0,
-    status: "approved",
-    paymentMethod: "Auto Debit",
-  },
-  {
-    id: "exp-005",
-    date: "2023-05-28",
-    category: "Meals",
-    vendor: "Taj Hotel",
-    amount: 2450.5,
-    status: "rejected",
-    paymentMethod: "Debit Card",
-  },
-];
-
-const expenseCategories = [
-  "Office Supplies",
-  "Travel",
-  "Software",
-  "Utilities",
-  "Meals",
-  "Rent",
-  "Marketing",
-  "Salaries",
-  "Others",
-];
-
-const paymentMethods = [
-  "Credit Card",
-  "Debit Card",
-  "Cash",
-  "Bank Transfer",
-  "UPI",
-  "Auto Debit",
-  "Others",
-];
-
-export default function Expenses() {
+const Expenses = () => {
+  const { expenses = [], isLoading, deleteExpense } = useExpenses();
+  const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
+  const [expenseToEdit, setExpenseToEdit] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [expenses, setExpenses] = useState(sampleExpenses);
-  const itemsPerPage = 10;
-  const { toast } = useToast();
-
-  const form = useForm({
-    defaultValues: {
-      vendor: "",
-      category: "Office Supplies",
-      amount: "",
-      date: new Date().toISOString().split("T")[0],
-      paymentMethod: "Credit Card",
-      notes: "",
-    },
+  const [selectedCategory, setSelectedCategory] = useState<string | "all">(
+    "all",
+  );
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: subMonths(new Date(), 1),
+    to: new Date(),
   });
 
-  // Filter expenses based on search query
-  const filteredExpenses = expenses.filter(
-    (expense) =>
-      expense.vendor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      expense.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      expense.id.toLowerCase().includes(searchQuery.toLowerCase()),
-  );
+  // Filter expenses based on search, category, and date range
+  const filteredExpenses = expenses.filter((expense) => {
+    // Search filter
+    const matchesSearch =
+      expense.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      expense.category?.toLowerCase().includes(searchQuery.toLowerCase());
 
-  const totalPages = Math.ceil(filteredExpenses.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedExpenses = filteredExpenses.slice(
-    startIndex,
-    startIndex + itemsPerPage,
-  );
+    // Category filter
+    const matchesCategory =
+      selectedCategory === "all" || expense.category === selectedCategory;
 
-  // Format currency as INR
-  const formatCurrency = (value: number) => {
-    return `₹${value.toLocaleString("en-IN")}`;
+    // Date range filter
+    let matchesDateRange = true;
+    if (dateRange?.from && dateRange?.to) {
+      const expenseDate = new Date(expense.date);
+      matchesDateRange =
+        expenseDate >= dateRange.from && expenseDate <= dateRange.to;
+    }
+
+    return matchesSearch && matchesCategory && matchesDateRange;
+  });
+
+  const handleEditExpense = (expense: any) => {
+    setExpenseToEdit(expense);
+    setIsAddExpenseOpen(true);
   };
 
-  // Get status badge style
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "approved":
-        return "bg-success-light text-success border-success";
-      case "pending":
-        return "bg-warning-light text-warning border-warning";
-      case "rejected":
-        return "bg-error-light text-error border-error";
-      default:
-        return "bg-info-light text-info border-info";
+  const handleDeleteExpense = async (id: string) => {
+    if (window.confirm("Are you sure you want to delete this expense?")) {
+      await deleteExpense.mutateAsync(id);
     }
   };
 
-  const handleSubmit = form.handleSubmit((data) => {
-    // Generate a unique ID for the new expense
-    const newId = `exp-${String(expenses.length + 1).padStart(3, "0")}`;
-
-    // Create new expense object
-    const newExpense = {
-      id: newId,
-      date: data.date,
-      category: data.category,
-      vendor: data.vendor,
-      amount: parseFloat(data.amount as string),
-      status: "pending",
-      paymentMethod: data.paymentMethod,
-      notes: data.notes,
-    };
-
-    // Add to expenses
-    setExpenses([newExpense, ...expenses]);
-
-    // Close dialog and reset form
-    setIsAddDialogOpen(false);
-    form.reset();
-
-    // Show success toast
-    toast({
-      title: "Expense added",
-      description: "Your expense has been added successfully",
-    });
-  });
+  // Calculate total expenses
+  const totalExpenses = filteredExpenses.reduce(
+    (sum, expense) => sum + Number(expense.amount),
+    0,
+  );
 
   return (
     <MainLayout>
@@ -217,342 +97,236 @@ export default function Expenses() {
           <div>
             <h1 className="text-2xl font-bold">Expenses</h1>
             <p className="text-muted-foreground">
-              Manage and track your business expenses
+              Track and manage your business expenses
             </p>
           </div>
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="btn-primary">
-                <Plus className="h-4 w-4 mr-1" /> Add Expense
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle>Add New Expense</DialogTitle>
-              </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="vendor"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Vendor/Merchant</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter vendor name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="category"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Category</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select category" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {expenseCategories.map((category) => (
-                                <SelectItem key={category} value={category}>
-                                  {category}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="amount"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Amount (₹)</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="number"
-                              placeholder="0.00"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <FormField
-                      control={form.control}
-                      name="date"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Date</FormLabel>
-                          <FormControl>
-                            <Input type="date" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-
-                    <FormField
-                      control={form.control}
-                      name="paymentMethod"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Payment Method</FormLabel>
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={field.value}
-                          >
-                            <FormControl>
-                              <SelectTrigger>
-                                <SelectValue placeholder="Select method" />
-                              </SelectTrigger>
-                            </FormControl>
-                            <SelectContent>
-                              {paymentMethods.map((method) => (
-                                <SelectItem key={method} value={method}>
-                                  {method}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-
-                  <FormField
-                    control={form.control}
-                    name="notes"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Notes (Optional)</FormLabel>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Add notes about this expense..."
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setIsAddDialogOpen(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button type="submit">Add Expense</Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
+          <Button
+            onClick={() => {
+              setExpenseToEdit(null);
+              setIsAddExpenseOpen(true);
+            }}
+          >
+            Add Expense
+          </Button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">
-                Total Expenses
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold flex items-center">
-                <IndianRupee className="h-4 w-4 mr-1" />
-                9,800.24
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">
-                This Month
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold flex items-center">
-                <IndianRupee className="h-4 w-4 mr-1" />
-                2,450.50
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">
-                Average Monthly
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold flex items-center">
-                <IndianRupee className="h-4 w-4 mr-1" />
-                3,266.75
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm text-muted-foreground">
-                Pending Approvals
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-2xl font-bold">1</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Search and filter */}
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="relative w-full sm:w-auto">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search expenses..."
-              className="pl-10 w-full sm:w-[300px]"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="dashboard-card">
+            <p className="text-sm text-muted-foreground">Total Expenses</p>
+            <p className="text-2xl font-bold">
+              {formatCurrency(totalExpenses)}
+            </p>
           </div>
-          <div className="flex gap-2 w-full sm:w-auto">
-            <Button variant="outline" className="w-full sm:w-auto">
-              All Expenses
-            </Button>
-            <Button variant="outline" className="w-full sm:w-auto">
-              <FileText className="h-4 w-4 mr-2" /> Export
-            </Button>
+          <div className="dashboard-card">
+            <p className="text-sm text-muted-foreground">This Month</p>
+            <p className="text-2xl font-bold">
+              {formatCurrency(
+                filteredExpenses
+                  .filter(
+                    (e) =>
+                      new Date(e.date).getMonth() === new Date().getMonth() &&
+                      new Date(e.date).getFullYear() ===
+                        new Date().getFullYear(),
+                  )
+                  .reduce((sum, e) => sum + Number(e.amount), 0),
+              )}
+            </p>
+          </div>
+          <div className="dashboard-card">
+            <p className="text-sm text-muted-foreground">Average Per Month</p>
+            <p className="text-2xl font-bold">
+              {formatCurrency(
+                totalExpenses /
+                  (dateRange?.from && dateRange?.to
+                    ? Math.max(
+                        1,
+                        Math.round(
+                          (dateRange.to.getTime() - dateRange.from.getTime()) /
+                            (30 * 24 * 60 * 60 * 1000),
+                        ),
+                      )
+                    : 1),
+              )}
+            </p>
           </div>
         </div>
 
-        {/* Expenses Table */}
-        <div className="bg-white rounded-lg border overflow-hidden">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Vendor</TableHead>
-                  <TableHead>Payment Method</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="text-right">Amount</TableHead>
-                  <TableHead className="w-[60px]"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedExpenses.length > 0 ? (
-                  paginatedExpenses.map((expense) => (
-                    <TableRow key={expense.id}>
-                      <TableCell className="font-medium">
-                        {expense.id}
-                      </TableCell>
-                      <TableCell>{expense.date}</TableCell>
-                      <TableCell>{expense.category}</TableCell>
-                      <TableCell>{expense.vendor}</TableCell>
-                      <TableCell>{expense.paymentMethod}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant="outline"
-                          className={`${getStatusColor(expense.status)} border`}
-                        >
-                          {expense.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="text-right flex justify-end items-center">
-                        <IndianRupee className="h-3 w-3 mr-1" />
-                        {expense.amount.toLocaleString("en-IN")}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>
-                              <FileText className="h-4 w-4 mr-2" /> View
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <Download className="h-4 w-4 mr-2" /> Download
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-8">
-                      No expenses found
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <ExpensesByCategory />
 
-          {/* Pagination */}
-          {filteredExpenses.length > 0 && (
-            <div className="flex items-center justify-between px-4 py-2 border-t">
-              <div className="text-sm text-muted-foreground">
-                Showing {startIndex + 1} to{" "}
-                {Math.min(startIndex + itemsPerPage, filteredExpenses.length)}{" "}
-                of {filteredExpenses.length} entries
+          <Card>
+            <CardHeader>
+              <CardTitle>Monthly Summary</CardTitle>
+              <CardDescription>Expense trends over time</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {/* For simplicity, just showing a simple summary. In a real app, you might want to add a chart here */}
+              <div className="space-y-4">
+                {[...Array(3)].map((_, i) => {
+                  const date = subMonths(new Date(), i);
+                  const monthExpenses = expenses.filter(
+                    (e) =>
+                      new Date(e.date).getMonth() === date.getMonth() &&
+                      new Date(e.date).getFullYear() === date.getFullYear(),
+                  );
+                  const total = monthExpenses.reduce(
+                    (sum, e) => sum + Number(e.amount),
+                    0,
+                  );
+
+                  return (
+                    <div key={i} className="flex justify-between items-center">
+                      <div>
+                        <p className="font-medium">
+                          {format(date, "MMMM yyyy")}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          {monthExpenses.length} expenses
+                        </p>
+                      </div>
+                      <p className="font-semibold">{formatCurrency(total)}</p>
+                    </div>
+                  );
+                })}
               </div>
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() =>
-                    setCurrentPage((prev) => Math.max(prev - 1, 1))
-                  }
-                  disabled={currentPage === 1}
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>All Expenses</CardTitle>
+            <CardDescription>
+              View and manage your expense records
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col md:flex-row gap-4 mb-6">
+              <div className="relative flex-grow">
+                <Input
+                  placeholder="Search expenses..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="lucide lucide-search"
+                  >
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                  </svg>
+                </span>
+              </div>
+
+              <div className="flex gap-2">
+                <Select
+                  value={selectedCategory}
+                  onValueChange={setSelectedCategory}
                 >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <div className="text-sm">
-                  Page {currentPage} of {totalPages || 1}
-                </div>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() =>
-                    setCurrentPage((prev) =>
-                      Math.min(prev + 1, totalPages || 1),
-                    )
-                  }
-                  disabled={currentPage === (totalPages || 1)}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    {EXPENSE_CATEGORIES.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <DatePickerWithRange
+                  dateRange={dateRange}
+                  onChange={setDateRange}
+                />
               </div>
             </div>
-          )}
-        </div>
+
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {isLoading ? (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-8">
+                        Loading expenses...
+                      </TableCell>
+                    </TableRow>
+                  ) : filteredExpenses.length > 0 ? (
+                    filteredExpenses.map((expense) => (
+                      <TableRow key={expense.id}>
+                        <TableCell>{formatDate(expense.date)}</TableCell>
+                        <TableCell>{expense.category}</TableCell>
+                        <TableCell>
+                          {expense.description || (
+                            <span className="text-muted-foreground italic">
+                              No description
+                            </span>
+                          )}
+                        </TableCell>
+                        <TableCell className="text-right font-medium">
+                          {formatCurrency(Number(expense.amount))}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex justify-end gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleEditExpense(expense)}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => handleDeleteExpense(expense.id)}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={5} className="text-center py-8">
+                        No expenses found
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
       </div>
+
+      <AddExpenseForm
+        open={isAddExpenseOpen}
+        onOpenChange={setIsAddExpenseOpen}
+        expenseToEdit={expenseToEdit}
+      />
     </MainLayout>
   );
-}
+};
+
+export default Expenses;

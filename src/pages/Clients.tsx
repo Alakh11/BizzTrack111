@@ -32,23 +32,46 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+<<<<<<< HEAD
 import CreateClientDialog from "@/components/clients/CreateClientDialog";
 import { useClients } from "@/hooks/useClients";
+=======
+import AddClientModal from "@/components/clients/AddClientModal";
+import ClientDetailsModal from "@/components/clients/ClientDetailsModal";
+import { Client, useClients } from "@/hooks/useClients";
+import { useInvoices } from "@/hooks/useInvoices";
+import { formatCurrency } from "@/lib/utils";
+>>>>>>> Bizztrack/main
 
 const Clients = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+<<<<<<< HEAD
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const itemsPerPage = 8;
 
   const { clients = [], isLoading } = useClients();
+=======
+  const [isAddClientOpen, setIsAddClientOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [isClientDetailsOpen, setIsClientDetailsOpen] = useState(false);
+
+  const itemsPerPage = 8;
+  const { clients = [], isLoading } = useClients();
+  const { invoices = [] } = useInvoices();
+>>>>>>> Bizztrack/main
 
   // Filter clients based on search query
   const filteredClients = clients ? clients.filter(
     (client) =>
       client.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+<<<<<<< HEAD
       client.email?.toLowerCase().includes(searchQuery.toLowerCase())
   ) : [];
+=======
+      client.email?.toLowerCase().includes(searchQuery.toLowerCase()),
+  );
+>>>>>>> Bizztrack/main
 
   // Pagination logic
   const totalPages = Math.ceil(filteredClients.length / itemsPerPage);
@@ -58,10 +81,21 @@ const Clients = () => {
     startIndex + itemsPerPage,
   );
 
-  const formatCurrency = (value: number) => {
-    return `$${value.toLocaleString()}`;
+  // Calculate client stats
+  const getClientStats = (clientId: string | undefined) => {
+    if (!clientId) return { totalInvoices: 0, totalSpent: 0 };
+
+    const clientInvoices = invoices.filter((inv) => inv.client_id === clientId);
+    const totalInvoices = clientInvoices.length;
+    const totalSpent = clientInvoices.reduce(
+      (sum, inv) => sum + Number(inv.total_amount),
+      0,
+    );
+
+    return { totalInvoices, totalSpent };
   };
 
+<<<<<<< HEAD
   // Helper to get client initials
   const getInitials = (name: string) => {
     return name
@@ -72,6 +106,23 @@ const Clients = () => {
       .substring(0, 2);
   };
 
+=======
+  const handleViewClient = (client: Client) => {
+    setSelectedClient(client);
+    setIsClientDetailsOpen(true);
+  };
+
+  // Calculate total revenue from all clients
+  const totalRevenue = invoices.reduce(
+    (total, invoice) => total + Number(invoice.total_amount || 0),
+    0,
+  );
+
+  // Get active projects count (in a real app, you'd have a projects table)
+  const activeProjects =
+    clients.length > 0 ? Math.ceil(clients.length * 0.75) : 0;
+
+>>>>>>> Bizztrack/main
   return (
     <MainLayout>
       <div className="space-y-6">
@@ -82,9 +133,15 @@ const Clients = () => {
               Manage and track all your clients
             </p>
           </div>
+<<<<<<< HEAD
           <Button 
             className="btn-primary"
             onClick={() => setIsCreateDialogOpen(true)}
+=======
+          <Button
+            className="btn-primary"
+            onClick={() => setIsAddClientOpen(true)}
+>>>>>>> Bizztrack/main
           >
             <Plus className="h-4 w-4 mr-1" /> Add Client
           </Button>
@@ -98,15 +155,19 @@ const Clients = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="dashboard-card">
             <p className="text-sm text-muted-foreground">Total Clients</p>
+<<<<<<< HEAD
             <p className="text-2xl font-bold">{clients?.length || 0}</p>
+=======
+            <p className="text-2xl font-bold">{clients.length || 0}</p>
+>>>>>>> Bizztrack/main
           </div>
           <div className="dashboard-card">
             <p className="text-sm text-muted-foreground">Active Projects</p>
-            <p className="text-2xl font-bold">18</p>
+            <p className="text-2xl font-bold">{activeProjects}</p>
           </div>
           <div className="dashboard-card">
             <p className="text-sm text-muted-foreground">Total Revenue</p>
-            <p className="text-2xl font-bold">$45,231.89</p>
+            <p className="text-2xl font-bold">{formatCurrency(totalRevenue)}</p>
           </div>
         </div>
 
@@ -145,11 +206,16 @@ const Clients = () => {
                 <TableBody>
                   {isLoading ? (
                     <TableRow>
+<<<<<<< HEAD
                       <TableCell colSpan={3} className="text-center py-8">
+=======
+                      <TableCell colSpan={6} className="text-center py-8">
+>>>>>>> Bizztrack/main
                         Loading clients...
                       </TableCell>
                     </TableRow>
                   ) : paginatedClients.length > 0 ? (
+<<<<<<< HEAD
                     paginatedClients.map((client) => (
                       <TableRow key={client.id}>
                         <TableCell>
@@ -196,6 +262,72 @@ const Clients = () => {
                         </TableCell>
                       </TableRow>
                     ))
+=======
+                    paginatedClients.map((client: Client) => {
+                      const { totalInvoices, totalSpent } = getClientStats(
+                        client.id,
+                      );
+                      return (
+                        <TableRow key={client.id}>
+                          <TableCell>
+                            <div className="flex items-center gap-3">
+                              <Avatar className="h-8 w-8 bg-refrens-light-blue text-primary">
+                                <AvatarFallback>
+                                  {client.name?.substring(0, 2).toUpperCase() ||
+                                    "CL"}
+                                </AvatarFallback>
+                              </Avatar>
+                              <div>
+                                <p className="font-medium text-sm">
+                                  {client.name}
+                                </p>
+                                {/* Remove company field references as it doesn't exist in Client type */}
+                              </div>
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <p className="text-sm">{client.email || "—"}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {client.phone || "—"}
+                            </p>
+                          </TableCell>
+                          <TableCell>{Math.floor(Math.random() * 3)}</TableCell>
+                          <TableCell>{totalInvoices}</TableCell>
+                          <TableCell className="text-right">
+                            {formatCurrency(totalSpent)}
+                          </TableCell>
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                  <span className="sr-only">Open menu</span>
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem
+                                  onClick={() => handleViewClient(client)}
+                                >
+                                  View Client
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() => handleViewClient(client)}
+                                >
+                                  Edit Client
+                                </DropdownMenuItem>
+                                <DropdownMenuItem>
+                                  Create Invoice
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive">
+                                  Delete Client
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })
+>>>>>>> Bizztrack/main
                   ) : (
                     <TableRow>
                       <TableCell colSpan={3} className="text-center py-8">
@@ -245,6 +377,17 @@ const Clients = () => {
           </CardContent>
         </Card>
       </div>
+
+      <AddClientModal
+        open={isAddClientOpen}
+        onOpenChange={setIsAddClientOpen}
+      />
+
+      <ClientDetailsModal
+        open={isClientDetailsOpen}
+        onOpenChange={setIsClientDetailsOpen}
+        client={selectedClient}
+      />
     </MainLayout>
   );
 };
