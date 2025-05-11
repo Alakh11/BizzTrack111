@@ -1,5 +1,5 @@
 
-import { User, Users, Receipt } from "lucide-react";
+import { User, Users, Receipt, IndianRupee } from "lucide-react";
 import DashboardCard from "./DashboardCard";
 
 const ClientStats = () => {
@@ -23,7 +23,10 @@ const ClientStats = () => {
         <div className="flex items-center space-x-4">
           <Receipt className="w-8 h-8 text-purple-500" />
           <div>
-            <p className="text-2xl font-semibold">$12,400</p>
+            <p className="text-2xl font-semibold flex items-center">
+              <IndianRupee className="h-4 w-4 mr-1" />
+              12,400
+            </p>
             <p className="text-sm text-gray-500">Outstanding</p>
           </div>
         </div>

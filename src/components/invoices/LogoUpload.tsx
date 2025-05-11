@@ -1,16 +1,17 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Upload, ImagePlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface LogoUploadProps {
-  onUpload: (logoUrl: string) => void;
-  currentLogo?: string;
+  businessLogo: string;
+  onLogoUpload: (logoUrl: string) => void;
 }
 
-const LogoUpload: React.FC<LogoUploadProps> = ({ onUpload, currentLogo }) => {
+const LogoUpload: React.FC<LogoUploadProps> = ({ businessLogo, onLogoUpload }) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(
-    currentLogo || null,
+    businessLogo || null,
   );
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
@@ -48,7 +49,7 @@ const LogoUpload: React.FC<LogoUploadProps> = ({ onUpload, currentLogo }) => {
     reader.onload = () => {
       const result = reader.result as string;
       setPreviewUrl(result);
-      onUpload(result);
+      onLogoUpload(result);
       setIsUploading(false);
       toast({
         title: "Logo uploaded",
@@ -102,7 +103,7 @@ const LogoUpload: React.FC<LogoUploadProps> = ({ onUpload, currentLogo }) => {
               variant="ghost"
               onClick={() => {
                 setPreviewUrl(null);
-                onUpload("");
+                onLogoUpload("");
               }}
               className="w-full text-destructive hover:text-destructive"
             >

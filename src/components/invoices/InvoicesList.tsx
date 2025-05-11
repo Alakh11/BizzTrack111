@@ -421,50 +421,6 @@ const InvoicesList = () => {
         </AlertDialogContent>
       </AlertDialog>
 
-<<<<<<< HEAD
-                          printWindow.document.write(html);
-                          printWindow.document.close();
-                          setTimeout(() => {
-                            printWindow.print();
-                          }, 500);
-                        }}
-                      >
-                        <Download className="h-4 w-4 mr-2" /> Download
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <Send className="h-4 w-4 mr-2" /> Send
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="text-red-600"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteInvoice.mutate(invoice.id);
-                        }}
-                      >
-                        <Trash className="h-4 w-4 mr-2" /> Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-
-      {/* Invoice View Dialog */}
-      {viewingInvoice && (
-        <Dialog open={isViewOpen} onOpenChange={setIsViewOpen}>
-          <InvoiceView 
-            invoice={viewingInvoice} 
-            open={isViewOpen}
-            onOpenChange={setIsViewOpen}
-          />
-        </Dialog>
-      )}
-    </div>
-=======
       {/* Edit Status Dialog */}
       <AlertDialog
         open={isEditStatusModalOpen}
@@ -500,7 +456,6 @@ const InvoicesList = () => {
         </AlertDialogContent>
       </AlertDialog>
     </>
->>>>>>> Bizztrack/main
   );
 };
 

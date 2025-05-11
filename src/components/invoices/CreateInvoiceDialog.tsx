@@ -1,3 +1,4 @@
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,11 +20,20 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import { IndianRupee } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const formSchema = z.object({
   invoiceNumber: z.string().min(1, "Invoice number is required"),
   clientName: z.string().min(1, "Client name is required"),
   amount: z.string().min(1, "Amount is required"),
+  template: z.string().optional(),
 });
 
 interface CreateInvoiceDialogProps {
@@ -43,8 +53,17 @@ const CreateInvoiceDialog = ({
       invoiceNumber: `INV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, "0")}`,
       clientName: "",
       amount: "",
+      template: "standard",
     },
   });
+
+  const templates = [
+    { id: "standard", name: "Standard" },
+    { id: "professional", name: "Professional" },
+    { id: "modern", name: "Modern" },
+    { id: "classic", name: "Classic" },
+    { id: "simple", name: "Simple" },
+  ];
 
   const handleSubmit = (data: z.infer<typeof formSchema>) => {
     onSubmit(data);
@@ -101,12 +120,46 @@ const CreateInvoiceDialog = ({
                 <FormItem>
                   <FormLabel>Amount</FormLabel>
                   <FormControl>
-                    <Input
-                      {...field}
-                      type="number"
-                      placeholder="Enter amount"
-                    />
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                        <IndianRupee className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <Input
+                        {...field}
+                        type="number"
+                        placeholder="Enter amount"
+                        className="pl-9"
+                      />
+                    </div>
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="template"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Template</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select template" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {templates.map((template) => (
+                        <SelectItem key={template.id} value={template.id}>
+                          {template.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

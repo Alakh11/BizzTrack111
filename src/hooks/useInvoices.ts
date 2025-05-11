@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "./use-toast";
@@ -19,7 +20,7 @@ export const useInvoices = () => {
 
       const { data, error } = await supabase
         .from("invoices")
-        .select("*, client:clients(name), invoice_items(*)")
+        .select("*, client:clients(name, address, email), invoice_items(*)")
         .eq("user_id", session.user.id)
         .order("created_at", { ascending: false });
 
