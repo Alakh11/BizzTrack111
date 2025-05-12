@@ -91,6 +91,21 @@ export const useTransactions = () => {
       if (!session) {
         throw new Error("You must be logged in to create a transaction");
       }
+      
+      // First check all product quantities to make sure there's enough stock
+      for (const item of items) {
+        const { data: product, error: getError } = await supabase
+          .from("products")
+          .select("quantity, name")
+          .eq("id", item.product_id)
+          .single();
+          
+        if (getError) throw getError;
+        
+        if (product.quantity < item.quantity) {
+          throw new Error(`Insufficient stock for ${product.name}. Available: ${product.quantity}`);
+        }
+      }
 
       // Create transaction with user_id
       const transactionWithUserId = {
@@ -124,11 +139,10 @@ export const useTransactions = () => {
 
       // Update product quantities
       for (const item of items) {
-        // Fix: Don't use rpc for decrement which has type issues
         // First get the current product quantity
         const { data: product, error: getError } = await supabase
           .from("products")
-          .select("quantity")
+          .select("quantity, low_stock_threshold")
           .eq("id", item.product_id)
           .single();
           
@@ -143,17 +157,27 @@ export const useTransactions = () => {
           .eq("id", item.product_id);
 
         if (updateError) throw updateError;
+        
+        // Check if product is now below threshold and show warning
+        if (newQuantity <= (product.low_stock_threshold || 10)) {
+          toast({
+            title: "Low Stock Warning",
+            description: `${product.name} is now low on stock (${newQuantity} remaining)`,
+            variant: "warning",
+          });
+        }
       }
 
       return { transaction: transactionData, items: itemsData };
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["transactions"] });
       queryClient.invalidateQueries({ queryKey: ["products"] });
       toast({
         title: "Success",
         description: "Transaction completed successfully",
       });
+      return data;
     },
     onError: (error) => {
       toast({
@@ -161,6 +185,7 @@ export const useTransactions = () => {
         description: error.message,
         variant: "destructive",
       });
+      throw error;
     },
   });
 

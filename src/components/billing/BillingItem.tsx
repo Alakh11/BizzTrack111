@@ -2,9 +2,10 @@
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash } from "lucide-react";
+import { Trash, AlertCircle } from "lucide-react";
 import { Product } from "@/hooks/useProducts";
 import { formatCurrency } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface BillingItemProps {
   product: Product;
@@ -20,6 +21,7 @@ const BillingItem: React.FC<BillingItemProps> = ({
   onRemove,
 }) => {
   const totalPrice = product.price * quantity;
+  const isExceedingStock = quantity > product.quantity;
 
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newQuantity = parseInt(e.target.value, 10) || 0;
@@ -50,16 +52,29 @@ const BillingItem: React.FC<BillingItemProps> = ({
         <Input
           type="number"
           min="1"
+          max={product.quantity}
           value={quantity}
           onChange={handleQuantityChange}
-          className="w-16 text-center"
+          className={`w-16 text-center ${isExceedingStock ? 'border-red-500' : ''}`}
         />
         <Button type="button" variant="outline" size="sm" onClick={incrementQuantity}>
           +
         </Button>
-        <span className="text-xs text-muted-foreground ml-2">
-          (Stock: {product.quantity})
-        </span>
+        <div className="flex items-center ml-2">
+          <span className={`text-xs ${isExceedingStock ? 'text-red-500 font-bold' : 'text-muted-foreground'}`}>
+            (Stock: {product.quantity})
+          </span>
+          {isExceedingStock && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <AlertCircle className="h-4 w-4 text-red-500 ml-1" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Quantity exceeds available stock!</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
       </div>
 
       <div className="flex items-center justify-between w-full sm:w-1/3">

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useProducts } from "@/hooks/useProducts";
 import { useTransactions } from "@/hooks/useTransactions";
@@ -19,6 +20,7 @@ import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { formatCurrency } from "@/lib/utils";
 import { Product } from "@/hooks/useProducts";
 import { ShoppingCart } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 type CartItem = {
   product: Product;
@@ -28,6 +30,8 @@ type CartItem = {
 const Billing = () => {
   const { products, isLoading: productsLoading } = useProducts();
   const { generateTransactionNumber, createTransaction } = useTransactions();
+  const { toast } = useToast();
+  
   const [cart, setCart] = useState<CartItem[]>([]);
   const [showCheckout, setShowCheckout] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
@@ -37,6 +41,7 @@ const Billing = () => {
     transactionNumber: string;
     totalAmount: number;
     date: Date;
+    paymentMethod?: string;
   } | null>(null);
 
   // Generate transaction number on component mount
@@ -45,6 +50,16 @@ const Billing = () => {
   }, [generateTransactionNumber]);
 
   const handleAddProduct = (product: Product) => {
+    // Check if there's enough stock
+    if (product.quantity <= 0) {
+      toast({
+        title: "Out of Stock",
+        description: `${product.name} is out of stock.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
     // Check if product is already in cart
     const existingItemIndex = cart.findIndex(
       (item) => item.product.id === product.id
@@ -53,7 +68,19 @@ const Billing = () => {
     if (existingItemIndex >= 0) {
       // Increment quantity if product is already in cart
       const updatedCart = [...cart];
-      updatedCart[existingItemIndex].quantity += 1;
+      const newQuantity = updatedCart[existingItemIndex].quantity + 1;
+      
+      // Check if the new quantity exceeds the available stock
+      if (newQuantity > product.quantity) {
+        toast({
+          title: "Insufficient Stock",
+          description: `Only ${product.quantity} units of ${product.name} available.`,
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      updatedCart[existingItemIndex].quantity = newQuantity;
       setCart(updatedCart);
     } else {
       // Add new item to cart
@@ -61,22 +88,19 @@ const Billing = () => {
     }
   };
 
-  const handleProductSearch = (query: string) => {
-    // This would typically search through products, but we're handling that in the ProductSearch component
-  };
-
-  const handleBarcodeScanned = (barcode: string) => {
-    const product = products.find((p) => p.barcode === barcode);
-    if (product) {
-      handleAddProduct(product);
-    } else {
-      // Show a message that the product wasn't found
-      console.log(`Product with barcode ${barcode} not found`);
-    }
-  };
-
   const handleQuantityChange = (index: number, quantity: number) => {
     const updatedCart = [...cart];
+    const product = updatedCart[index].product;
+    
+    // Check if the new quantity exceeds the available stock
+    if (quantity > product.quantity) {
+      toast({
+        title: "Warning",
+        description: `Quantity exceeds available stock (${product.quantity}) for ${product.name}`,
+        variant: "warning",
+      });
+    }
+    
     updatedCart[index].quantity = quantity;
     setCart(updatedCart);
   };
@@ -95,6 +119,26 @@ const Billing = () => {
   };
 
   const handleCheckout = () => {
+    // Validate cart
+    const invalidItems = cart.filter(item => item.quantity > item.product.quantity);
+    if (invalidItems.length > 0) {
+      toast({
+        title: "Invalid Quantities",
+        description: "Some items have quantities exceeding available stock. Please adjust before proceeding.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (cart.length === 0) {
+      toast({
+        title: "Empty Cart",
+        description: "Please add at least one product to the cart before checkout.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setShowCheckout(true);
   };
 
@@ -109,7 +153,7 @@ const Billing = () => {
       }));
 
       // Create transaction
-      await createTransaction.mutateAsync({
+      const result = await createTransaction.mutateAsync({
         transaction: transactionData,
         items,
       });
@@ -120,6 +164,7 @@ const Billing = () => {
         transactionNumber: transactionData.transaction_number,
         totalAmount: calculateTotal(),
         date: new Date(),
+        paymentMethod: transactionData.payment_method,
       });
 
       // Show receipt
@@ -127,6 +172,7 @@ const Billing = () => {
       setShowReceipt(true);
     } catch (error) {
       console.error("Error completing transaction:", error);
+      // Toast already shown by the mutation error handler
     }
   };
 
@@ -139,6 +185,23 @@ const Billing = () => {
     setCart([]);
     setShowReceipt(false);
     setTransactionNumber(generateTransactionNumber());
+  };
+
+  const handleBarcodeScanned = (barcode: string) => {
+    const product = products.find((p) => p.barcode === barcode);
+    if (product) {
+      handleAddProduct(product);
+      toast({
+        title: "Product Found",
+        description: `Added ${product.name} to cart`,
+      });
+    } else {
+      toast({
+        title: "Product Not Found",
+        description: `No product found with barcode ${barcode}`,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -226,7 +289,7 @@ const Billing = () => {
             </Card>
           </div>
 
-          {/* Right panel - Recent transactions */}
+          {/* Right panel - Transaction info */}
           <div>
             <Card>
               <CardHeader>
@@ -290,6 +353,7 @@ const Billing = () => {
                 transactionNumber={receiptData.transactionNumber}
                 totalAmount={receiptData.totalAmount}
                 date={receiptData.date}
+                paymentMethod={receiptData.paymentMethod}
                 onPrint={handlePrintReceipt}
                 onClose={handleNewTransaction}
               />
