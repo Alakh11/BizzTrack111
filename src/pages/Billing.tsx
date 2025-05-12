@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useProducts } from "@/hooks/useProducts";
 import { useTransactions } from "@/hooks/useTransactions";
@@ -277,7 +276,7 @@ const Billing = () => {
               totalAmount={calculateTotal()}
               onSubmit={handleCompleteTransaction}
               onCancel={() => setShowCheckout(false)}
-              isLoading={createTransaction.isPending}
+              isLoading={createTransaction.isPending || false}
             />
           </DialogContent>
         </Dialog>

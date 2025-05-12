@@ -32,7 +32,11 @@ export const useTransactions = () => {
     return {
       transactions: [],
       isLoading: false,
-      createTransaction: { mutate: () => {}, mutateAsync: async () => ({}) },
+      createTransaction: { 
+        mutate: () => {}, 
+        mutateAsync: async () => ({}),
+        isPending: false 
+      },
       generateTransactionNumber: () => "TXN000000",
     };
   }

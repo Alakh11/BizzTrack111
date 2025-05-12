@@ -44,7 +44,7 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
   totalAmount,
   onSubmit,
   onCancel,
-  isLoading,
+  isLoading = false,
 }) => {
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [notes, setNotes] = useState("");
