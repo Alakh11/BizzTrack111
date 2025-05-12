@@ -31,7 +31,6 @@ export type Database = {
           user_id: string
         }
         Update: {
-<<<<<<< HEAD
           address?: string | null
           created_at?: string | null
           email?: string | null
@@ -43,52 +42,39 @@ export type Database = {
         }
         Relationships: []
       }
-=======
-          address?: string | null;
-          created_at?: string | null;
-          email?: string | null;
-          id?: string;
-          name?: string;
-          phone?: string | null;
-          updated_at?: string | null;
-          user_id?: string;
-        };
-        Relationships: [];
-      };
       expenses: {
         Row: {
-          amount: number;
-          category: string;
-          created_at: string | null;
-          date: string;
-          description: string | null;
-          id: string;
-          updated_at: string | null;
-          user_id: string;
-        };
+          amount: number
+          category: string
+          created_at: string | null
+          date: string
+          description: string | null
+          id: string
+          updated_at: string | null
+          user_id: string
+        }
         Insert: {
-          amount: number;
-          category: string;
-          created_at?: string | null;
-          date: string;
-          description?: string | null;
-          id?: string;
-          updated_at?: string | null;
-          user_id: string;
-        };
+          amount: number
+          category: string
+          created_at?: string | null
+          date: string
+          description?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id: string
+        }
         Update: {
-          amount?: number;
-          category?: string;
-          created_at?: string | null;
-          date?: string;
-          description?: string | null;
-          id?: string;
-          updated_at?: string | null;
-          user_id?: string;
-        };
-        Relationships: [];
-      };
->>>>>>> Bizztrack/main
+          amount?: number
+          category?: string
+          created_at?: string | null
+          date?: string
+          description?: string | null
+          id?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       invoice_items: {
         Row: {
           amount: number
@@ -139,7 +125,6 @@ export type Database = {
       }
       invoices: {
         Row: {
-<<<<<<< HEAD
           client_id: string | null
           created_at: string | null
           due_date: string
@@ -184,52 +169,6 @@ export type Database = {
           updated_at?: string | null
           user_id?: string
         }
-=======
-          client_id: string | null;
-          created_at: string | null;
-          due_date: string;
-          id: string;
-          invoice_date: string;
-          invoice_number: string;
-          metadata: Json | null;
-          notes: string | null;
-          status: string | null;
-          terms: string | null;
-          total_amount: number;
-          updated_at: string | null;
-          user_id: string;
-        };
-        Insert: {
-          client_id?: string | null;
-          created_at?: string | null;
-          due_date: string;
-          id?: string;
-          invoice_date: string;
-          invoice_number: string;
-          metadata?: Json | null;
-          notes?: string | null;
-          status?: string | null;
-          terms?: string | null;
-          total_amount: number;
-          updated_at?: string | null;
-          user_id: string;
-        };
-        Update: {
-          client_id?: string | null;
-          created_at?: string | null;
-          due_date?: string;
-          id?: string;
-          invoice_date?: string;
-          invoice_number?: string;
-          metadata?: Json | null;
-          notes?: string | null;
-          status?: string | null;
-          terms?: string | null;
-          total_amount?: number;
-          updated_at?: string | null;
-          user_id?: string;
-        };
->>>>>>> Bizztrack/main
         Relationships: [
           {
             foreignKeyName: "invoices_client_id_fkey"
@@ -238,58 +177,53 @@ export type Database = {
             referencedRelation: "clients"
             referencedColumns: ["id"]
           },
-<<<<<<< HEAD
         ]
       }
-=======
-        ];
-      };
       products: {
         Row: {
-          barcode: string | null;
-          category: string;
-          created_at: string | null;
-          description: string | null;
-          id: string;
-          low_stock_threshold: number | null;
-          name: string;
-          price: number;
-          quantity: number;
-          sku: string;
-          updated_at: string | null;
-          user_id: string;
-        };
+          barcode: string | null
+          category: string
+          created_at: string | null
+          description: string | null
+          id: string
+          low_stock_threshold: number | null
+          name: string
+          price: number
+          quantity: number
+          sku: string
+          updated_at: string | null
+          user_id: string
+        }
         Insert: {
-          barcode?: string | null;
-          category: string;
-          created_at?: string | null;
-          description?: string | null;
-          id?: string;
-          low_stock_threshold?: number | null;
-          name: string;
-          price: number;
-          quantity?: number;
-          sku: string;
-          updated_at?: string | null;
-          user_id: string;
-        };
+          barcode?: string | null
+          category: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          low_stock_threshold?: number | null
+          name: string
+          price: number
+          quantity?: number
+          sku: string
+          updated_at?: string | null
+          user_id: string
+        }
         Update: {
-          barcode?: string | null;
-          category?: string;
-          created_at?: string | null;
-          description?: string | null;
-          id?: string;
-          low_stock_threshold?: number | null;
-          name?: string;
-          price?: number;
-          quantity?: number;
-          sku?: string;
-          updated_at?: string | null;
-          user_id?: string;
-        };
-        Relationships: [];
-      };
->>>>>>> Bizztrack/main
+          barcode?: string | null
+          category?: string
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          low_stock_threshold?: number | null
+          name?: string
+          price?: number
+          quantity?: number
+          sku?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -364,6 +298,90 @@ export type Database = {
           name?: string
           price?: number
           updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      transaction_items: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          price: number
+          product_id: string
+          quantity: number
+          transaction_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          price: number
+          product_id: string
+          quantity: number
+          transaction_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          price?: number
+          product_id?: string
+          quantity?: number
+          transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transaction_items_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_items_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transactions: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          notes: string | null
+          payment_method: string
+          status: string
+          total_amount: number
+          transaction_number: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          payment_method?: string
+          status?: string
+          total_amount: number
+          transaction_number: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          notes?: string | null
+          payment_method?: string
+          status?: string
+          total_amount?: number
+          transaction_number?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
