@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import {
@@ -10,6 +11,7 @@ import {
   Settings,
   Briefcase,
   LogOut,
+  ShoppingCart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -68,6 +70,12 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
       icon: <Briefcase size={24} />,
       href: "/services",
       active: location.pathname.includes("/services"),
+    },
+    {
+      title: "Billing",
+      icon: <ShoppingCart size={24} />,
+      href: "/billing",
+      active: location.pathname.includes("/billing"),
     },
     {
       title: "Expenses",
