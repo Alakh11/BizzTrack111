@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ArrowLeft, Save } from "lucide-react";
@@ -53,7 +54,7 @@ const InvoiceGenerationStepper = ({
       <InvoiceSteps
         currentStep={currentStep}
         steps={steps}
-        onChange={handleStepChange}
+        onStepChange={handleStepChange}
       />
 
       <div>{children}</div>
