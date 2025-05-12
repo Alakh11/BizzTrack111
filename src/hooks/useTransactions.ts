@@ -142,7 +142,7 @@ export const useTransactions = () => {
         // First get the current product quantity
         const { data: product, error: getError } = await supabase
           .from("products")
-          .select("quantity, low_stock_threshold")
+          .select("quantity, low_stock_threshold, name")
           .eq("id", item.product_id)
           .single();
           
@@ -163,7 +163,7 @@ export const useTransactions = () => {
           toast({
             title: "Low Stock Warning",
             description: `${product.name} is now low on stock (${newQuantity} remaining)`,
-            variant: "warning",
+            variant: "destructive",
           });
         }
       }

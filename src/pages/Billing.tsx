@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useProducts } from "@/hooks/useProducts";
 import { useTransactions } from "@/hooks/useTransactions";
@@ -36,7 +35,7 @@ const Billing = () => {
   const [showCheckout, setShowCheckout] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
   const [transactionNumber, setTransactionNumber] = useState("");
-  const [receiptData, setReceiptData] = useState<{
+  const [receiptData, setReceiptData = useState<{
     items: CartItem[];
     transactionNumber: string;
     totalAmount: number;
@@ -97,7 +96,7 @@ const Billing = () => {
       toast({
         title: "Warning",
         description: `Quantity exceeds available stock (${product.quantity}) for ${product.name}`,
-        variant: "warning",
+        variant: "destructive",
       });
     }
     
