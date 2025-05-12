@@ -5,6 +5,14 @@ import { useToast } from "./use-toast";
 import { Product } from "./useProducts";
 
 export const useProductInventory = () => {
+  // Check if we're in a browser environment before using hooks
+  if (typeof window === 'undefined') {
+    // Return a placeholder when not in browser (SSR)
+    return {
+      updateStock: { mutate: () => {}, mutateAsync: async () => ({}) },
+    };
+  }
+
   const queryClient = useQueryClient();
   const { toast } = useToast();
 

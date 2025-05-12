@@ -26,6 +26,17 @@ export interface Transaction {
 }
 
 export const useTransactions = () => {
+  // Check if we're in a browser environment before using hooks
+  if (typeof window === 'undefined') {
+    // Return a placeholder when not in browser (SSR)
+    return {
+      transactions: [],
+      isLoading: false,
+      createTransaction: { mutate: () => {}, mutateAsync: async () => ({}) },
+      generateTransactionNumber: () => "TXN000000",
+    };
+  }
+
   const queryClient = useQueryClient();
   const { toast } = useToast();
 

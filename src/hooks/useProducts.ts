@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "./use-toast";
@@ -35,7 +36,24 @@ const generateBarcode = () => {
   return `${prefix}${randomDigits}`;
 };
 
+// Main hook function that should only be used within components wrapped with QueryClientProvider
 export const useProducts = () => {
+  // Check if we're in a browser environment before using hooks
+  if (typeof window === 'undefined') {
+    // Return a placeholder when not in browser (SSR)
+    return {
+      products: [],
+      isLoading: false,
+      createProduct: { mutate: () => {}, mutateAsync: async () => ({}) },
+      updateProduct: { mutate: () => {}, mutateAsync: async () => ({}) },
+      deleteProduct: { mutate: () => {}, mutateAsync: async () => ({}) },
+      filterByCategory: () => [],
+      searchProducts: () => [],
+      getLowStockProducts: () => [],
+    };
+  }
+
+  // Only use hooks when in browser environment
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
