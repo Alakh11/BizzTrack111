@@ -109,9 +109,22 @@ export const useTransactions = () => {
 
       // Update product quantities
       for (const item of items) {
+        // Fix: Don't use rpc for decrement which has type issues
+        // First get the current product quantity
+        const { data: product, error: getError } = await supabase
+          .from("products")
+          .select("quantity")
+          .eq("id", item.product_id)
+          .single();
+          
+        if (getError) throw getError;
+        
+        // Then update with new calculated quantity
+        const newQuantity = product.quantity - item.quantity;
+        
         const { error: updateError } = await supabase
           .from("products")
-          .update({ quantity: supabase.rpc("decrement", { x: item.quantity }) })
+          .update({ quantity: newQuantity })
           .eq("id", item.product_id);
 
         if (updateError) throw updateError;
