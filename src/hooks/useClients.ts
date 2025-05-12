@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "./use-toast";
@@ -33,9 +32,6 @@ export const useClients = () => {
       const { data, error } = await supabase
         .from("clients")
         .select("*")
-
-        .eq("user_id", session.user.id)
-        .order("created_at", { ascending: false });
         .eq("user_id", session.user.id);
 
       if (error) throw error;
@@ -44,11 +40,7 @@ export const useClients = () => {
   });
 
   const createClient = useMutation({
-
-    mutationFn: async (newClient: any) => {
-      // Get current user Id
     mutationFn: async (newClient: Client) => {
-    
       const {
         data: { session },
       } = await supabase.auth.getSession();
@@ -56,10 +48,6 @@ export const useClients = () => {
       if (!session) {
         throw new Error("You must be logged in to create a client");
       }
-
-
-      // Add user_id to the client
-
 
       const clientWithUserId = {
         ...newClient,
@@ -91,18 +79,6 @@ export const useClients = () => {
     },
   });
 
-
-  // Update client
-  const updateClient = useMutation({
-    mutationFn: async ({ id, clientData }: { id: string; clientData: any }) => {
-      const { error } = await supabase
-        .from("clients")
-        .update(clientData)
-        .eq("id", id);
-
-      if (error) throw error;
-      return id;
-
   const updateClient = useMutation({
     mutationFn: async (client: Client) => {
       if (!client.id) {
@@ -124,7 +100,6 @@ export const useClients = () => {
 
       if (error) throw error;
       return data;
-
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["clients"] });
@@ -142,12 +117,6 @@ export const useClients = () => {
     },
   });
 
-
-  // Delete client
-  const deleteClient = useMutation({
-    mutationFn: async (clientId: string) => {
-      const { error } = await supabase.from("clients").delete().eq("id", clientId);
-
   const deleteClient = useMutation({
     mutationFn: async (clientId: string) => {
       const { error } = await supabase
@@ -155,15 +124,10 @@ export const useClients = () => {
         .delete()
         .eq("id", clientId);
 
-
       if (error) throw error;
       return clientId;
     },
-
-    onSuccess: () => {
-
     onSuccess: (clientId) => {
-
       queryClient.invalidateQueries({ queryKey: ["clients"] });
       toast({
         title: "Success",
