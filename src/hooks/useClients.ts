@@ -38,7 +38,6 @@ export const useClients = () => {
         .order("created_at", { ascending: false });
 =======
         .eq("user_id", session.user.id);
->>>>>>> Bizztrack/main
 
       if (error) throw error;
       return data || [];
