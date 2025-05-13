@@ -129,6 +129,15 @@ export default function Auth({
     </div>
   );
 
+  // Adding an onSuccess handler for the AuthForm
+  const handleAuthSuccess = () => {
+    navigate("/");
+    toast({
+      title: mode === "login" ? "Login Successful" : "Signup Successful",
+      description: mode === "login" ? "Welcome back!" : "Your account has been created.",
+    });
+  };
+
   return (
     <div
       className="min-h-screen flex flex-col items-center justify-center p-4 relative"
@@ -162,7 +171,10 @@ export default function Auth({
           renderForgotPassword()
         ) : (
           <div className="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-xl">
-            <AuthForm mode={mode as any} />
+            <AuthForm 
+              type={mode === "login" ? "login" : "signup"} 
+              onSuccess={handleAuthSuccess}
+            />
 
             {mode === "login" && (
               <div className="text-center mt-4">
