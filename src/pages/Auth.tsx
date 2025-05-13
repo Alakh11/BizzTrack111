@@ -1,11 +1,15 @@
-import { Link } from "react-router-dom";
+
+import { Link, useNavigate } from "react-router-dom";
 import { AuthForm } from "@/components/auth/AuthForm";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Mail } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function Auth({
   mode = "login",
@@ -14,37 +18,56 @@ export default function Auth({
 }) {
   const [email, setEmail] = useState("");
   const [resetSent, setResetSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/");
+    }
+  }, [user, navigate]);
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
 
     if (!email) {
-      toast({
-        title: "Error",
-        description: "Please enter your email address",
-        variant: "destructive",
-      });
+      setError("Please enter your email address");
+      return;
+    }
+    
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address");
       return;
     }
 
     try {
-      // In a real app, this would connect to Supabase or your auth provider
-      // const { error } = await supabase.auth.resetPasswordForEmail(email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
 
-      // if (error) throw error;
+      if (error) throw error;
 
       setResetSent(true);
       toast({
         title: "Password reset email sent",
         description: "Check your inbox for instructions to reset your password",
       });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
         description: "Failed to send reset email. Please try again.",
         variant: "destructive",
       });
+      setError(error.message);
     }
   };
 
@@ -69,6 +92,14 @@ export default function Auth({
                 password.
               </p>
             </div>
+            
+            {error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+            
             <form onSubmit={handleResetPassword} className="space-y-4">
               <div className="space-y-2">
                 <label htmlFor="email" className="text-sm font-medium">

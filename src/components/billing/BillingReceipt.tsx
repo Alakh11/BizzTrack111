@@ -24,6 +24,8 @@ interface BillingReceiptProps {
   totalAmount: number;
   date: Date;
   paymentMethod?: string;
+  customerName?: string;
+  customerMobile?: string;
   onPrint: () => void;
   onClose: () => void;
 }
@@ -34,6 +36,8 @@ const BillingReceipt: React.FC<BillingReceiptProps> = ({
   totalAmount,
   date,
   paymentMethod = "Cash",
+  customerName,
+  customerMobile,
   onPrint,
   onClose,
 }) => {
@@ -59,7 +63,7 @@ const BillingReceipt: React.FC<BillingReceiptProps> = ({
       <div className="border-t border-b py-4 border-gray-200 grid grid-cols-2 gap-4 text-sm">
         <div>
           <p className="font-medium">Date:</p>
-          <p>{date.toLocaleDateString()}</p>
+          <p>{formatDate(date)}</p>
         </div>
         <div>
           <p className="font-medium">Time:</p>
@@ -74,6 +78,27 @@ const BillingReceipt: React.FC<BillingReceiptProps> = ({
           <p>{paymentMethod.replace("_", " ").replace(/\b\w/g, (l) => l.toUpperCase())}</p>
         </div>
       </div>
+
+      {/* Customer information section */}
+      {(customerName || customerMobile) && (
+        <div className="border-b border-gray-200 py-4">
+          <h3 className="font-medium mb-2">Customer Information:</h3>
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            {customerName && (
+              <div>
+                <p className="font-medium">Name:</p>
+                <p>{customerName}</p>
+              </div>
+            )}
+            {customerMobile && (
+              <div>
+                <p className="font-medium">Mobile:</p>
+                <p>{customerMobile}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       <Table>
         <TableHeader>

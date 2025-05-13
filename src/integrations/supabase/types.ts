@@ -42,6 +42,39 @@ export type Database = {
         }
         Relationships: []
       }
+      customers: {
+        Row: {
+          address: string | null
+          created_at: string
+          email: string | null
+          id: string
+          mobile: string
+          name: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          mobile: string
+          name: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          mobile?: string
+          name?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
           amount: number
@@ -231,8 +264,11 @@ export type Database = {
           business_name: string | null
           city: string | null
           created_at: string | null
+          date_of_birth: string | null
+          first_name: string | null
           gst_number: string | null
           id: string
+          last_name: string | null
           phone: string | null
           pincode: string | null
           state: string | null
@@ -246,8 +282,11 @@ export type Database = {
           business_name?: string | null
           city?: string | null
           created_at?: string | null
+          date_of_birth?: string | null
+          first_name?: string | null
           gst_number?: string | null
           id: string
+          last_name?: string | null
           phone?: string | null
           pincode?: string | null
           state?: string | null
@@ -261,8 +300,11 @@ export type Database = {
           business_name?: string | null
           city?: string | null
           created_at?: string | null
+          date_of_birth?: string | null
+          first_name?: string | null
           gst_number?: string | null
           id?: string
+          last_name?: string | null
           phone?: string | null
           pincode?: string | null
           state?: string | null
@@ -301,6 +343,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      stored_receipts: {
+        Row: {
+          created_at: string
+          id: string
+          is_deleted: boolean
+          receipt_data: Json
+          transaction_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          receipt_data: Json
+          transaction_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_deleted?: boolean
+          receipt_data?: Json
+          transaction_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stored_receipts_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       transaction_items: {
         Row: {
@@ -350,6 +430,8 @@ export type Database = {
       transactions: {
         Row: {
           created_at: string
+          customer_mobile: string | null
+          customer_name: string | null
           date: string
           id: string
           notes: string | null
@@ -362,6 +444,8 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          customer_mobile?: string | null
+          customer_name?: string | null
           date?: string
           id?: string
           notes?: string | null
@@ -374,6 +458,8 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          customer_mobile?: string | null
+          customer_name?: string | null
           date?: string
           id?: string
           notes?: string | null

@@ -20,6 +20,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { formatCurrency } from "@/lib/utils";
 import { Transaction } from "@/hooks/useTransactions";
+import CustomerForm from "./CustomerForm";
 
 interface TransactionFormProps {
   transactionNumber: string;
@@ -48,6 +49,10 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
 }) => {
   const [paymentMethod, setPaymentMethod] = useState("cash");
   const [notes, setNotes] = useState("");
+  const [customerInfo, setCustomerInfo] = useState<{
+    name: string;
+    mobile: string;
+  } | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +64,13 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
       payment_method: paymentMethod,
       status: "completed",
       notes,
+      customer_name: customerInfo?.name || null,
+      customer_mobile: customerInfo?.mobile || null,
     });
+  };
+
+  const handleSelectCustomer = (customer: { name: string; mobile: string }) => {
+    setCustomerInfo(customer);
   };
 
   return (
@@ -89,6 +100,9 @@ const TransactionForm: React.FC<TransactionFormProps> = ({
               />
             </div>
           </div>
+
+          {/* Customer information form */}
+          <CustomerForm onSelectCustomer={handleSelectCustomer} />
 
           <div className="space-y-2">
             <Label htmlFor="paymentMethod">Payment Method</Label>

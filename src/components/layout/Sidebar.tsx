@@ -48,6 +48,12 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
       active: location.pathname === "/",
     },
     {
+      title: "Billing",
+      icon: <ShoppingCart size={24} />,
+      href: "/billing",
+      active: location.pathname.includes("/billing"),
+    },
+    {
       title: "Invoices",
       icon: <Receipt size={24} />,
       href: "/invoices",
@@ -70,12 +76,6 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
       icon: <Briefcase size={24} />,
       href: "/services",
       active: location.pathname.includes("/services"),
-    },
-    {
-      title: "Billing",
-      icon: <ShoppingCart size={24} />,
-      href: "/billing",
-      active: location.pathname.includes("/billing"),
     },
     {
       title: "Expenses",

@@ -22,6 +22,8 @@ export interface Transaction {
   payment_method: string;
   status: string;
   notes?: string;
+  customer_name?: string;
+  customer_mobile?: string;
   transaction_items?: TransactionItem[];
 }
 
@@ -37,7 +39,18 @@ export const useTransactions = () => {
         mutateAsync: async () => ({}),
         isPending: false 
       },
+      saveReceipt: {
+        mutate: () => {},
+        mutateAsync: async () => ({}),
+        isPending: false
+      },
       generateTransactionNumber: () => "TXN000000",
+      getStoredReceipts: () => [],
+      deleteReceipt: { 
+        mutate: () => {}, 
+        mutateAsync: async () => ({}),
+        isPending: false 
+      },
     };
   }
 
@@ -75,6 +88,30 @@ export const useTransactions = () => {
     },
   });
 
+  // Query to fetch stored receipts
+  const { data: storedReceipts = [] } = useQuery({
+    queryKey: ["stored_receipts"],
+    queryFn: async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        return [];
+      }
+
+      const { data, error } = await supabase
+        .from("stored_receipts")
+        .select("*, transactions(*)")
+        .eq("user_id", session.user.id)
+        .eq("is_deleted", false)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
   // Mutation to create a new transaction with items
   const createTransaction = useMutation({
     mutationFn: async ({
@@ -96,7 +133,7 @@ export const useTransactions = () => {
       for (const item of items) {
         const { data: product, error: getError } = await supabase
           .from("products")
-          .select("quantity, name")
+          .select("quantity, low_stock_threshold, name")
           .eq("id", item.product_id)
           .single();
           
@@ -189,10 +226,86 @@ export const useTransactions = () => {
     },
   });
 
+  // Mutation to save a receipt
+  const saveReceipt = useMutation({
+    mutationFn: async ({
+      transactionId,
+      receiptData,
+    }: {
+      transactionId: string;
+      receiptData: any;
+    }) => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        throw new Error("You must be logged in to save a receipt");
+      }
+
+      const { data, error } = await supabase
+        .from("stored_receipts")
+        .insert({
+          user_id: session.user.id,
+          transaction_id: transactionId,
+          receipt_data: receiptData,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stored_receipts"] });
+      toast({
+        title: "Success",
+        description: "Receipt saved successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Mutation to delete a receipt
+  const deleteReceipt = useMutation({
+    mutationFn: async (receiptId: string) => {
+      const { error } = await supabase
+        .from("stored_receipts")
+        .update({ is_deleted: true })
+        .eq("id", receiptId);
+
+      if (error) throw error;
+      return receiptId;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["stored_receipts"] });
+      toast({
+        title: "Success",
+        description: "Receipt deleted successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   return {
     transactions,
     isLoading,
     createTransaction,
+    saveReceipt,
     generateTransactionNumber,
+    storedReceipts,
+    deleteReceipt,
   };
 };

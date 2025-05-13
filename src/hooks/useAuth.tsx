@@ -1,11 +1,27 @@
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
+interface ProfileData {
+  id: string;
+  username?: string;
+  first_name?: string;
+  last_name?: string;
+  date_of_birth?: string;
+  full_name?: string;
+  avatar_url?: string;
+  business_name?: string;
+  business_address?: string;
+  phone?: string;
+  city?: string;
+  state?: string;
+}
+
 interface AuthContextType {
   user: User | null;
-  userProfile: any | null;
+  userProfile: ProfileData | null;
   signOut: () => Promise<void>;
 }
 
@@ -17,7 +33,7 @@ const AuthContext = createContext<AuthContextType>({
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [userProfile, setUserProfile] = useState<any | null>(null);
+  const [userProfile, setUserProfile] = useState<ProfileData | null>(null);
   const navigate = useNavigate();
 
   // Fetch user profile data
@@ -43,17 +59,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
-    // Check active session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      const currentUser = session?.user ?? null;
-      setUser(currentUser);
-
-      if (currentUser) {
-        fetchProfile(currentUser.id);
-      }
-    });
-
-    // Listen for auth changes
+    // Set up auth state listener FIRST
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -61,9 +67,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(currentUser);
 
       if (currentUser) {
-        fetchProfile(currentUser.id);
+        // Defer fetching profile to avoid potential Supabase auth deadlocks
+        setTimeout(() => {
+          fetchProfile(currentUser.id);
+        }, 0);
       } else {
         setUserProfile(null);
+      }
+    });
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+
+      if (currentUser) {
+        fetchProfile(currentUser.id);
       }
     });
 

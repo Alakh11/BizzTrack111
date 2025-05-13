@@ -14,6 +14,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan, onClose }) => {
   const [scanning, setScanning] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
   const [countdown, setCountdown] = useState<number | null>(null);
+  const [manualEntry, setManualEntry] = useState<string>("");
   
   useEffect(() => {
     const startCamera = async () => {
@@ -31,30 +32,8 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan, onClose }) => {
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
           await videoRef.current.play();
+          startScanning();
         }
-        
-        // In a real application, we would integrate a barcode scanning library
-        // like Quagga.js or ZXing here, but for this example we'll simulate a scan
-        // Don't worry, keyboard barcode scanners work like keyboard inputs and will
-        // be detected automatically when used in the search field
-        
-        // Simulate scanning countdown for demonstration
-        setCountdown(3);
-        const timer = setInterval(() => {
-          setCountdown(prev => {
-            if (prev === null || prev <= 1) {
-              clearInterval(timer);
-              simulateScan();
-              return null;
-            }
-            return prev - 1;
-          });
-        }, 1000);
-        
-        return () => {
-          clearInterval(timer);
-        };
-        
       } catch (error) {
         console.error("Error accessing camera:", error);
         setError("Could not access the camera. Please make sure you have granted camera permissions.");
@@ -65,6 +44,15 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan, onClose }) => {
       startCamera();
     }
     
+    // Listen for keyboard input for barcode scanners that act like keyboards
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Enter' && manualEntry.length > 0) {
+        handleManualSubmit();
+      }
+    };
+    
+    window.addEventListener('keydown', handleKeyDown);
+    
     return () => {
       // Stop camera on component unmount
       if (videoRef.current && videoRef.current.srcObject) {
@@ -73,20 +61,52 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan, onClose }) => {
           track.stop();
         });
       }
+      
+      window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [scanning]);
+  }, [scanning, manualEntry]);
+  
+  const startScanning = () => {
+    if (!canvasRef.current || !videoRef.current) return;
+    
+    const canvas = canvasRef.current;
+    const video = videoRef.current;
+    const context = canvas.getContext('2d');
+    
+    if (!context) return;
+    
+    // In a real implementation, we'd use a library like QuaggaJS or ZXing
+    // For now, simulate scanning with a countdown
+    setCountdown(3);
+    
+    const timer = setInterval(() => {
+      setCountdown(prev => {
+        if (prev === null || prev <= 1) {
+          clearInterval(timer);
+          simulateScan();
+          return null;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
   
   const simulateScan = () => {
     if (!scanning) return;
     
     // For demonstration: generate a mock barcode
+    // In a real implementation, this would be replaced with actual barcode detection
     const mockBarcode = "PRD" + Math.floor(10000000000 + Math.random() * 90000000000);
-    
-    // In a real app, we would capture frames from the video and analyze them
-    // for barcodes using a library like Quagga.js
     
     setScanning(false);
     onScan(mockBarcode);
+  };
+  
+  const handleManualSubmit = () => {
+    if (manualEntry.trim()) {
+      onScan(manualEntry.trim());
+      setManualEntry("");
+    }
   };
   
   return (
@@ -116,7 +136,10 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan, onClose }) => {
               
               {/* Targeting frame */}
               <div className="absolute inset-0 flex items-center justify-center">
-                <div className="border-2 border-red-500 w-3/4 h-1/3 rounded-md"></div>
+                <div className="border-2 border-red-500 w-3/4 h-1/3 rounded-md">
+                  {/* Add scanning line animation */}
+                  <div className="absolute left-0 right-0 top-0 h-0.5 bg-red-500 animate-[scan_2s_ease-in-out_infinite]"></div>
+                </div>
               </div>
               
               {/* Countdown overlay */}
@@ -129,9 +152,21 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan, onClose }) => {
               )}
             </div>
             
-            <p className="text-sm text-center text-muted-foreground">
+            <p className="text-sm text-center text-muted-foreground mb-4">
               Center the barcode within the frame to scan
             </p>
+            
+            {/* Manual entry option */}
+            <div className="flex items-center gap-2 mb-4">
+              <input
+                type="text"
+                value={manualEntry}
+                onChange={(e) => setManualEntry(e.target.value)}
+                placeholder="Enter barcode manually"
+                className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50"
+              />
+              <Button onClick={handleManualSubmit} type="button">Enter</Button>
+            </div>
             
             <div className="mt-4 flex justify-between">
               <Button variant="outline" onClick={onClose}>Cancel</Button>
@@ -139,6 +174,7 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onScan, onClose }) => {
                 onClick={() => {
                   setScanning(true);
                   setCountdown(3);
+                  startScanning();
                 }}
                 disabled={countdown !== null}
               >
