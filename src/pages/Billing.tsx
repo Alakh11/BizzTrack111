@@ -46,6 +46,15 @@ interface StoredReceipt {
   created_at: string;
 }
 
+// Define the transaction response type
+interface TransactionResponse {
+  transaction: {
+    id: string;
+    [key: string]: any;
+  };
+  [key: string]: any;
+}
+
 const Billing = () => {
   const { products, isLoading: productsLoading } = useProducts();
   const { generateTransactionNumber, createTransaction, saveReceipt } = useTransactions();
@@ -174,11 +183,11 @@ const Billing = () => {
         amount: item.product.price * item.quantity,
       }));
 
-      // Create transaction
+      // Create transaction with explicit type for the result
       const result = await createTransaction.mutateAsync({
         transaction: transactionData,
         items,
-      });
+      }) as TransactionResponse;
 
       // Set receipt data
       const newReceiptData = {
