@@ -46,12 +46,13 @@ interface StoredReceipt {
   created_at: string;
 }
 
-// Define the transaction response type
+// Define the transaction response type with a more flexible structure
 interface TransactionResponse {
   transaction: {
     id: string;
     [key: string]: any;
   };
+  items?: any[];
   [key: string]: any;
 }
 
@@ -183,11 +184,19 @@ const Billing = () => {
         amount: item.product.price * item.quantity,
       }));
 
-      // Create transaction with explicit type for the result
+      // Create transaction with a safer type assertion approach
       const result = await createTransaction.mutateAsync({
         transaction: transactionData,
         items,
-      }) as TransactionResponse;
+      });
+      
+      // Verify and cast the result after checking for necessary properties
+      const typedResult = result as unknown as TransactionResponse;
+      
+      // Validate that the required properties exist before using them
+      if (!typedResult || !typedResult.transaction || !typedResult.transaction.id) {
+        throw new Error("Invalid transaction response structure");
+      }
 
       // Set receipt data
       const newReceiptData = {
@@ -202,15 +211,11 @@ const Billing = () => {
       
       setReceiptData(newReceiptData);
 
-      // Save receipt in the database
-      if (result && result.transaction && result.transaction.id) {
-        await saveReceipt.mutateAsync({
-          transactionId: result.transaction.id,
-          receiptData: newReceiptData,
-        });
-      } else {
-        console.error("Missing transaction ID", result);
-      }
+      // Save receipt in the database using the validated transaction ID
+      await saveReceipt.mutateAsync({
+        transactionId: typedResult.transaction.id,
+        receiptData: newReceiptData,
+      });
 
       // Show receipt
       setShowCheckout(false);
