@@ -1,224 +1,215 @@
 
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import React, { useState } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
-  Receipt,
-  Users,
-  PackageOpen,
   FileText,
-  BarChartBig,
-  Settings,
-  Briefcase,
-  LogOut,
   ShoppingCart,
+  Users,
+  Settings,
+  LogOut,
+  Store,
+  PenTool,
+  Receipt,
+  BarChart,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/hooks/useAuth";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
-interface SidebarProps {
-  isCollapsed: boolean;
-  setIsCollapsed: (collapsed: boolean) => void;
+interface NavItem {
+  label: string;
+  icon: React.ElementType;
+  href: string;
+  description?: string;
 }
 
-const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
-  const { signOut, user, userProfile } = useAuth();
-  const isMobile = useIsMobile();
-  const location = useLocation();
-  const [mounted, setMounted] = useState(false);
+const navItems: NavItem[] = [
+  {
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    href: "/dashboard",
+    description: "Overview of your business",
+  },
+  {
+    label: "Billing",
+    icon: Receipt,
+    href: "/billing",
+    description: "Create invoices and receipts",
+  },
+  {
+    label: "Invoices",
+    icon: FileText,
+    href: "/invoices",
+    description: "Manage invoices",
+  },
+  {
+    label: "Products",
+    icon: ShoppingCart,
+    href: "/products",
+    description: "Manage your inventory",
+  },
+  {
+    label: "Services",
+    icon: PenTool,
+    href: "/services",
+    description: "Manage your services",
+  },
+  {
+    label: "Clients",
+    icon: Users,
+    href: "/clients",
+    description: "Manage your clients",
+  },
+  {
+    label: "Expenses",
+    icon: Store,
+    href: "/expenses",
+    description: "Track your expenses",
+  },
+  {
+    label: "Reports",
+    icon: BarChart,
+    href: "/reports",
+    description: "Business analytics",
+  },
+  {
+    label: "Settings",
+    icon: Settings,
+    href: "/settings",
+    description: "Manage your account",
+  },
+];
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+const Sidebar = () => {
+  const { user, userProfile, signOut } = useAuth();
+  const navigate = useNavigate();
+  const [expanded, setExpanded] = useState(true);
 
-  // Close sidebar on mobile when route changes
-  useEffect(() => {
-    if (isMobile && !isCollapsed) {
-      setIsCollapsed(true);
-    }
-  }, [location.pathname, isMobile, isCollapsed, setIsCollapsed]);
-
-  const sidebarItems = [
-    {
-      title: "Dashboard",
-      icon: <LayoutDashboard size={24} />,
-      href: "/",
-      active: location.pathname === "/",
-    },
-    {
-      title: "Billing",
-      icon: <ShoppingCart size={24} />,
-      href: "/billing",
-      active: location.pathname.includes("/billing"),
-    },
-    {
-      title: "Invoices",
-      icon: <Receipt size={24} />,
-      href: "/invoices",
-      active: location.pathname.includes("/invoices"),
-    },
-    {
-      title: "Clients",
-      icon: <Users size={24} />,
-      href: "/clients",
-      active: location.pathname.includes("/clients"),
-    },
-    {
-      title: "Products",
-      icon: <PackageOpen size={24} />,
-      href: "/products",
-      active: location.pathname.includes("/products"),
-    },
-    {
-      title: "Services",
-      icon: <Briefcase size={24} />,
-      href: "/services",
-      active: location.pathname.includes("/services"),
-    },
-    {
-      title: "Expenses",
-      icon: <FileText size={24} />,
-      href: "/expenses",
-      active: location.pathname.includes("/expenses"),
-    },
-    {
-      title: "Reports",
-      icon: <BarChartBig size={24} />,
-      href: "/reports",
-      active: location.pathname.includes("/reports"),
-    },
-    {
-      title: "Settings",
-      icon: <Settings size={24} />,
-      href: "/settings",
-      active: location.pathname.includes("/settings"),
-    },
-  ];
-
-  if (!mounted) return null;
-
-  // Get user initials for the avatar
-  const getInitials = () => {
-    if (userProfile?.full_name) {
-      const names = userProfile.full_name.split(" ");
-      if (names.length >= 2) {
-        return `${names[0][0]}${names[names.length - 1][0]}`.toUpperCase();
-      } else if (names.length === 1 && names[0]) {
-        return names[0][0].toUpperCase();
-      }
-    }
-
-    // Fallback to email
-    if (user?.email) {
-      return user.email[0].toUpperCase();
-    }
-
-    return "U";
+  const toggleSidebar = () => {
+    setExpanded(!expanded);
   };
 
-  // Get display name prioritizing full_name over email
-  const getDisplayName = () => {
-    if (userProfile?.full_name) {
-      return userProfile.full_name;
-    }
-
-    if (user?.email) {
-      return user.email;
-    }
-
-    return "User";
+  const handleSignOut = () => {
+    signOut();
+    navigate("/login");
   };
+
+  const initials =
+    userProfile?.first_name && userProfile?.last_name
+      ? `${userProfile.first_name[0]}${userProfile.last_name[0]}`
+      : user?.email?.substring(0, 2).toUpperCase() || "U";
 
   return (
-    <div
+    <aside
       className={cn(
-        "relative h-full border-r transition-all duration-300 ease-in-out shadow-lg",
-        isCollapsed ? "w-16" : "w-64",
-        "dark:bg-gradient-to-b dark:from-[#0f172a] dark:via-[#1e293b] dark:to-[#334155] dark:text-white",
-        "bg-white text-slate-800",
+        "flex flex-col h-screen border-r bg-sidebar text-sidebar-foreground border-sidebar-border shrink-0 transition-all duration-300 ease-in-out overflow-hidden",
+        expanded ? "w-[280px]" : "w-[70px]"
       )}
     >
-      <div className="p-4 flex flex-col h-full">
-        {/* User Info */}
-        {user && (
-          <div
-            className={cn(
-              "mb-6 border-b pb-4 dark:border-gray-600 border-gray-200",
-              isCollapsed ? "flex justify-center" : "",
-            )}
-          >
-            <div
-              className={cn(
-                "flex items-center",
-                isCollapsed ? "flex-col" : "flex-row",
-              )}
-            >
-              <Avatar className="h-10 w-10 border shadow-md dark:border-white border-slate-300">
-                <AvatarImage src="" alt="User" />
-                <AvatarFallback className="bg-primary text-primary-foreground">
-                  {getInitials()}
-                </AvatarFallback>
-              </Avatar>
-
-              {!isCollapsed && (
-                <div className="ml-3 overflow-hidden">
-                  <p className="font-semibold dark:text-white text-slate-800 truncate">
-                    {getDisplayName()}
-                  </p>
-                  {user.email && (
-                    <p className="text-xs dark:text-gray-300 text-gray-600 truncate">
-                      {user.email}
-                    </p>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
+      <div
+        className={cn(
+          "flex items-center h-16 px-4 border-b border-sidebar-border shrink-0",
+          !expanded && "justify-center"
         )}
-
-        {/* Navigation Links */}
-        <nav className="flex-1 space-y-1">
-          {sidebarItems.map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              className={cn(
-                "flex items-center py-3 px-3 rounded-md transition-colors font-medium",
-                item.active
-                  ? "bg-primary text-primary-foreground dark:bg-white dark:text-black"
-                  : "dark:text-gray-300 text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700/40 dark:hover:text-white hover:text-black",
-                isCollapsed ? "justify-center" : "justify-start",
-              )}
-            >
-              <span>{item.icon}</span>
-              {!isCollapsed && <span className="ml-3">{item.title}</span>}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Logout Button */}
-        <button
-          onClick={signOut}
-          className={cn(
-            "flex items-center py-3 px-3 mt-4 rounded-md dark:text-gray-300 text-gray-600 hover:bg-red-100 dark:hover:bg-red-600 hover:text-red-600 dark:hover:text-white transition-colors",
-            isCollapsed ? "justify-center" : "justify-start",
-          )}
+      >
+        <Button
+          variant="outline"
+          size="icon"
+          className="mr-2 border-sidebar-border"
+          onClick={toggleSidebar}
         >
-          <LogOut size={24} />
-          {!isCollapsed && <span className="ml-3">Sign Out</span>}
-        </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="transition-transform"
+            style={{
+              transform: expanded ? "rotate(0deg)" : "rotate(180deg)",
+            }}
+          >
+            <path d="M15 6l-6 6l6 6" />
+          </svg>
+        </Button>
 
-        {/* Decorative Bottom Design */}
-        {!isCollapsed && (
-          <div className="mt-auto pt-4 text-center text-sm dark:text-gray-400 text-gray-500 border-t dark:border-gray-600 border-gray-200">
-            <p>BizzTrack © {new Date().getFullYear()}</p>
-            <p className="text-xs">Crafted with ❤️ by Alakh</p>
+        {expanded && (
+          <div className="flex items-center ml-2">
+            <span className="text-xl font-semibold ml-1">BizzTrack</span>
           </div>
         )}
       </div>
-    </div>
+
+      <div className="flex-1 overflow-auto py-1">
+        <nav className="grid gap-0.5 px-2 group-[[data-collapsed=true]]:justify-center">
+          {navItems.map((item, index) => (
+            <NavLink
+              key={index}
+              to={item.href}
+              className={({ isActive }) =>
+                cn(
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                  isActive
+                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
+                    : "text-sidebar-foreground",
+                  !expanded && "justify-center px-0"
+                )
+              }
+            >
+              <item.icon className={cn("h-5 w-5", !expanded && "h-6 w-6")} />
+              {expanded && <span>{item.label}</span>}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
+
+      <div className="flex flex-col mt-auto border-t border-sidebar-border p-4">
+        <div className={cn("flex items-center justify-between mb-2", !expanded && "justify-center")}>
+          {expanded ? (
+            <>
+              <div className="flex items-center">
+                <div className="mr-2">
+                  <Avatar className="h-9 w-9">
+                    <AvatarImage src={userProfile?.avatar_url || ""} />
+                    <AvatarFallback>{initials}</AvatarFallback>
+                  </Avatar>
+                </div>
+                <div>
+                  <p className="text-sm font-medium leading-none">
+                    {userProfile?.first_name || user?.email?.split("@")[0]}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {user?.email || ""}
+                  </p>
+                </div>
+              </div>
+              <ThemeToggle />
+            </>
+          ) : (
+            <ThemeToggle />
+          )}
+        </div>
+
+        <Button
+          variant="ghost"
+          className={cn(
+            "justify-start px-2",
+            !expanded && "justify-center"
+          )}
+          onClick={handleSignOut}
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          {expanded && <span>Sign out</span>}
+        </Button>
+      </div>
+    </aside>
   );
 };
 

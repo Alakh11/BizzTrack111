@@ -22,8 +22,8 @@ export interface Transaction {
   payment_method: string;
   status: string;
   notes?: string;
-  customer_name?: string;
-  customer_mobile?: string;
+  customer_name?: string | null;
+  customer_mobile?: string | null;
   transaction_items?: TransactionItem[];
 }
 
@@ -36,7 +36,7 @@ export const useTransactions = () => {
       isLoading: false,
       createTransaction: { 
         mutate: () => {}, 
-        mutateAsync: async () => ({}),
+        mutateAsync: async () => ({ transaction: {}, items: [] }),
         isPending: false 
       },
       saveReceipt: {

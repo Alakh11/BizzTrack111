@@ -128,7 +128,7 @@ const SavedReceipts: React.FC<SavedReceiptsProps> = ({ onEdit }) => {
                   {receipts.map((receipt) => (
                     <TableRow key={receipt.id}>
                       <TableCell>
-                        {formatDate(new Date(receipt.created_at))}
+                        {formatDate(new Date(receipt.created_at).toISOString())}
                       </TableCell>
                       <TableCell>{receipt.transactions.transaction_number}</TableCell>
                       <TableCell>{receipt.transactions.customer_name || "N/A"}</TableCell>
@@ -171,7 +171,7 @@ const SavedReceipts: React.FC<SavedReceiptsProps> = ({ onEdit }) => {
 
       <Dialog open={showReceipt} onOpenChange={setShowReceipt}>
         <DialogContent className="sm:max-w-xl">
-          {selectedReceipt && (
+          {selectedReceipt && selectedReceipt.receipt_data && (
             <BillingReceipt
               items={selectedReceipt.receipt_data.items}
               transactionNumber={selectedReceipt.transactions.transaction_number}

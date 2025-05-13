@@ -90,9 +90,20 @@ const CustomerForm: React.FC<CustomerFormProps> = ({ onSelectCustomer }) => {
     setLoading(true);
     
     try {
+      // Get current user session
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("No active session found");
+      }
+      
       const { data, error } = await supabase
         .from('customers')
-        .insert([{ name, mobile }])
+        .insert({
+          name, 
+          mobile,
+          user_id: session.user.id
+        })
         .select()
         .single();
         

@@ -1,150 +1,50 @@
-# 📦 Supabase Integration – BizzTrack11
 
-This document describes how Supabase is integrated into the **BizzTrack11** project for authentication, user profiles, and database operations.
+# Supabase Integration in the Business Management App
 
----
+## Overview
+This project uses Supabase as its backend service provider, handling data storage, authentication, and server-side functions. Supabase is an open-source Firebase alternative built on top of PostgreSQL.
 
-## 🔧 Supabase Setup
+## Features Used
 
-We use [Supabase](https://supabase.com/) as a backend-as-a-service for:
+### 1. Authentication
+- Email/password authentication for user signup and login
+- Password reset functionality
+- Session management
+- User profile storage
 
-- 🔐 Authentication (email/password)
-- 🧠 Database (PostgreSQL)
-- 👥 User profile management
-- 🔒 Row-Level Security (RLS) to protect data per user
+### 2. Database Tables
+The following database tables are managed through Supabase:
 
+- `profiles`: Stores user profile information including name, business details, and contact information
+- `products`: Manages inventory items with fields for name, SKU, price, quantity, and category
+- `transactions`: Records sales transactions with payment information and status
+- `transaction_items`: Stores line items for each transaction
+- `customers`: Stores customer information including name, contact details, and address
+- `stored_receipts`: Maintains a record of transaction receipts for later reference
+- `expenses`: Tracks business expenses by category
+- `services`: Stores service offerings with pricing
+- `invoices`: Manages customer invoices
+- `invoice_items`: Tracks individual line items for invoices
+- `clients`: Stores client information for invoicing
 
-### 🛠️ Supabase Client Setup
+### 3. Row Level Security (RLS)
+Supabase RLS policies are implemented for each table to ensure users can only access their own data, providing security at the database level.
 
-`lib/supabaseClient.ts`:
+### 4. Real-time Updates
+The application uses Supabase's real-time subscription features to keep data synchronized across different devices and users.
 
-```ts
-import { createClient } from "@supabase/supabase-js";
+### 5. Storage
+Supabase Storage is used for:
+- Profile pictures
+- Product images
+- Business documents
 
-export const supabase = createClient(
-  import.meta.env.VITE_SUPABASE_URL!,
-  import.meta.env.VITE_SUPABASE_ANON_KEY!,
-);
-```
+## Integration Points
+- The main Supabase client is initialized in `src/integrations/supabase/client.ts`
+- Authentication hooks in `src/hooks/useAuth.tsx` manage user login, signup, and session state
+- Custom hooks for each entity type (products, transactions, invoices, etc.) handle CRUD operations against the Supabase backend
 
----
-
-## 👥 Authentication
-
-Supabase handles user authentication with email and password.
-
-Used in:
-
-- `hooks/useAuth.ts`
-- `Sidebar.tsx` (to show user name and avatar)
-- Login/Logout flows
-
-### Key Auth Functions
-
-```ts
-const { data, error } = await supabase.auth.signInWithPassword({
-  email,
-  password,
-});
-await supabase.auth.signOut();
-const {
-  data: { user },
-} = await supabase.auth.getUser();
-```
-
----
-
-## 🡩‍💼 User Profiles
-
-We use a `profiles` table to store full names and other info beyond basic auth.
-
-### 🔢 Table Structure (`profiles`)
-
-| Column       | Type | Description              |
-| ------------ | ---- | ------------------------ |
-| `id`         | UUID | Matches `auth.users.id`  |
-| `full_name`  | Text | User's full name         |
-| `avatar_url` | Text | (Optional) profile image |
-| `email`      | Text | Redundant for UI use     |
-
-### 🚀 Fetch Logic
-
-```ts
-const {
-  data: { user },
-} = await supabase.auth.getUser();
-
-const { data: profile } = await supabase
-  .from("profiles")
-  .select("*")
-  .eq("id", user.id)
-  .single();
-```
-
----
-
-## 📦 Database Tables
-
-Your app may use these tables, one per feature area:
-
-- `invoices`
-- `clients`
-- `products`
-- `services`
-- `expenses`
-- `profiles`
-
-Each table is queried securely using Supabase’s client.
-
-Example:
-
-```ts
-const { data, error } = await supabase
-  .from("invoices")
-  .select("*")
-  .eq("user_id", user.id);
-```
-
----
-
-## 🔐 Row-Level Security (RLS)
-
-All user-specific data is protected via Supabase Row-Level Security policies.
-
-### ✅ Example Policy (Invoices)
-
-```sql
-CREATE POLICY "User can view own invoices"
-ON invoices
-FOR SELECT
-USING (user_id = auth.uid());
-```
-
-Repeat for `clients`, `products`, etc., with `user_id = auth.uid()` logic.
-
----
-
-## 🧪 Folder Structure Overview
-
-```bash
-/lib
-  supabaseClient.ts     # Supabase client setup
-
-/hooks
-  useAuth.ts            # Handles auth logic
-
-/components
-  Sidebar.tsx           # Displays user info and logout
-```
-
----
-
-## 🧬 Resources
-
-- [Supabase Documentation](https://supabase.com/docs)
-- [Supabase Auth Guide](https://supabase.com/docs/guides/auth)
-- [Row-Level Security](https://supabase.com/docs/learn/auth-deep-dive/auth-row-level-security)
-
-```
-
-```
+## Configuration
+The Supabase connection is configured using environment variables:
+- `SUPABASE_URL`: The URL of the Supabase project
+- `SUPABASE_PUBLISHABLE_KEY`: The public API key for authentication from the browser

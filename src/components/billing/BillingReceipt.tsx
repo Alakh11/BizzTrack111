@@ -45,7 +45,7 @@ const BillingReceipt: React.FC<BillingReceiptProps> = ({
     <div className="space-y-6 print:p-0 print:m-0" id="receipt">
       <div className="flex justify-between items-center">
         <div className="text-left">
-          <h2 className="text-2xl font-bold print:text-xl">Invoice Receipt</h2>
+          <h2 className="text-2xl font-bold print:text-xl">Receipt</h2>
           <p className="text-muted-foreground print:text-sm">
             Transaction #{transactionNumber}
           </p>
@@ -63,7 +63,7 @@ const BillingReceipt: React.FC<BillingReceiptProps> = ({
       <div className="border-t border-b py-4 border-gray-200 grid grid-cols-2 gap-4 text-sm">
         <div>
           <p className="font-medium">Date:</p>
-          <p>{formatDate(date)}</p>
+          <p>{formatDate(date.toISOString())}</p>
         </div>
         <div>
           <p className="font-medium">Time:</p>

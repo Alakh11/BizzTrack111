@@ -177,10 +177,14 @@ const Billing = () => {
       setReceiptData(newReceiptData);
 
       // Save receipt in the database
-      await saveReceipt.mutateAsync({
-        transactionId: result.transaction.id,
-        receiptData: newReceiptData,
-      });
+      if (result && result.transaction && result.transaction.id) {
+        await saveReceipt.mutateAsync({
+          transactionId: result.transaction.id,
+          receiptData: newReceiptData,
+        });
+      } else {
+        console.error("Missing transaction ID", result);
+      }
 
       // Show receipt
       setShowCheckout(false);
