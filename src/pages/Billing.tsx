@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useProducts } from "@/hooks/useProducts";
 import { useTransactions } from "@/hooks/useTransactions";
@@ -32,17 +33,17 @@ interface StoredReceipt {
   id: string;
   receipt_data: {
     items: CartItem[];
-    transactionNumber: string;
-    totalAmount: number;
-    date: Date;
-    paymentMethod?: string;
-    customerName?: string;
-    customerMobile?: string;
   };
   transactions: {
     transaction_number: string;
     id: string;
+    total_amount: number;
+    customer_name?: string;
+    customer_mobile?: string;
+    date?: string;
+    payment_method?: string;
   };
+  created_at: string;
 }
 
 const Billing = () => {
