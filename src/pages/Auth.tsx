@@ -1,6 +1,6 @@
 
 import { Link, useNavigate } from "react-router-dom";
-import { AuthForm } from "@/components/auth/AuthForm";
+import AuthForm from "@/components/auth/AuthForm";
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

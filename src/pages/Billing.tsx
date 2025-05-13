@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useProducts } from "@/hooks/useProducts";
 import { useTransactions } from "@/hooks/useTransactions";
@@ -28,6 +27,23 @@ type CartItem = {
   product: Product;
   quantity: number;
 };
+
+interface StoredReceipt {
+  id: string;
+  receipt_data: {
+    items: CartItem[];
+    transactionNumber: string;
+    totalAmount: number;
+    date: Date;
+    paymentMethod?: string;
+    customerName?: string;
+    customerMobile?: string;
+  };
+  transactions: {
+    transaction_number: string;
+    id: string;
+  };
+}
 
 const Billing = () => {
   const { products, isLoading: productsLoading } = useProducts();
@@ -224,9 +240,9 @@ const Billing = () => {
     }
   };
 
-  const handleEditReceipt = (storedReceipt: any) => {
+  const handleEditReceipt = (storedReceipt: StoredReceipt) => {
     // Load receipt data into the current transaction
-    if (storedReceipt && storedReceipt.receipt_data && storedReceipt.receipt_data.items) {
+    if (storedReceipt && storedReceipt.receipt_data) {
       setCart(storedReceipt.receipt_data.items);
       setTransactionNumber(storedReceipt.transactions.transaction_number);
       setActiveTab("new-transaction");

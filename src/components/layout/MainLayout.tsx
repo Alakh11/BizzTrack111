@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import Sidebar from "./Sidebar";
@@ -51,8 +52,8 @@ const MainLayout = ({ children, className }: MainLayoutProps) => {
       <div className="flex flex-1 overflow-hidden">
         <div className="fixed top-16 bottom-0 left-0 h-[calc(100vh-4rem)] z-10">
           <Sidebar
-            isCollapsed={!isSidebarOpen}
-            setIsCollapsed={(collapsed) => setIsSidebarOpen(!collapsed)}
+            isOpen={!isSidebarOpen}
+            onToggle={(isOpen: boolean) => setIsSidebarOpen(!isOpen)}
           />
         </div>
         <main

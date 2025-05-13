@@ -1,5 +1,7 @@
+
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+import { useState, useEffect } from "react";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -71,4 +73,21 @@ export function calculateDueDate(invoiceDate: string, daysUntilDue = 14) {
   const date = new Date(invoiceDate);
   date.setDate(date.getDate() + daysUntilDue);
   return date.toISOString().split("T")[0];
+}
+
+// Add useDebounce hook
+export function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedValue(value);
+    }, delay);
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value, delay]);
+
+  return debouncedValue;
 }
