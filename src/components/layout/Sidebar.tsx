@@ -26,6 +26,11 @@ interface NavItem {
   description?: string;
 }
 
+interface SidebarProps {
+  expanded: boolean;
+  setExpanded: (expanded: boolean) => void;
+}
+
 const navItems: NavItem[] = [
   {
     label: "Dashboard",
@@ -83,10 +88,9 @@ const navItems: NavItem[] = [
   },
 ];
 
-const Sidebar = () => {
+const Sidebar: React.FC<SidebarProps> = ({ expanded, setExpanded }) => {
   const { user, userProfile, signOut } = useAuth();
   const navigate = useNavigate();
-  const [expanded, setExpanded] = useState(true);
 
   const toggleSidebar = () => {
     setExpanded(!expanded);

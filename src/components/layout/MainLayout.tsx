@@ -52,8 +52,8 @@ const MainLayout = ({ children, className }: MainLayoutProps) => {
       <div className="flex flex-1 overflow-hidden">
         <div className="fixed top-16 bottom-0 left-0 h-[calc(100vh-4rem)] z-10">
           <Sidebar
-            isOpen={!isSidebarOpen}
-            onToggle={(isOpen: boolean) => setIsSidebarOpen(!isOpen)}
+            expanded={isSidebarOpen}
+            setExpanded={setIsSidebarOpen}
           />
         </div>
         <main

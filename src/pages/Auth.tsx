@@ -162,7 +162,7 @@ export default function Auth({
           renderForgotPassword()
         ) : (
           <div className="bg-white/90 backdrop-blur-sm p-6 rounded-lg shadow-xl">
-            <AuthForm mode={mode} />
+            <AuthForm mode={mode as any} />
 
             {mode === "login" && (
               <div className="text-center mt-4">
